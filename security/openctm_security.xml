@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="1">
+
+    <record id="openstc_employee" model="res.groups">
+        <field name="name">OpenSTC/Employee</field>
+        <field name="category_id" ref="base.module_category_project_management"/>
+    </record>
+
+    <record id="openstc_agent" model="res.groups">
+        <field name="name">OpenSTC/Agent</field>
+        <field name="category_id" ref="base.module_category_project_management"/>
+        <field name="implied_ids" eval="[(4, ref('openstm_employee'))]"/>
+    </record>
+
+    <record id="openstc_dst" model="res.groups">
+         <field name="name">OpenSTC/DST</field>
+         <field name="category_id" ref="base.module_category_project_management"/>
+         <field name="implied_ids" eval="[(4, ref('openstm_qualifier'))]"/>
+    </record>
+
+    <record id="openstc_manager" model="res.groups">
+        <field name="name">OpenSTC/Manager</field>
+        <field name="category_id" ref="base.module_category_project_management"/>
+        <field name="implied_ids" eval="[(4, ref('openstm_qualifier'))]"/>
+    </record>
+
+    <record model="ir.rule" id="site_rule">
+        <field name="name">Site Rule</field>
+        <field name="model_id" ref="model_openstc_site"/>
+        <field name="domain_force">[('service','in',[s.id for s in user.service_ids])]</field>
+        <field eval="1" name="global"/>
+    </record>
+
+</data>
+</openerp>
