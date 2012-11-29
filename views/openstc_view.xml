@@ -2,8 +2,1063 @@
 <openerp>
     <data>
 
+    	<!--  planning -->
+
+        <record id="openstc_task_category_form_view" model="ir.ui.view">
+            <field name="name">openstc.planning.form</field>
+            <field name="model">openstc.planning</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="planning">
+					<field name="name" />
+                </form>
+            </field>
+        </record>
+        <record id="openstc_action_view_planning" model="ir.actions.act_window">
+            <field name="name">Planning</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.planning</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
 
 
+
+
+
+        <record id="openstc_task_category_search_view" model="ir.ui.view">
+            <field name="name">openstc.task.category.search</field>
+            <field name="model">openstc.task.category</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Categories">
+                    <field name="parent_id"/>
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+        <record id="openstc_task_category_form_view" model="ir.ui.view">
+            <field name="name">openstc.task.category.form</field>
+            <field name="model">openstc.task.category</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Categories">
+                	<group colspan="2" col="2">
+                    	<separator string="General" colspan="2"/>
+                    	<field name="name"/>
+                    	<field name="code"/>
+                    </group>
+                    <group colspan="2" col="2">
+                    	<separator string="" colspan="2"/>
+                    	<field name="parent_id"/>
+                    	<field name="sequence" invisible="1"/>
+                    </group>
+                    <group colspan="2" col="2">
+                    	<separator string="" colspan="2"/>
+                    	<field name="unit"/>
+                    	<field name="quantity" invisible="1"/>
+                    </group>
+                    <newline/>
+                </form>
+            </field>
+        </record>
+        <record id="openstc_task_category_list_view" model="ir.ui.view">
+            <field name="name">openstc.task.category.list</field>
+            <field name="model">openstc.task.category</field>
+            <field name="type">tree</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="Categories">
+                    <field name="complete_name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+        <record id="openstc_task_category_tree_view" model="ir.ui.view">
+            <field name="name">openstc.task.category.tree</field>
+            <field name="model">openstc.task.category</field>
+            <field name="type">tree</field>
+            <field name="field_parent">child_id</field>
+            <field name="arch" type="xml">
+                <tree toolbar="True" string="Categories">
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+        <record id="openstc_task_category_action" model="ir.actions.act_window">
+            <field name="name">Catégories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.task.category</field>
+            <field name="domain">[('parent_id','=',False)]</field>
+            <field name="view_type">tree</field>
+            <field name="view_id" ref="openstc_task_category_tree_view"/>
+            <field name="help">Here is a list of all your products classified by category. You can click a category to get the list of all products linked to this category or to a child of this category.</field>
+        </record>
+
+        <!-- categories -->
+    	<!--  <record id="view_task_category_form" model="ir.ui.view">
+            <field name="name">openstc.task.category.form</field>
+            <field name="model">openstc.task.category</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+            	<group colspan="2" col="2">
+            		<separator string="General" colspan="2"/>
+            		<field name="name"/>
+            		<field name="intervention_assignement_id" />
+	            </group>
+	            <group colspan="2" col="2">
+	            	<separator string="Details" colspan="2"/>
+	            	<field name="unit"/>
+	            	<field name="quantity"/>
+	            </group>
+	            <separator string="" colspan="4"/>
+	            <group colspan="2" col="2">
+	            	<field name="task_category_ids"/>
+	            </group>
+	           	<group colspan="2" col="2">
+            		<field name="service_ids" />
+	            </group>
+            </field>
+        </record>
+
+        <record id="view_openstc_task_category_tree" model="ir.ui.view">
+            <field name="name">openstc.task.category.tree</field>
+            <field name="model">openstc.task.category</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Services" >
+            		<field name="name"/>
+	            	<field name="unit"/>
+	            	<field name="quantity"/>
+                </tree>
+            </field>
+        </record>
+
+       <record id="action_openstc_view_task_category" model="ir.actions.act_window">
+            <field name="name">Categories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.task.category</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        -->
+
+
+		<!-- res_users  -->
+    	<record id="view_users_form_inherit5" model="ir.ui.view">
+            <field name="name">res.users.form.inherit</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                 <separator string="Email Preferences"  position="before" >
+                 	<field name="service_ids"/>
+                 </separator>
+            </field>
+        </record>
+
+
+        <!-- <record id="view_users_form_filter3" model="ir.ui.view">
+            <field name="name">res.users.search.openstc</field>
+            <field name="model">res.users</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Users">
+                    <field name="service_ids">
+                        <filter domain="[('technical','=',True)]"  help="Employees" icon="terp-personal" />
+                        <filter domain="[('technical','=',False)]"  help="Demandeurs" icon="terp-personal-" />
+                    </field>
+                    <field name="name"/>
+                    <field name="login"/>
+                </search>
+            </field>
+        </record>  -->
+
+
+       <record id="action_openstc_view_employees5" model="ir.actions.act_window">
+            <field name="name">Employés municipaux</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.users</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--   <field name="context">{"search_default_draft": 1, "search_default_open":1, "search_default_project_id": project_id}</field>
+            <field name="search_view_id" ref="view_users_form_filter3"/> -->
+        </record>
+
+
+		<!-- service -->
+		<record model="ir.ui.view" id="view_openstc_service_form">
+            <field name="name">openstc.service.form</field>
+            <field name="model">openstc.service</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Service">
+                	<group colspan="2" col="2">
+                    	<separator string="General" colspan="2"/>
+                		<field name="name"/>
+                		<field name="code"/>
+                	</group>
+                	<group colspan="2" col="2">
+                		<separator string="Service" colspan="2"/>
+                		<field name="service_id"/>
+                		<field name="technical" />
+                	</group>
+                	<group colspan="2" col="2">
+                		<separator string="Organisation" colspan="2"/>
+                		<field name="manager_id"/>
+                		<field name="category_ids" />
+                	</group>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_openstc_service_tree" model="ir.ui.view">
+            <field name="name">openstc.service.tree</field>
+            <field name="model">openstc.service</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Services" >
+               		<field name="name"/>
+               		<field name="code"/>
+               		<field name="manager_id"/>
+                </tree>
+            </field>
+        </record>
+
+       <record id="action_openstc_view_service" model="ir.actions.act_window">
+            <field name="name">Services</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.service</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+    	<!--  employee -->
+		<record model="ir.ui.view" id="view_openstc_employee_form">
+            <field name="name">openstc.employee.form</field>
+            <field name="model">openstc.employee</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Employee">
+                	<group colspan="6" col="6">
+                    	<separator string="General" colspan="4"/>
+                		<!-- <field name="code"/> -->
+                		<field name="name"/>
+                		<field name="firstname"/>
+                		<field name="service_id"/>
+                	</group>
+                	<group colspan="2" col="2">
+                    	<separator string="Entreprise" colspan="2"/>
+                		<field name="post"/>
+                		<field name="position"/>
+                		<field name="arrival_date"/>
+                		<field name="cost"/>
+                		<field name="qualification" />
+                	</group>
+                	<group colspan="2" col="2">
+                    	<separator string="Personal" colspan="2"/>
+            			<field name="birth_date"/>
+            			<field name="address_home"/>
+            			<field name="city_home"/>
+            			<field name="phone"/>
+                	</group>
+                </form>
+            </field>
+        </record>
+
+    	<!--  site -->
+		<record model="ir.ui.view" id="view_openstc_site_form">
+            <field name="name">openstc.site.form</field>
+            <field name="model">openstc.site</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Site">
+                	<group colspan="4" col="4">
+                    	<separator string="General" colspan="6"/>
+                		<field name="name"/>
+                		<field name="type"/>
+                	</group>
+                	<group colspan="2" col="2">
+                    	<separator string="Organisation" colspan="2"/>
+                		<field name="service"/>
+                		<field name="site_parent_id"/>
+                	</group>
+                	<group colspan="2" col="2">
+                    	<separator string="Properties" colspan="2"/>
+						<field name="lenght"/>
+                		<field name="width"/>
+                		<field name="surface"/>
+                	</group>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_openstc_site_tree" model="ir.ui.view">
+            <field name="name">openstc.site.tree</field>
+            <field name="model">openstc.site</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Sites" >
+               		<field name="name"/>
+               		<field name="service"/>
+               		<field name="type"/>
+               		<field name="site_parent_id"/>
+               		<field name="lenght"/>
+               		<field name="width"/>
+               		<field name="surface"/>
+                </tree>
+            </field>
+        </record>
+
+       <record id="action_openstc_view_site" model="ir.actions.act_window">
+            <field name="name">Sites</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.site</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Partner partner form -->
+		<record id="view_openstc_partner_tree" model="ir.ui.view">
+		    <field name="name">res.partner.tree</field>
+		    <field name="model">res.partner</field>
+		    <field name="type">tree</field>
+		    <field name="inherit_id" ref="base.view_partner_tree"/>
+		    <field name="arch" type="xml">
+		        <field name="name" position="after">
+		            <field name="type_id"/>
+		            <field name="service_id" />
+		            <field name="technical_service_id"/>
+		            <field name="technical_site_id"/>
+		        </field>
+		        <field name="ref" position="replace"/>
+		        <field name="city" position="replace"/>
+                <field name="country" position="replace"/>
+                <field name="user_id" position="replace"/>
+		    </field>
+		</record>
+
+		<record id="view_openstc_partner_filter" model="ir.ui.view">
+		    <field name="name">res.partner.search</field>
+		    <field name="model">res.partner</field>
+		    <field name="type">search</field>
+		    <field name="inherit_id" ref="base.view_res_partner_filter"/>
+		    <field name="arch" type="xml">
+		        <field name="name" position="after">
+		            <field name="type_id"/>
+		            <field name="service_id" />
+		            <field name="technical_service_id"/>
+		            <field name="technical_site_id"/>
+		        </field>
+		    </field>
+		</record>
+
+		<record id="view_openstc_partner_form" model="ir.ui.view">
+		    <field name="name">res.partner.form.inherit</field>
+		    <field name="model">res.partner</field>
+		    <field name="type">form</field>
+		    <field name="inherit_id" ref="base.view_partner_form"/>
+		    <field name="arch" type="xml">
+		    	<field name="ref" position="replace"/>
+		    	<field name="customer" position="replace"/>
+                <field name="supplier" position="replace"/>
+                <field name="title" position="replace"/>
+                <field name="lang" position="replace"/>
+                <separator string="Categories" position="replace"/>
+                <field name="category_id" position="replace"/>
+		        <xpath expr="/form/group/group/field[@name='name']" position="after" >
+		        	<field name="type_id"/>
+		        	<field name="service_id" />
+		            <field name="technical_service_id" domain="[('technical', '=', True)]"/>
+		            <field name="technical_site_id" domain="[('service', '=', technical_service_id)]"/>
+		        </xpath>
+		        <!--  <page string="Sales &amp; Purchases" position="replace"/> -->
+		        <!--
+		         <xpath expr="/form/notebook/page[@string='General']/group[@groups='base.group_extended']" position=”replace”>
+
+		        <xpath expr="/form/notebook/page[@string='General']" position="after">
+		        	<page string="Sites">
+
+		        	</page>
+		        </xpath>
+		        -->
+		        <!-- <xpath expr="/form/notebook/page[@string='Sales &amp; Purchases']" position="replace"/>  -->
+		    </field>
+		</record>
+
+		<record id="action_openstc_view_partner" model="ir.actions.act_window">
+            <field name="name">Demandeurs</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+		<!--  partner type -->
+		<record model="ir.ui.view" id="view_openstc_partner_form_type">
+            <field name="name">openstc.partner.type.form</field>
+            <field name="model">openstc.partner.type.type</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Demandeur type">
+                	<group colspan="2" col="2">
+                		<field name="code" />
+                		<field name="name"/>
+                	</group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_openstc_partner_type_tree" model="ir.ui.view">
+            <field name="name">openstc.partner.type.tree</field>
+            <field name="model">openstc.partner.type</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Demandeur type" >
+                	<field name="code"/>
+               		<field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+       <record id="action_openstc_view_partner_type" model="ir.actions.act_window">
+            <field name="name">Types</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.partner.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+     	<!-- ask -->
+        <record model="ir.ui.view" id="view_openstc_ask_form">
+            <field name="name">openstc.ask.form</field>
+            <field name="model">openstc.ask</field>
+            <field name="type">form</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form string="Intervention asks">
+                	 <group col="4" colspan="4">
+                	    <group colspan="2" col="2">
+	                    	<separator string="Demandeur" colspan="2"/>
+	                    	<field name="partner_type" on_change="onChangePartnerType(partner_type)"/>
+	                	 	<field name="partner_type_code" invisible="1"/>
+	                    	<field name="partner_id"  on_change="onChangePartner(partner_id)"
+	                	 		domain="[('type_id', '=', partner_type)]" attrs="{'invisible':[('partner_type_code', '=', 'RIVERAIN')]}"/>
+                        </group>
+                        <group colspan="2" col="2">
+                        	<separator string="Details" colspan="2"/>
+                        	<field name="partner_service_id" attrs="{'invisible':[('partner_type_code', '=', 'RIVERAIN')]}"/>
+
+                        	<field name="partner_address" on_change="onChangePartnerAddress(partner_address)"
+                        		domain="[('partner_id', '=', partner_id)]"
+                        		attrs="{'invisible':[('partner_type_code', '=', 'RIVERAIN')]}"/>
+                        	<field name="partner_phone" attrs="{'invisible':[('partner_type_code', '=', 'RIVERAIN')]}"/>
+	        				<field name="partner_email" attrs="{'invisible':[('partner_type_code', '=', 'RIVERAIN')]}"/>
+
+	        				<field name="people_name" attrs="{'invisible':[('partner_type_code', '!=', 'RIVERAIN')]}"/>
+                        	<field name="people_phone" attrs="{'invisible':[('partner_type_code', '!=', 'RIVERAIN')]}"/>
+	        				<field name="people_email" attrs="{'invisible':[('partner_type_code', '!=', 'RIVERAIN')]}"/>
+                        </group>
+                    </group>
+                    <group col="4" colspan="4">
+                    	<group colspan="2" col="2">
+                    		<separator string="Demande" colspan="2"/>
+                    		<field name="current_date"/>
+                    	    <field name="name" />
+                    	    <field name="description" height="10" widget="text_wiki"/>
+                    	    <field name="refusal_reason" attrs="{'invisible':[('state','not in',('refused'))]}" widget="text_wiki"/>
+							<field name="state" attrs="{'invisible':True}"/>
+						</group>
+                        <group colspan="2" col="2">
+                        	<separator string="Patrimoine" colspan="2"/>
+                        	<field name="service_id" domain="[('technical', '=', True)]" />
+							<field name="site1"   domain="[('service', '=', service_id)]" />
+							<!--  <field name="site2" domain="[('site_parent_id','!=',None),('site_parent_id','=',site1)]"/>  -->
+							<field name="site_details" />
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_openstc_ask_form2">
+            <field name="name">openstc.ask.form</field>
+            <field name="model">openstc.ask</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Intervention asks">
+	                <group colspan="4" col="4">
+	                	<!--  <field name="belong_to_uid" invisible="1"/> -->
+
+	                </group>
+	                <group colspan="4" col="4">
+	                	<group colspan="4" col="4">
+	                		<field name="name"/>
+	                		<field name="intervention_assignement_id" />
+	                		<field name="service_id" />
+	                		<field name="date_deadline"/>
+		                	<field name="manager_id" invisible="1"/>
+		                	 <!--  domain="[('id','in', [s.id for s in user_services])]" -->
+	               		</group>
+	                	<group colspan="4" col="4">
+	               			<field name="note"/>
+	               		</group>
+	                </group>
+
+
+
+	                <separator string="" colspan="4" />
+	                <group colspan="4" col="6">
+	                    <label string ="" colspan="2"/>
+	                    <button icon="gtk-cancel" special="cancel" string="Cancel"/>
+	                    <button icon="terp-gtk-go-back-rtl" string="Valid ask" name="action_valid_ok" type="object" />
+	                </group>
+                </form>
+            </field>
+        </record>
+
+         <record id="openstc_valid_ask" model="ir.actions.act_window">
+            <field name="name">openstc.ask.valid</field>
+            <field name="res_model">openstc.ask</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_openstc_ask_form2"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_openstc_ask_tree" model="ir.ui.view">
+            <field name="name">openstc.ask.tree</field>
+            <field name="model">openstc.ask</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Intervention asks" >
+                	<!--  <field name="belong_to_uid" invisible="1"/> -->
+                	<field name="name" />
+                	<field name="description"/>
+                	<field name="site1"  />
+                	<field name="service_id" select="1"/>
+                	<field name="partner_id" />
+                	<field name="manager_id" groups="openstc.openstc_dst"/>
+                	<field name="current_date" />
+                	<field name="confirm_by_dst" invisible="1" />
+                   	<field name="state" widget="statusbar" statusbar_visible="wait,confirm,valid,refused,closed" />
+					<button name="action_valid" states="wait" string="Valid" type="object" icon="gtk-yes" help="For valid the task"
+                    	context="{'state':'valid'}" groups="openstc.openstc_qualifier" />
+                    <button name="action_refused" states="wait" string="Cancel" type="object" icon="gtk-cancel" help="For refuse the task"
+                    	context="{'state':'refused'}" groups="openstc.openstc_dst"/>
+                    <button name="%(action_ask_modify_service)d" string="Modify Service" type="action" icon="gtk-convert" help="Modify service"
+                    	groups="openstc.openstc_manager,openstc.openstc_dst" attrs="{'invisible':[('state', '!=', 'valid')]}"/>
+                    <button name="action_to_be_confirm" string="To be confirm" type="object" icon="gtk-info" help="For confirm the ask by DST"
+                    	context="{'state':'confirm'}" groups="openstc.openstc_manager"
+                    	attrs="{'invisible':['|','|',('confirm_by_dst', '=', True),('state', '!=', 'wait')]}"  />
+                    <button name="action_confirm" string="Confirm" type="object" icon="gtk-info" help="For confirm the ask by DST"
+                    	context="{'state':'wait'}" groups="openstc.openstc_dst" attrs="{'invisible':['|',('confirm_by_dst', '=', True),('state', '!=', 'confirm')]}"/>
+                </tree>
+            </field>
+        </record>
+
+         <record id="view_openstc_ask_filter" model="ir.ui.view">
+            <field name="name">openstc.ask.select</field>
+            <field name="model">openstc.ask</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Search Project">
+                   <group>
+                   		<filter icon="terp-check" string="Valid" name="valid" domain="[('state', '=','valid')]" />
+                       	<filter icon="terp-check" string="Refused" name="Refused" domain="[('state', '=','refused')]" />
+                       	<filter icon="terp-check" string="Wait" name="Wait" domain="[('state', '=','wait')]" />
+                       	<field name="service_id" string="Service"/>
+                       	<!--  <filter icon="terp-personal+" name="service"  domain="[('service_id', '=', 'service')]" string="Service"  help="Projects in which I am a member."/>
+                   		 -->
+                   </group>
+                   <newline />
+                    <group expand="0" string="Group By..." groups="base.group_extended">
+                        <filter string="partner_id" name="Partner"  icon="terp-personal" domain = "[]" context="{'group_by':'partner_id'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+
+        <record id="action_openstc_view_ask" model="ir.actions.act_window">
+            <field name="name">Intervention asks</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.ask</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_service": 1}</field>
+
+            <!-- <field name="domain">[('belong_to_uid','=','True')]</field> -->
+
+        </record>
+        <!--  <record id="action_openstc_view_ask_tree" model="ir.actions.act_window">
+            <field name="name">Intervention asks</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.ask</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_openstc_ask_filter"/>
+        </record> -->
+
+   		<!-- intervention -->
+   		  <record id="openstc_view_project_project_filter" model="ir.ui.view">
+            <field name="name">project.project.select.inherit</field>
+            <field name="model">project.project</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="project.view_project_project_filter"/>
+            <field name="arch" type="xml">
+                <filter name="Current" position="replace"/>
+                <filter name="Pending" position="replace"/>
+                <filter name="Template" position="replace"/>
+                <!--  <filter name="Member" position="replace"/> -->
+                <field name="partner_id" position="replace"/>
+                <filter name="Parent" position="replace"/>
+                <filter name="Partner" position="replace"/>
+            </field>
+         </record>
+
+
+   		 <record id="openstc_view_project_project_tree" model="ir.ui.view">
+            <field name="name">project.project.tree.inherit</field>
+            <field name="model">project.project</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="project.view_project"/>
+            <field name="field_parent">child_ids</field>
+            <field name="arch" type="xml">
+            	<field name="total_hours" position="replace"/>
+            	<field name="partner_id" position="replace"/>
+            	<!-- <field name="partner_id" position="progress_rate"/>  -->
+            	<!--  <field name="state" position="replace" invisible="1"/> -->
+            	<xpath expr="//field[@name='state']" position="after">
+               	    <button name="%(action_openstc_create_task_view)d"   string="Add Intervention"
+                   		type="action" icon="gtk-go-forward"/>
+                   	<field name="ask_id" invisible="1"/>
+            	</xpath>
+            </field>
+        </record>
+
+
+         <record id="openstc_view_project_project_form" model="ir.ui.view">
+            <field name="name">project.project.form.inherit</field>
+            <field name="model">project.project</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+            	<field name="date_start" position="replace" />
+            	<field name="date" position="replace" />
+            	<field name="parent_id"  position="replace" />
+            	<!--  <field name="state" position="replace" invisible="1"/> -->
+                <xpath expr="//field[@name='name']" position="after">
+                	<field name="state" invisible="1" />
+                	<field name="ask_id"/>
+                	<field name="intervention_assignement_id" />
+	                <field name="date_deadline"/>
+	                <field name="service_id" />
+	                <field name="site1" />
+            	</xpath>
+            	<page string='Administration' position="replace"/>
+            	<!--  <page string='Notes' position="replace"/> -->
+            	<page string='Tasks Stages' position="replace"/>
+            	<page string='Members' position="replace"/>
+            	<page string='Billing' position="replace"/>
+
+            	<!--  <field name="resource_calendar_id" position="replace"/>
+            	<field name="company_id" position="replace"/>
+            	<field name="priority" position="replace"/>
+            	<button name="set_cancel" position="replace"/>
+            	<button name="set_template" position="replace"/>
+            	<button name="set_open" position="replace"/>
+            	<button name="set_pending" position="replace"/>
+            	<button name="reset_project" position="replace"/>
+            	<button name="duplicate_template" position="replace"/>
+            	-->
+            </field>
+        </record>
+
+   		<record id="action_openstc_view_intervention" model="ir.actions.act_window">
+            <field name="name">Projects</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">project.project</field>
+            <field name="view_type">form</field>
+            <!--  <field name="search_view_id" ref="project.view_project_project_filter" invisible="1"/> -->
+            <!--  <field name="domain">['|',('user_id', '=', uid),('members', '=', uid)]</field> -->
+            <field name="view_mode">tree,form,gantt</field>
+            <field name="view_id" ref="openstc_view_project_project_tree"/>
+        </record>
+
+
+        <!--  <act_window
+            id="openstc_intervention_tasks"
+            name="Tasks"
+            res_model="project.task"
+            src_model="project.project"
+            view_mode="tree,form,calendar,graph"
+            view_type="form"
+            groups="openstc.openstc_qualifier"
+            key2="client_action_multi"/> -->
+
+		<!--  task -->
+		<record model="ir.ui.view" id="openstc_view_project_task_filter">
+            <field name="name">project.task.filter</field>
+            <field name="model">project.task</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="project.view_task_search_form"/>
+            <field name="arch" type="xml">
+				<filter name="draft" position="replace"/>
+				<filter name="open" position="replace"/>
+				<filter string="Pending" position="replace"/>
+				<filter string="Stage" position="replace"/>
+				<filter string="State" position="replace"/>
+				<!--  <filter string="Start Date" position="replace"/>
+				<filter string="Start Date" position="replace"/>-->
+            </field>
+        </record>
+
+
+
+        <record model="ir.ui.view" id="view_openstc_task_tree">
+            <field name="name">project.task.tree.inherit</field>
+            <field name="model">project.task</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="project.view_task_tree2"/>
+            <field name="arch" type="xml">
+            	<field name="sequence" position="replace"/>
+	           	<button name="next_type" position="replace"/>
+	            <xpath expr="//field[@name='type_id']" position="attributes">
+                	<attribute name="invisible">True</attribute>
+                </xpath>
+	            <field name="delegated_user_id" position="replace"/>
+	            <button name="do_open" position="replace"/>
+	            <button name="%(project.action_project_task_delegate)d"  position="replace"/>
+	            <button name="action_close" position="replace"/>
+            	<xpath expr="//field[@name='name']" position="after">
+            		<!--  <field name="ask_id" domain="[('state','=','valid')]" /> -->
+            		<!-- <field name="intervention_assignement_id"/>  -->
+					<field name="category_id"/>
+            	</xpath>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_openstc_task_form">
+            <field name="name">project.task.form.inherit</field>
+            <field name="model">project.task</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+            	<field name="project_id" position="replace" />
+            	<field name="date_deadline"  position="replace" />
+                <page string='Delegations History' position="replace"/>
+            	<field name="sequence" position="replace"/>
+            	<separator string="Miscelleanous" position="replace"/>
+                <field name="partner_id" position="replace"/>
+                <field name="company_id" position="replace"/>
+                <field name="type_id" position="replace"/>
+                <field name="priority" position="replace"/>
+                <button name="prev_type" position="replace"/>
+                <button name="next_type" position="replace"/>
+                <button name="do_cancel" position="replace"/>
+                <button name="do_draft" position="replace"/>
+                <button name="do_open" position="replace"/>
+                <button name="do_pending" position="replace"/>
+                <button name="%(project.action_project_task_delegate)d" position="replace"/>
+        	</field>
+        </record>
+
+
+		<!--  Dashboard -->
+
+
+		<delete model="ir.actions.act_window" search="[('name', '=', 'Tasks')]"  />
+
+        <record id="openstc_action_view_task" model="ir.actions.act_window">
+            <field name="name">Tasks</field>
+             <field name="type">ir.actions.act_window</field>
+            <field name="res_model">project.task</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_openstc_task_tree"/>
+            <field name="view_mode">tree,form,calendar</field>
+        </record>
+
+   		<!-- task work-->
+         <record id="view_task_work_form" model="ir.ui.view">
+            <field name="name">project.task.work.form.inherit</field>
+            <field name="model">project.task.work</field>
+            <field name="inherit_id" ref="project.view_task_work_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                	<!-- <field name="qualifier_id" invisible="1"/>
+               		 <button name="action_done" string="Fait" type="object" icon="gtk-yes" help="For finnish the task"/> -->
+            	</xpath>
+            </field>
+        </record>
+
+        <record id="action_openstc_task_work" model="ir.actions.act_window">
+            <field name="name">Task Work action</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">project.task.work</field>
+            <!--  <field name="domain">[('user_id', '=', uid),('date','&lt;=',time.strftime('%Y-%m-%d'))]</field> -->
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+       <record id="openstc_view_task_project_user_search" model="ir.ui.view">
+            <field name="name">report.project.task.user.search.inherit</field>
+            <field name="model">report.project.task.user</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="project.view_task_project_user_search"/>
+            <field name="arch" type="xml">
+				   <field name="partner_id" position="replace"/>
+                   <field name="company_id" position="replace"/>
+                   <filter string="Partner" position="replace" />
+                   <filter string="State" position="replace"/>
+                   <filter string="Company" position="replace"/>
+                   <filter string="Stage" position="replace" />
+            </field>
+        </record>
+
+        <record id="openstc_view_task_project_user_tree" model="ir.ui.view">
+            <field name="name">report.project.task.user.tree.inherit</field>
+            <field name="model">report.project.task.user</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="project.view_task_project_user_tree"/>
+            <field name="arch" type="xml">
+                    <field name="company_id" position="replace"/>
+                    <field name="partner_id" position="replace"/>
+                    <field name="hours_delay" position="replace"/>
+                    <field name="opening_days" position="replace"/>
+                    <field name="closing_days" position="replace"/>
+                    <field name="delay_endings_days" position="replace"/>
+            </field>
+        </record>
+
+        <!-- Menu oe -->
+        <!--  <record id="openstc_edit_menu_access" model="ir.ui.view">
+            <field name="name">ir.ui.menu.openstc</field>
+            <field name="model">ir.ui.menu</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="edit_menu_access"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                	<field name="href" "/>
+            	</xpath>
+            </field>
+        </record>
+        -->
+
+
+		<!--  others -->
+ 		<!--  <record id="base.menu_main_pm" model="ir.ui.menu">
+      		<field name="name">openstc</field>
+    	</record> -->
+
+    	<menuitem
+            icon="terp-project" id="base.menu_main_pm"
+            name="Interventions" sequence="10"
+            groups="openstc_employee"/>
+
+ 		<!--  <record id="project.menu_project_management" model="ir.ui.menu">
+      		<field name="name">Interventions Management</field>
+    	</record> -->
+
+		<menuitem id="project.menu_project_management"
+			groups="openstc_employee"
+			name="Interventions Management"
+			parent="base.menu_main_pm"
+			sequence="1"/>
+
+		<menuitem action="action_openstc_view_ask"
+   			id="menu_action_openstc_view_ask"
+   			parent="project.menu_project_management"
+   			name="Intervention asks"
+   			groups="openstc_employee"
+   			sequence="1"/>
+
+		<menuitem name="Interventions"
+				action="action_openstc_view_intervention"
+				id="project.menu_open_view_project_all"
+				parent="project.menu_project_management"
+				groups="openstc_qualifier"
+				sequence="2"/>
+
+		<menuitem action="openstc_action_view_task"
+				id="openstc_menu_action_view_task"
+				parent="project.menu_project_management"
+				name="Tasks"
+				groups="openstc_qualifier,openstc_agent"
+				sequence="3"/>
+
+		<!--  planning -->
+   		<menuitem action="openstc_action_view_planning"
+   			id="menu_planning"
+			groups="openstc_dst,openstc_manager"
+			name="Planning"
+			parent="project.menu_project_management"
+			sequence="4"/>
+
+
+   		<!--  <menuitem action="action_openstc_task_work"
+   			id="menu_action_openstc_view_task_work"
+   			parent="project.menu_project_management"
+   			groups="openstc_employee"
+   			sequence="4"/>
+   		-->
+
+   		<!--  Configuration -->
+
+   		<menuitem id="menu_configuration"
+			groups="openstc_dst,openstc_manager"
+			name="Configuration"
+			parent="base.menu_main_pm"
+			sequence="3"/>
+
+		<menuitem action="action_openstc_view_site"
+   			id="menu_action_openstc_view_site"
+   			parent="menu_configuration"
+   			groups="openstc_dst,openstc_manager"
+   			sequence="1"/>
+
+   		<menuitem action="action_openstc_view_service"
+   			id="menu_action_openstc_view_service"
+   			parent="menu_configuration"
+   			groups="openstc_dst,openstc_manager"
+   			sequence="2"/>
+
+   		<menuitem action="openstc_task_category_action"
+   			id="menu_action_openstc_view_task_category"
+   			parent="menu_configuration"
+   			groups="openstc_dst,openstc_manager"
+   			sequence="3"/>
+
+   	 	<menuitem action="action_openstc_view_employees5"
+   			id="menu_action_openstc_view_employees"
+   			parent="menu_configuration"
+   			groups="openstc_dst,openstc_manager"
+   			sequence="4"/>
+
+
+
+   		<!--  partner -->
+   		<menuitem
+   			id="menu_openstc_partner"
+   			groups="openstc_dst,openstc_manager"
+   			name="Demandeurs"
+   			parent="menu_configuration"
+   			sequence="5"/>
+
+   		<menuitem action="action_openstc_view_partner"
+   			id="menu_action_openstc_view_partner"
+   			parent="menu_openstc_partner"
+   			groups="openstc_dst,openstc_manager"
+   			sequence="1"/>
+
+   		<menuitem action="action_openstc_view_partner_type"
+   			id="menu_action_openstc_view_partner_type"
+   			parent="menu_openstc_partner"
+   			groups="openstc_dst,openstc_manager"
+   			sequence="2"/>
+
+
+
+
+
+
+
+		<!--  Dashboard -->
+   		<menuitem id="base.menu_project_report"
+   			name="Reporting"
+            groups="openstc_dst"
+            parent="base.menu_main_pm" sequence="2"/>
+
+        <!-- Dashboard Task -->
+        <menuitem id="project.project_report_task"
+        	name="Tasks"
+        	groups="openstc_dst"
+            parent="base.menu_project_report"/>
+
+        <!--  <menuitem action="project.action_view_task_history_burndown"
+        	groups="openstc_dst"
+            id="project.menu_action_view_task_history_burndown"
+            parent="project.project_report_task" />
+
+        <menuitem action="project.action_view_task_history_cumulative"
+        	groups="openstc_dst"
+            id="project.menu_action_view_task_history_cumulative"
+            parent="project.project_report_task" />
+         -->
+
+        <menuitem action="project.action_project_task_user_tree"
+            groups="openstc_dst" id="project.menu_project_task_user_tree"
+            parent="project.project_report_task"/>
+
+   		<menuitem
+            id="project.next_id_86"
+            name="Dashboard"
+            groups="openstc_dst"
+            sequence="0"
+            parent="base.menu_project_report"/>
+
+
+        <menuitem
+            action="project.open_board_project"
+            icon="terp-graph"
+            id="project.menu_board_project"
+            parent="project.next_id_86"
+            groups="openstc_dst"
+            sequence="1"/>
+
+
+        <act_window
+            context="{'search_default_project_id': [active_id], 'default_project_id': active_id}"
+            id="project.act_project_project_2_project_task_all"
+            name="Tasks"
+            res_model="project.task"
+            src_model="project.project"
+            view_mode="tree,form,calendar,graph"
+            view_type="form"/>
+
+    	<!--  <record id="project.menu_open_view_project_all" model="ir.ui.menu">
+      		<field name="name">Interventions all</field>
+      		<field name="parent">project.menu_project_management</field>
+    	</record> -->
+
+		 <delete model="ir.ui.menu" id="project.menu_definitions" />
+		 <delete model="ir.ui.menu" id="project.menu_project_config_project" />
+		 <delete model="ir.actions.act_window" id="project.open_task_type_form" />
+		 <delete model="ir.rule" id="project.task_visibility_rule" />
+
+		 <!--  <delete model="res.groups" id="group_project_user" />
+		 <delete model="res.groups" id="group_project_manager" />
+		 -->
+
+		 <!--  suppression des tâches déléguées -->
+		 <!--  <record id="openstc_board_project_form" model="ir.ui.view">
+            <field name="name">board.project.form.inherit</field>
+            <field name="model">board.board</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="project.board_project_form"/>
+            <field name="arch" type="xml">
+				<action name="%(project.action_view_delegate_task_tree)d" position="replace"/>
+            </field>
+        </record>
+
+        -->
+
+         <!--  <delete model="ir.ui.view" id="project.view_delegated_task_tree"/>
+		 <delete model="ir.actions.act_window" id="action_view_delegate_task_tree"/>
+		 -->
 
 
     </data>

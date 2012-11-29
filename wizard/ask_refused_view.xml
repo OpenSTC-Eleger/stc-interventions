@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="view_openstc_refused_ask_form" model="ir.ui.view">
+            <field name="name">openstc.refused.ask.wizard.form</field>
+            <field name="model">openstc.refused.ask.wizard</field>
+            <field name="type">form</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+            <form string="Qualifier la demande">
+                <group colspan="4" col="6">
+                	<field name="refusal_reason"/>
+                	<field name="note"/>
+                </group>
+                <separator string="" colspan="4" />
+                <group colspan="4" col="6">
+                    <label string ="" colspan="2"/>
+                    <button icon="gtk-cancel" special="cancel" string="Cancel"/>
+                    <button icon="terp-gtk-go-back-rtl" string="Refuser la demande" name="action_refused_ask" type="object" />
+                </group>
+            </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_openstc_refused_ask_view">
+            <field name="name">Associate tasks to wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.refused.ask.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="domain">[('state','=','refused')]</field>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+
+        <!--  <act_window id="act_ask_refused_ask_wizard"
+            name="Refused asks"
+            res_model="openstc.refused.ask.wizard"
+            src_model="openstc.ask"
+            view_mode="form"
+            key2="client_action_multi"
+            target="new"
+            domain="[('state','!=','valid'),('state','!=','refused')]" />
+           -->
+    </data>
+</openerp>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="view_openstc_create_task_form" model="ir.ui.view">
+            <field name="name">openstc.create.task.wizard.form</field>
+            <field name="model">openstc.create.task.wizard</field>
+            <field name="type">form</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+            	<form string="Création de l'intervention et de ses tâches">
+					<field name="inter_state" invisible="1" />
+	                <group colspan="6" col="6">
+	                	<field name="inter_name"/>
+	                	<field name="inter_date_deadline"/>
+	                	<field name="inter_service_id"/>
+	                </group>
+	                <group colspan="4" col="4">
+	           			<separator string="Location" colspan="6"/>
+	           			<field name="inter_manager"/>
+	            		<field name="inter_site1" />
+	            	</group>
+	                <field name="task_ids" nolabel="1" colspan="4" height="400">
+	                    <tree string="tasks" editable="bottom">
+	                        <field name="name"/>
+	                        <field name="category_id"/>
+	                        <field name="planned_hours"/>
+	                        <field name="user_id" />
+	                    </tree>
+	                    <form string="task">
+	                        <field name="name"/>
+	                        <field name="category_id"/>
+	                        <field name="planned_hours"/>
+	                        <!--  <field name="user_id" domain="('id', 'in', [u.id for u in team_id.users_ids])" /> -->
+	                    </form>
+	                </field>
+	                <separator string="" colspan="4" />
+	                <group colspan="4" col="6">
+	                    <label string ="" colspan="2"/>
+	                    <button icon="gtk-cancel" special="cancel" string="Cancel"/>
+	                    <button icon="terp-gtk-go-back-rtl" string="Add task" name="action_add_task" type="object" />
+	                </group>
+            	</form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_openstc_create_task_view">
+            <field name="name">Associate tasks to wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.create.task.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="domain">[('state','=','valid')]</field>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</openerp>
