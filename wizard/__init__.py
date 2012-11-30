@@ -25,5 +25,5 @@ import create_task
 import ask_modify_service
 #import ask_valid
 import ask_refused
-
+import openstc_pret_wizard
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

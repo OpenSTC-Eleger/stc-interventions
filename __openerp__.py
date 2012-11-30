@@ -8,7 +8,7 @@
 {
     "name": "openstc",
     "version": "0.1",
-    "depends": ["project", "board","product", "stock", "hotel_reservation", "email_template"],
+    "depends": ["purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
     "author": "PYF & BP",
     "category": "Category",
     "description": """
@@ -20,11 +20,16 @@
 
         'wizard/create_task_view.xml',
         'wizard/ask_refused_view.xml',
-        'wizard/ask_modify_service.xml',
+        'wizard/ask_modify_service.xml',     
+        "wizard/openstc_pret_view_wizard.xml",
+        
         'views/openstc_view.xml',
+        "views/openstc_pret_view.xml",
 
-        'views/openstc_view.xml',
         'workflow/ask.xml',
+        "workflow/openstc_pret_workflow.xml",
+
+        "report/openstc_pret_qte_dispo_report_view.xml",
     ],
     "demo": [],
     "test": [],
