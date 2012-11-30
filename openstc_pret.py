@@ -99,7 +99,7 @@ class hotel_reservation(osv.osv):
                 que votre demande est prise en compte mais qu'un ou plusieurs articles que vous voulez réserver ne 
                 sont pas disponible à cette date.""")),
                 'name':fields.char('Nom Manifestation', size=128),
-                'partner_mail':fields.char('Email Demandeur', size=128, required=True)
+                'partner_mail':fields.char('Email Demandeur', size=128, required=False)
         }
     _defaults = {
                  'in_option': lambda *a :0,
