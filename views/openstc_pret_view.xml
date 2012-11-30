@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+
+		<!-- Vue Produits mère pour l'ensemble du projet OpenStock -->
+		<record model="ir.ui.view" id="view_openstock_fournitures_tree">
+			<field name="name">fourniture.product.tree</field>
+			<field name="model">product.product</field>
+			<field name="inherit_id" ref="product.product_product_tree_view" />
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<tree
+					colors="red:virtual_available&lt;0;blue:virtual_available&gt;=0 and state in ('draft', 'end', 'obsolete');black:virtual_available&gt;=0 and state not in ('draft', 'end', 'obsolete')"
+					string="Products" position="replace">
+					<tree string="Produits">
+						<field name="name" />
+						<field name="qte_dispo" />
+						<field name="list_price" />
+						<field name="seuil_confirm" />
+					</tree>
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="view_openstock_fournitures_form">
+			<field name="name">fourniture.product.form</field>
+			<field name="model">product.product</field>
+			<field name="inherit_id" ref="stock.view_normal_stock_property_form" />
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<field name="virtual_available" position="after">
+					<field name="seuil_confirm" />
+				</field>
+			</field>
+		</record>
+
+		<!-- Vues Réservation d'articles -->
+		<record model="ir.ui.view" id="view_openstock_reservation_form">
+			<field name="name">open.pret_location.reservation.form</field>
+			<field name="model">hotel.reservation</field>
+			<field name="inherit_id" ref="hotel_reservation.view_hotel_reservation_form" />
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<field name="reservation_no" position="after">
+					<field name="name" />
+				</field>
+				<field name="date_order" select="1" position="replace">
+					<field name="date_order" string="Date de création" select="1"
+						position="replace"
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+				</field>
+				<field name="shop_id" select="2" position="replace">
+					<field name="shop_id" string="Magasin" select="2" position="replace"
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+				</field>
+				<field name="pricelist_id" position="replace">
+					<field name="pricelist_id" string="Liste de prix"
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+				</field>
+				<field name="partner_id" on_change="onchange_partner_id(partner_id)"
+					select="1" position="replace">
+					<field name="partner_id" string="Demandeur"
+						on_change="onchange_partner_id(partner_id)" select="1"
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+					<field name="partner_mail" attrs="{'invisible':[('state','=','remplir')]}" />
+				</field>
+				<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
+					position="replace">
+					<field name="partner_order_id" string="Adresse de Commande"
+						domain="[('partner_id','=',partner_id)]"
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+				</field>
+				<field name="partner_invoice_id" domain="[('partner_id','=',partner_id)]"
+					position="replace">
+					<field name="partner_invoice_id" string="Adresse de facturation"
+						domain="[('partner_id','=',partner_id)]"
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+				</field>
+				<field name="partner_shipping_id" domain="[('partner_id','=',partner_id)]"
+					position="replace">
+					<field name="partner_shipping_id" string="Adresse de Livraison"
+						domain="[('partner_id','=',partner_id)]"
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+				</field>
+				<field name="adults" position="replace" />
+				<field name="childs" position="replace" />
+				<field name="checkin" colspan="1" position="replace">
+					<field name="checkin" string="Début de la Réservation"
+						colspan="1" attrs="{'readonly':[('state','=','done')]}" />
+				</field>
+				<field name="checkout" on_change="on_change_checkout(checkin,checkout)"
+					position="replace">
+					<field name="checkout" string="Fin de la Réservation"
+						on_change="on_change_checkout(checkin,checkout,state,reservation_line)"
+						attrs="{'readonly':[('state','=','done')]}" />
+				</field>
+
+
+				<field name="reservation_line" colspan="4" nolabel="1"
+					position="replace">
+					<field name="reservation_line" string="Lignes de Réservation"
+						colspan="4" nolabel="1"
+						on_change="on_change_reservation_line(reservation_line,state)">
+						<tree string="Ligne de réservation" editable="top">
+							<field name="categ_id" required="1" />
+							<field name="reserve_product" colspan="4"
+								domain="[('categ_id','=',categ_id)]" required="1" />
+							<field name="qte_reserves" />
+							<field name="prix_unitaire" />
+							<field name="dispo" />
+						</tree>
+					</field>
+				</field>
+				<field name="state" position="after">
+					<button name="cancel" string="Annuler" states="draft,confirm" />
+					<button name="redraft" string="Reprendre" states="cancle" />
+					<button name="to_draft" string="Suivant" states="remplir" />
+					<button name="verif_dispo" type="object" string="Vérifier Disponibilités"
+						states="remplir" />
+					<button name="do_checkin" type="object"
+						string="Générer Check-In des articles" states="confirm" />
+					<field name="in_option" on_change="onchange_in_option(in_option,state)" />
+				</field>
+				<button name="done" string="Create Folio" states="confirm"
+					position="replace">
+					<button name="done" string="Générer Check-Out articles"
+						states="in_use" />
+				</button>
+				<button name="confirm" string="Confirm" states="draft"
+					position="replace">
+					<button name="confirm" string="Confirmer" states="draft" />
+				</button>
+
+			</field><!-- end tag of xml arch -->
+		</record>
+
+		<record model="ir.ui.view" id="view_openstock_reservation_tree">
+			<field name="name">hotel.reservation.tree</field>
+			<field name="model">hotel.reservation</field>
+			<field name="inherit_id" ref="hotel_reservation.view_hotel_reservation_tree" />
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="reservation_no" position="replace">
+					<field name="name" />
+					<field name="reservation_no" string="N° Réservation" />
+				</field>
+				<field name="partner_id" select="1" position="replace">
+					<field name="partner_id" select="1" string="Demandeur" />
+				</field>
+				<field name="checkin" position="replace">
+					<field name="checkin" string="Date de début Réservation" />
+				</field>
+				<field name="checkout" position="replace">
+					<field name="checkout" string="Date de fin Réservation" />
+				</field>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="view_openstock_reservation_folio_form">
+			<field name="name">open.pret_location.reservation.form</field>
+			<field name="model">hotel.folio</field>
+			<field name="inherit_id" ref="hotel.view_hotel_folio1_form" />
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<!-- @TODO: Rajouter <form> parent pour que les modifs soient prises 
+					en compte <field name="checkin_date" position="replace"> <field name="checkin_date" 
+					string="Date de début de Réservation"/> </field> <field name="checkout_date" 
+					on_change="on_change_checkout(checkin_date,checkout_date)" position="replace"> 
+					<field name="checkout_date" on_change="on_change_checkout(checkin_date,checkout_date)" 
+					string="Date de fin de Réservation"/> </field> <field name="product_uom_qty" 
+					on_change="product_id_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, 
+					'lang' in context and context['lang'], False, parent.date_order)" context="{'partner_id':'parent.partner_id','quantity':'product_uom_qty','pricelist':'parent.pricelist_id','shop':'parent.shop_id','uom':'product_uom'}" 
+					invisible="1" position="replace"> <field name="product_uom_qty" on_change="product_id_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, 
+					'lang' in context and context['lang'], False, parent.date_order)" context="{'partner_id':'parent.partner_id','quantity':'product_uom_qty','pricelist':'parent.pricelist_id','shop':'parent.shop_id','uom':'product_uom'}" 
+					invisible="1" string="Quantité réservée"/> </field> <field name="product_uom" 
+					on_change="product_uom_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, 
+					'lang' in context and context['lang'], False, parent.date_order)" string="Rent(UOM)" 
+					position="replace"> <field name="product_uom" on_change="product_uom_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, 
+					'lang' in context and context['lang'], False, parent.date_order)" string="Unité 
+					de Mesure"/> </field> -->
+				<field name="service_lines" colspan="4" string="Service Line"
+					nolabel="1" position="replace" />
+				<field name="room_lines" colspan="4"
+					default_get="{'checkin_date': checkin_date,'checkout_date':checkout_date}"
+					nolabel="1" position="replace">
+					<field name="room_lines" colspan="4"
+						default_get="{'checkin_date': checkin_date,'checkout_date':checkout_date}"
+						nolabel="1">
+						<tree string="Articles Réservés">
+							<field name="name" />
+							<field name="checkin_date" string="Date de début de Réservation" />
+							<field name="checkout_date" string="Date de fin de Réservation" />
+							<field name="product_id" string="Article Réservé" />
+							<field name="product_uom_qty" string="Quantité Réservée" />
+							<field name="price_unit" string="Prix Unitaire" />
+							<field name="price_subtotal" />
+						</tree>
+					</field>
+				</field>
+				<field name="partner_id" on_change="onchange_partner_id(partner_id)"
+					required="1" string="Guest Name" colspan="4" position="replace">
+					<field name="partner_id" on_change="onchange_partner_id(partner_id)"
+						required="1" string="Demandeur" colspan="4" />
+				</field>
+				<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
+					string="Booking Contact" position="replace">
+					<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
+						string="Contact demandeur" />
+				</field>
+				<field name="name" colspan="1" string="Folio No" position="replace">
+					<field name="name" colspan="1" string="N° Folio" />
+				</field>
+				<field name="shop_id" string="Branch" position="replace">
+					<field name="shop_id" string="Magasin" />
+				</field>
+				<field name="duration" on_change="onchange_dates(checkin_date,False,duration)"
+					position="replace" />
+				<button name="button_dummy" string="Compute" states="draft"
+					type="object" position="replace">
+					<button name="button_dummy" string="Calculer" states="draft"
+						type="object" />
+				</button>
+				<button name="order_confirm" string="Confirm Folio" states="draft"
+					position="replace">
+					<button name="order_confirm" string="Confirmer Folio"
+						states="draft" />
+				</button>
+				<button name="invoice_recreate" string="Recreate Invoice"
+					states="invoice_except" position="replace">
+					<button name="invoice_recreate" string="Recreate Invoice"
+						states="Recréer facture" />
+				</button>
+				<button name="invoice_corrected" string="Invoice Corrected"
+					states="invoice_except" position="replace">
+					<button name="invoice_corrected" string="Facture corrigée"
+						states="invoice_except" />
+				</button>
+				<button name="ship_recreate" string="Recreate Procurement"
+					states="shipping_except" position="replace">
+					<button name="ship_recreate" string="Recréer Approvisionnement"
+						states="shipping_except" />
+				</button>
+				<button name="ship_corrected" string="Procurement Corrected"
+					states="shipping_except" position="replace">
+					<button name="ship_corrected" string="Approvisionnement Corrigé"
+						states="shipping_except" />
+				</button>
+				<button name="manual_invoice" states="manual" string="Create Invoice"
+					position="replace">
+					<button name="manual_invoice" states="manual" string="Créer Facture" />
+				</button>
+				<button name="ship_cancel" string="Cancel Folio" states="shipping_except"
+					position="replace">
+					<button name="ship_cancel" string="Annuler Folio" states="shipping_except" />
+				</button>
+				<button name="action_cancel_draft" states="cancel" string="Set to Draft"
+					type="object" position="replace">
+					<button name="action_cancel_draft" states="cancel"
+						string="Mettre en Brouillon" type="object" />
+				</button>
+				<button name="action_cancel" string="Cancel Folio" states="manual,progress"
+					type="object" position="replace">
+					<button name="action_cancel" string="Annuler Folio" states="manual,progress"
+						type="object" />
+				</button>
+				<button name="cancel" string="Cancel Folio" states="draft"
+					position="replace">
+					<button name="cancel" string="Annuler Folio" states="draft" />
+				</button>
+				<button name="invoice_cancel" string="Cancel Folio" states="invoice_except"
+					position="replace">
+					<button name="invoice_cancel" string="Annuler Folio" states="invoice_except" />
+				</button>
+			</field><!-- end tag of xml arch -->
+		</record>
+
+		<record model="ir.ui.view" id="view_openstock_reservation_folio1_tree">
+			<field name="name">hotel.folio.tree</field>
+			<field name="inherit_id" ref="hotel.view_hotel_folio1_tree" />
+			<field name="model">hotel.folio</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="checkin_date" position="replace">
+					<field name="checkin_date" string="Date de début Réservation" />
+				</field>
+				<field name="checkout_date" position="replace">
+					<field name="checkout_date" string="Date de fin Réservation" />
+				</field>
+			</field>
+		</record>
+
+		<!-- Actions Mouvements Internes -->
+		<record id="action_openstock_view_fournitures" model="ir.actions.act_window">
+			<field name="name">Ressources</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">product.product</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<record id="action_openstock_view_reservation" model="ir.actions.act_window">
+			<field name="name">Réservations à Valider</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','draft')]</field>
+		</record>
+
+		<record id="action_openstock_view_reservation_confirmed" model="ir.actions.act_window">
+			<field name="name">Réservations Confirmées</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','confirm')]</field>
+		</record>
+
+		<record id="action_openstock_view_reservation_cancel" model="ir.actions.act_window">
+			<field name="name">Réservations Annulées</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','cancle')]</field>
+		</record>
+
+		<record id="action_openstock_view_reservation_a_remplir" model="ir.actions.act_window">
+			<field name="name">Réservations en Brouillon</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','remplir'),('in_option','=',False)]</field>
+		</record>
+
+		<record id="action_openstock_view_reservation_a_revalider" model="ir.actions.act_window">
+			<field name="name">Réservations A Re-Vérifier</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','remplir'),('in_option','=',True)]</field>
+		</record>
+
+
+		<record id="action_openstock_view_reservation_done" model="ir.actions.act_window">
+			<field name="name">Réservations Terminées</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','done')]</field>
+		</record>
+
+		<record id="action_openstock_view_reservation_in_use" model="ir.actions.act_window">
+			<field name="name">Réservations en cours d'utilisation</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('state','=','in_use')]</field>
+		</record>
+
+		<record id="action_openstock_view_reservation_new" model="ir.actions.act_window">
+			<field name="name">Créer une nouvelle réservation</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+		</record>
+
+		<record id="action_openstock_view_reservation_folio" model="ir.actions.act_window">
+			<field name="name">Voir Check-In - Check-Out</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.folio</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+		<!-- Actions Prêts/Locations -->
+		<record id="action_openstock_pret_location_view_product" model="ir.actions.act_window">
+			<field name="name">Prêts / Locations</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">product.product</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+
+		<!-- <record id="action_open_pret_location_reservation_create_form" model="ir.actions.act_window"> 
+			<field name="name" >Réserver article(s)</field> <field name="type" >ir.actions.act_window</field> 
+			<field name="res_model" >hotel.reservation</field> <field name="view_type" 
+			>form</field> <field name="view_mode" >form</field> <field name="src_model">product.product</field> 
+			<field name="view_id" ref="hotel_reservation.view_hotel_reservation_form"/> 
+			<field name="target">current</field> <field name="context">{'from_product':'1', 
+			'product_ids':active_ids}</field> </record> <record id="action_open_pret_location_reservation_create_values" 
+			model="ir.values"> <field name="name">Réserver article(s)</field> <field 
+			name="key2">client_action_multi</field> <field eval="1" name="object"/> <field 
+			name="value" eval="'ir.actions.act_window,' + str(ref('action_open_pret_location_reservation_create_form'))" 
+			/> <field name="key">action</field> <field name="model">product.product</field> 
+			</record> -->
+
+		<record id="action_open_pret_location_reservation_create_form"
+			model="ir.actions.act_window">
+			<field name="name">Réserver article(s)</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="src_model">product.product</field>
+			<field name="view_id" ref="hotel_reservation.view_hotel_reservation_form" />
+			<field name="target">current</field>
+			<field name="context">{'from_product':'1', 'product_ids':active_ids}
+			</field>
+		</record>
+
+		<record id="action_open_pret_location_reservation_create_values"
+			model="ir.values">
+			<field name="name">Réserver article(s)</field>
+			<field name="key2">client_action_multi</field>
+			<field eval="1" name="object" />
+			<field name="value"
+				eval="'ir.actions.act_window,' + str(ref('action_open_pret_location_reservation_create_form'))" />
+			<field name="key">action</field>
+			<field name="model">hotel.room</field>
+		</record>
+
+		<!-- calendar views -->
+
+
+		<!-- Menus Mouvements Internes -->
+		<menuitem icon="terp-project" id="base.menu_main_openstock"
+			name="Prêt - Location" sequence="10" />
+
+		<menuitem id="menu_action_view_reservations" name="Gestion des Réservations"
+			parent="base.menu_main_openstock" sequence="2" />
+
+		<menuitem id="menu_action_view_articles" name="Gestion des Ressources"
+			parent="base.menu_main_openstock" sequence="1" />
+
+		<!-- MenuItems Gestion des Ressources -->
+		<menuitem id="menu_action_view_fournitures" action="action_openstock_view_fournitures"
+			name="Choisir Ressources à réserver" parent="menu_action_view_articles"
+			sequence="1" />
+
+		<menuitem id="menu_action_view_emprunt_ext" name="Emprunter des Ressources à l'extérieur"
+			action="action_view_openstc_pret_emprunt_wizard" parent="menu_action_view_articles"
+			sequence="2" />
+
+		<menuitem id="menu_action_openstock_view_reservation_folio"
+			action="action_openstock_view_reservation_folio" name="Voir Check-In - Check-Out"
+			parent="menu_action_view_articles" sequence="3" />
+
+		<!-- MenuItems Gestion des Réservations -->
+
+		<menuitem id="menu_action_openstock_view_reservation_new"
+			action="action_openstock_view_reservation_new" name="Créer une nouvelle réservation"
+			parent="menu_action_view_reservations" sequence="2" />
+
+		<menuitem id="menu_action_openstock_view_reservation_a_remplir"
+			action="action_openstock_view_reservation_a_remplir" name="Réservations en Brouillon"
+			parent="menu_action_view_reservations" sequence="3" />
+
+		<menuitem id="menu_action_openstock_view_reservation_a_revalider"
+			action="action_openstock_view_reservation_a_revalider" name="Réservations A re-vérifier"
+			parent="menu_action_view_reservations" sequence="4" />
+
+		<menuitem id="menu_action_openstock_view_reservation" action="action_openstock_view_reservation"
+			name="Réservations à Valider" parent="menu_action_view_reservations"
+			sequence="5" />
+
+		<menuitem id="menu_action_openstock_view_reservation_confirmed"
+			action="action_openstock_view_reservation_confirmed" name="Réservations Confirmées"
+			parent="menu_action_view_reservations" sequence="6" />
+
+		<menuitem id="menu_action_openstock_view_reservation_in_use"
+			action="action_openstock_view_reservation_in_use" name="Réservations En cours d'utilisation"
+			parent="menu_action_view_reservations" sequence="7" />
+
+		<menuitem id="menu_action_openstock_view_reservation_done"
+			action="action_openstock_view_reservation_done" name="Réservations Terminées"
+			parent="menu_action_view_reservations" sequence="8" />
+
+		<menuitem id="menu_action_openstock_view_reservation_cancel"
+			action="action_openstock_view_reservation_cancel" name="Réservations Annulées"
+			parent="menu_action_view_reservations" sequence="9" />
+
+		<!-- Groupe Factice pour cacher les menus aux utilisateurs (sauf l'admin) -->
+		<record id="group_view_all_menus" model="res.groups">
+			<field name="name">Voir tous les menus</field>
+		</record>
+
+		<menuitem id="hotel.hotel_management_menu" name="Hotel Management"
+			groups="group_view_all_menus" />
+	</data>
+</openerp>

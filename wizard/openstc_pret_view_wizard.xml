@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<openerp>
+	<data>
+
+		<record model="ir.ui.view" id="view_openstc_pret_emprunt_wizard">
+			<field name="name">openstc.pret.emprunt.wizard</field>
+			<field name="model">openstc.pret.emprunt.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Emprunter des Ressources auprès de Collectivités extérieures">
+					<field name="emprunt_line" nolabel="1" colspan="4" required="1">
+						<tree string="Lignes d'emprunt" editable="top">
+							<field name="product_id" />
+							<field name="partner_id" />
+							<field name="qte" />
+							<field name="date_expected" />
+						</tree>
+					</field>
+					<button icon="gtk-cancel" colspan="1" string="Cancel"
+						special="cancel" />
+					<button colspan="1" name="do_emprunt" string="Emprunter"
+						type="object" />
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="action_view_openstc_pret_emprunt_wizard">
+			<field name="name">Emprunter des Ressources à l'extérieur</field>
+			<field name="res_model">openstc.pret.emprunt.wizard</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="action_view_openstc_pret_create_emprunt_wizard">
+			<field name="name">Emprunter des Ressources à l'extérieur</field>
+			<field name="res_model">openstc.pret.emprunt.wizard</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+			<field name="context">{'prod_error_ids':prod_error_ids,'reservation_id':reservation_id}</field>
+		</record>
+		
+			<record model="ir.ui.view" id="view_openstc_pret_warning_dispo_wizard">
+			<field name="name">openstc.pret.warning.dispo.wizard</field>
+			<field name="model">openstc.pret.warning.dispo.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Des articles ne sont pas dispo">
+					<label string="Attention, certains des articles que vous voulez réserver ne sont pas disponibles." colspan="4"/>
+					<newline/>
+					<label string="Vous avez les droits pour déclencher une demande d'emprunt des articles manquants 
+					    			auprès de collectivités extérieurs, voulez le faire ? 
+					    			Si oui, cliquez sur le bouton 'Commencer l'emprunt' où vous pourrez choisir dans quelles
+					    			collectivités vous voulez emprunter (la relation avec ces collectivités ne sera
+					    			pas gérée dans le processus, Vous devez faire la prise de contact habituelle
+					    			pour confirmer l'emprunt auprès des collectivités)." colspan="4"/>
+					<newline />
+					<button icon="gtk-cancel" colspan="1" string="Annuler"
+						special="cancel"/>
+					<button colspan="1" name="%(action_view_openstc_pret_create_emprunt_wizard)d" string="Commencer l'emprunt" type="action" />
+				</form>
+			</field>
+		</record>
+	</data>
+</openerp>

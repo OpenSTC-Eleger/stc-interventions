@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		<!-- Modifs du workflow de hotel.reservation (ajout de fonctionnalités 
+			du workflow existant) -->
+		<record model="workflow.activity" id="act_cancel">
+			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
+			<field name="name">cancel</field>
+			<field name="kind">function</field>
+			<field name="action">cancelled_reservation()</field>
+		</record>
+
+		<record model="workflow.activity" id="act_redraft">
+			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
+			<field name="name">redraft</field>
+			<field name="kind">function</field>
+			<field name="action">redrafted_reservation()</field>
+		</record>
+
+		<record model="workflow.activity" id="hotel_reservation.act_draft">
+			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
+			<field name="flow_start" eval="False" />
+			<field name="name">draft</field>
+			<field name="kind">function</field>
+			<field name="action">drafted_reservation()</field>
+		</record>
+
+		<record model="workflow.activity" id="act_remplir">
+			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
+			<field name="name">remplir</field>
+			<field name="kind">function</field>
+			<field name="flow_start">True</field>
+			<field name="action">ARemplir_reservation()</field>
+		</record>
+
+		<record model="workflow.activity" id="act_in_use">
+			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
+			<field name="name">in_use</field>
+			<field name="kind">function</field>
+			<field name="action">in_used_reservation()</field>
+		</record>
+
+		<record model="workflow.activity" id="hotel_reservation.act_done">
+			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
+			<field name="name">done</field>
+			<field name="flow_stop">True</field>
+			<field name="kind">function</field>
+			<field name="action">done_reservation()</field>
+		</record>
+
+		<record model="workflow.transition" id="t00">
+			<field name="act_from" ref="act_remplir" />
+			<field name="act_to" ref="hotel_reservation.act_draft" />
+			<field name="signal">to_draft</field>
+			<field name="condition">need_confirm()</field>
+		</record>
+		<record model="workflow.transition" id="t002">
+			<field name="act_from" ref="act_remplir" />
+			<field name="act_to" ref="hotel_reservation.act_confirm" />
+			<field name="signal">to_draft</field>
+			<field name="condition">not_need_confirm()</field>
+		</record>
+
+
+		<record model="workflow.transition" id="t001">
+			<field name="act_from" ref="hotel_reservation.act_draft" />
+			<field name="act_to" ref="act_remplir" />
+			<field name="signal">reserv_modified</field>
+		</record>
+
+
+		<record model="workflow.transition" id="t01">
+			<field name="act_from" ref="hotel_reservation.act_draft" />
+			<field name="act_to" ref="act_cancel" />
+			<field name="signal">cancel</field>
+		</record>
+
+		<record model="workflow.transition" id="t02">
+			<field name="act_from" ref="hotel_reservation.act_confirm" />
+			<field name="act_to" ref="act_cancel" />
+			<field name="signal">cancel</field>
+		</record>
+
+		<record model="workflow.transition" id="t03">
+			<field name="act_from" ref="act_cancel" />
+			<field name="act_to" ref="act_remplir" />
+			<field name="signal">redraft</field>
+		</record>
+
+		<record model="workflow.transition" id="t04">
+			<field name="act_from" ref="act_redraft" />
+			<field name="act_to" ref="hotel_reservation.act_draft" />
+			<field name="condition">is_drafted()</field>
+		</record>
+		<record model="workflow.transition" id="t05">
+			<field name="act_from" ref="act_redraft" />
+			<field name="act_to" ref="act_cancel" />
+			<field name="condition">is_not_drafted()</field>
+		</record>
+		<record model="workflow.transition" id="hotel_reservation.t2">
+			<field name="act_from" ref="hotel_reservation.act_confirm" />
+			<field name="act_to" ref="act_in_use" />
+			<field name="signal">put_in_use</field>
+		</record>
+		<record model="workflow.transition" id="t06">
+			<field name="act_from" ref="act_in_use" />
+			<field name="act_to" ref="hotel_reservation.act_done" />
+			<field name="signal">done</field>
+		</record>
+	</data>
+</openerp>
