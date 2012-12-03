@@ -9,8 +9,7 @@
 			<field name="inherit_id" ref="product.product_product_tree_view" />
 			<field name="type">tree</field>
 			<field name="arch" type="xml">
-				<tree
-					colors="red:virtual_available&lt;0;blue:virtual_available&gt;=0 and state in ('draft', 'end', 'obsolete');black:virtual_available&gt;=0 and state not in ('draft', 'end', 'obsolete')"
+				<tree colors="red:virtual_available&lt;0;blue:virtual_available&gt;=0 and state in ('draft', 'end', 'obsolete');black:virtual_available&gt;=0 and state not in ('draft', 'end', 'obsolete')" 
 					string="Products" position="replace">
 					<tree string="Produits">
 						<field name="name" />
@@ -409,27 +408,24 @@
 			<field name="src_model">product.product</field>
 			<field name="view_id" ref="hotel_reservation.view_hotel_reservation_form" />
 			<field name="target">current</field>
-			<field name="context">{'from_product':'1', 'product_ids':active_ids}
-			</field>
+			<field name="context">{'from_product':'1', 'product_ids':active_ids}</field>
 		</record>
 
-		<record id="action_open_pret_location_reservation_create_values"
-			model="ir.values">
+		<record id="action_open_pret_location_reservation_create_values" model="ir.values">
 			<field name="name">Réserver article(s)</field>
 			<field name="key2">client_action_multi</field>
-			<field eval="1" name="object" />
-			<field name="value"
-				eval="'ir.actions.act_window,' + str(ref('action_open_pret_location_reservation_create_form'))" />
+			<field eval="1" name="object"/>
+			<field name="value" eval="'ir.actions.act_window,' + str(ref('action_open_pret_location_reservation_create_form'))" />
 			<field name="key">action</field>
-			<field name="model">hotel.room</field>
+			<field name="model">product.product</field>
 		</record>
 
 		<!-- calendar views -->
 
 
 		<!-- Menus Mouvements Internes -->
-		<menuitem icon="terp-project" id="base.menu_main_openstock"
-			name="Prêt - Location" sequence="10" />
+		<menuitem icon="terp-project" id="base.menu_main_openstock" 
+		    name="Prêt - Location" sequence="10" />
 
 		<menuitem id="menu_action_view_reservations" name="Gestion des Réservations"
 			parent="base.menu_main_openstock" sequence="2" />

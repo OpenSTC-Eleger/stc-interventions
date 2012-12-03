@@ -61,7 +61,6 @@ class product_product(osv.osv):
     _inherit = "product.product"
     _description = "Task Category"
     _columns = {
-                #, type="integer", store=True, method=True
         "qte_dispo": fields.function(_calc_qte_dispo_now, store=True,string="Disponible Aujourd'hui", type="integer", readonly=True),
         "geo": fields.char("Position Géographique", 128),
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
@@ -163,7 +162,6 @@ class hotel_reservation(osv.osv):
         etape_validation = False
         for resa in reservations:
             for line in resa.reservation_line:
-                print(line.reserve_product.name + " : qté désirée=" + str(line.qte_reserves) + ", seuil=" + str(line.reserve_product.seuil_confirm))
                 if line.qte_reserves > line.reserve_product.seuil_confirm:
                     etape_validation = True
         print("need_confirm")
@@ -192,16 +190,16 @@ class hotel_reservation(osv.osv):
         #Si pour l'initialisation de la vue, on est passé par l'action "Réserver article(s)" associée aux catalogues produits
         if ('from_product' in context) and (context['from_product']=='1') :
             data = context and context.get('product_ids', []) or []
-            #produit_obj = self.pool.get('product.product')
-            produit_obj = self.pool.get('hotel.room')
+            produit_obj = self.pool.get('product.product')
+            #produit_obj = self.pool.get('hotel.room')
             #Pour chaque produit sélectionnés dans la vue tree des catalogues, on crée une ligne de réservation (objet hotel.reservation.line)
             reservation_lines = []
             for produit in produit_obj.browse(cr, uid, data, []):
                 reservation_lines.append(self.pool.get('hotel_reservation.line').create(cr, uid, {
-                                                                                        'reserve_product':  produit.product_id.id,
-                                                                                        'categ_id':produit.product_id.categ_id.id,
-                                                                                        'reserve':[(4, produit.product_id.id)],
-                                                                                        'prix_unitaire':produit.product_id.product_tmpl_id.list_price,
+                                                                                        'reserve_product':  produit.id,
+                                                                                        'categ_id':produit.categ_id.id,
+                                                                                        'reserve':[(4, produit.id)],
+                                                                                        'prix_unitaire':produit.product_tmpl_id.list_price,
                                                                                         'qte_reserves':10
                                                                                 }))
 
@@ -350,6 +348,7 @@ class hotel_reservation(osv.osv):
         return True
     
     #Renvoies actions bdd permettant de mettre toutes les dispo de la résa à False
+    #Ne renvoie que les actions de mises à jours des lignes déjà enregistrées dans la réservation
     def uncheck_all_dispo(self, cr, uid, ids, contex=None):
         line_ids = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id','in',ids)])
         reservation_line = []
@@ -485,38 +484,47 @@ class hotel_reservation(osv.osv):
         print(state)
         ret = super(hotel_reservation, self).on_change_checkout(cr, uid, ids, checkin, checkout, context)
         print(ids)
-        #TOCKECK: Verif utilité, à supprimer et tester si tout fonctionne
-        if reservation_line and ids:
-            self.write(cr, uid, ids, {'reservation_line':reservation_line})
+        #TODO: Permet d'enregistrer les lignes de réservations lors d'un onchange
+        """if reservation_line and ids:
+            self.write(cr, uid, ids, {'reservation_line':reservation_line})"""
         #Fin TOCHECK
         
         if state and state in ('confirm','draft'):
+            #TODO: Mettre la mise à l'état "remplir" dans le wkf, peut-être via une activité intermédiaire
             self.trigger_reserv_modified(cr, uid, ids, context)
             if ids:
-                ret['value'] = {'state':'remplir', 'reservation_line': self.uncheck_all_dispo(cr, uid, ids, context)}
+                #ret['value'] = {'state':'remplir', 'reservation_line': self.uncheck_all_dispo(cr, uid, ids, context)}
+                ret['value'] = {'state':'remplir'}
             ret['warning'] = {'title':'Modification(s) importante(s) de la réservation', 'message':"""Les modifications de la réservation (ajout/modification 
                                    d\'articles réservés ou des dates de réservation) impliquent de revalider la disponibilité des articles que vous
                                    souhaitez réserver. Veuillez cliquer à nouveau sur le bouton "Vérifier Disponibilités"."""}
         
-        elif state and state in ("remplir",):
-             ret['value'] = {'reservation_line':self.uncheck_all_dispo(cr, uid, ids, context)}
+        if state and state in ("remplir","draft","confirm"):
+            if not reservation_line:
+                reservation_line = []
+            reservation_line.extend(self.uncheck_all_dispo(cr, uid, ids, context))
+            ret.update({'reservation_line':reservation_line})
         return ret
         
     def on_change_reservation_line(self, cr ,uid, ids, reservation_line=False, state=False, context=None):
         ret = {'value':{}}
-        if reservation_line and ids:
-            self.write(cr, uid, ids, {'reservation_line':reservation_line})
+        """if reservation_line and ids:
+            self.write(cr, uid, ids, {'reservation_line':reservation_line})"""
         if state and state in ('draft', 'confirm'):
             for data in reservation_line:
                 #Toute modif de lignes produits entraîne une revalidation, seule la suppression d'une ligne outrepasse cette étape
                 #si aucune modif n'implique de re-valider les dispo, on laisse l'utilisateur poursuivre
                 if data[0] <> 4:
                     self.trigger_reserv_modified(cr, uid, ids, context)
-                    ret['value'] = {'reservation_line': self.uncheck_all_dispo(cr, uid, ids, context)}
+                    ret['value'] = 'remplir'
+                    if not reservation_line:
+                        reservation_line = []
+                    reservation_line.extend(self.uncheck_all_dispo(cr, uid, ids, context))
+                    ret['value'] = {'reservation_line': reservation_line}
                     ret['warning'] = {'title':'Modification(s) importante(s) de la réservation', 'message': """Les modifications de la réservation (ajout/modification 
                                 d\'articles réservés ou des dates de réservation) impliquent de revalider la disponibilité des articles que vous
                                 souhaitez réserver. Veuillez cliquer à nouveau sur le bouton "Vérifier Disponibilités"."""}
-                    break 
+                    break
         return ret
     
     def onchange_partner_id(self, cr, uid, ids, part):
