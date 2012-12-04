@@ -337,16 +337,16 @@
 			<field name="res_model">hotel.reservation</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','remplir'),('in_option','=',False)]</field>
+			<field name="domain">[('state','=','remplir'),('in_option','in',('no','in_option'))]</field>
 		</record>
 
 		<record id="action_openstock_view_reservation_a_revalider" model="ir.actions.act_window">
-			<field name="name">Réservations A Re-Vérifier</field>
+			<field name="name">Réservations Bloquées</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="res_model">hotel.reservation</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','remplir'),('in_option','=',True)]</field>
+			<field name="domain">[('state','=','remplir'),('in_option','=','block')]</field>
 		</record>
 
 

@@ -107,15 +107,44 @@ class hotel_reservation_line(osv.osv):
 hotel_reservation_line()
 
 class hotel_reservation(osv.osv):
+    AVAILABLE_IN_OPTION_LIST = [('no','Rien à Signaler'),('in_option','Réservation En Option'),('block','Réservation bloquée')]
     _name = "hotel.reservation"
     _inherit = "hotel.reservation"
     _description = "Réservations"
 
+    def _calc_in_option(self, cr, uid, ids, name, args, context=None):
+        print("début calc_in_option")
+        ret = {}
+        for resa in self.browse(cr, uid, ids):
+            ret[resa.id] = 'no'
+            now = datetime.now()
+            checkin = strptime(resa.checkin, '%Y-%m-%d %H:%M:%S')    
+            for line in resa.reservation_line:
+                #Vérif si résa dans les délais, sinon, in_option est cochée
+                d = timedelta(days=int(line.reserve_product.sale_delay))
+                print("now :"+str(now))
+                print("checkin :" + str(checkin))
+                #Si l'un des produits est hors délai
+                if now + d > checkin:
+                    if line.reserve_product.bloquant:
+                        ret[resa.id] = 'block'
+                    elif ret[resa.id] == 'no':
+                        ret[resa.id] = 'in_option'
+        return ret
+    
+    def _get_resa_modified(self, cr, uid, ids, context=None):
+        return ids
+    
     _columns = {
                 'state': fields.selection([('draft', 'A Valider'),('confirm','Confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Brouillon')], 'Etat',readonly=True),
-                'in_option':fields.boolean("En Option", readonly = True, help=("""Une réservation en option signifie 
-                que votre demande est prise en compte mais qu'un ou plusieurs articles que vous voulez réserver ne 
-                sont pas disponible à cette date.""")),
+                'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
+                                            help=("""Une réservation mise en option signifie que votre demande est prise en compte mais
+                                            dont on ne peut pas garantir la livraison à la date prévue.
+                                            Une réservation signifie que la réservation n'est pas prise en compte car nous ne pouvons pas 
+                                            garantir la livraison aux dates que vous avez prévues""")),
+                #'in_option':fields.boolean("En Option", readonly = True, help=("""Une réservation en option signifie 
+                #votre demande est prise en compte mais qu'un ou plusieurs articles que vous voulez réserver ne 
+                #sont pas disponible à cette date.""")),
                 'name':fields.char('Nom Manifestation', size=128, required=True),
                 'partner_mail':fields.char('Email Demandeur', size=128, required=False)
         }
@@ -127,21 +156,25 @@ class hotel_reservation(osv.osv):
 
     def confirmed_reservation(self,cr,uid,ids):
         #self.write(cr, uid, ids, {'state':'confirm'})
-        if self.is_all_dispo(cr, uid, ids[0]):
-            if self.is_all_valid(cr, uid, ids[0]):
-                self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
-                #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
-                return True
+        for resa in self.browse(cr, uid, ids):
+            if self.is_all_dispo(cr, uid, ids[0]):
+                if self.is_all_valid(cr, uid, ids[0]):
+                    if resa.in_option == 'block':
+                        raise osv.except_osv("Erreur","""Votre réservation est bloquée car la date de début de votre manifestion
+                        ne nous permet pas de vous livrer dans les temps.""")
+                    self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
+                    #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
+                    return True
+                else:
+                    raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
+                    pour les articles réservés (lieu où les livrer et combien) soit cocher la case "ne sais pas".
+                    Si vous avez rempli les infos supplémentaires et coché la case "ne sais pas", veuillez la décocher. """)
+                    return False
             else:
-                raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
-                pour les articles réservés (lieu où les livrer et combien) soit cocher la case "ne sais pas".
-                Si vous avez rempli les infos supplémentaires et coché la case "ne sais pas", veuillez la décocher. """)
+                raise osv.except_osv("""Vous devez vérifier les disponibilités""","""Erreur de validation du formulaire: un ou plusieurs
+                 de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée. 
+                 Vous devez valider les disponibilités de vos articles via le bouton "vérifier disponibilités".""")
                 return False
-        else:
-            raise osv.except_osv("""Vous devez vérifier les disponibilités""","""Erreur de validation du formulaire: un ou plusieurs
-             de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée. 
-             Vous devez valider les disponibilités de vos articles via le bouton "vérifier disponibilités".""")
-            return False
         return True
     
     #Mettre à l'état cancle et retirer les mouvements de stocks (supprimer mouvement ou faire le mouvement inverse ?)
@@ -152,21 +185,26 @@ class hotel_reservation(osv.osv):
     
     
     def drafted_reservation(self, cr, uid, ids):
-        if self.is_all_dispo(cr, uid, ids[0]):
-            if self.is_all_valid(cr, uid, ids[0]):
-                self.write(cr, uid, ids, {'state':'draft'}, context={'check_dispo':'1'})
-                #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
-                return True
+        for resa in self.browse(cr, uid, ids):
+            if self.is_all_dispo(cr, uid, ids[0]):
+                if self.is_all_valid(cr, uid, ids[0]):
+                    if resa.in_option == 'block':
+                        raise osv.except_osv("Erreur","""Votre réservation est bloquée car la date de début de votre manifestion
+                        ne nous permet pas de vous livrer dans les temps.""")
+                    self.write(cr, uid, ids, {'state':'draft'}, context={'check_dispo':'1'})
+                    #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
+                    return True
+                else:
+                    raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
+                    pour les articles réservés (lieu où les livrer et combien) soit cocher la case "ne sais pas".
+                    Si vous avez rempli les infos supplémentaires et coché la case "ne sais pas", veuillez la décocher. """)
+                    return False
             else:
-                raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
-                pour les articles réservés (lieu où les livrer et combien) soit cocher la case "ne sais pas".
-                Si vous avez rempli les infos supplémentaires et coché la case "ne sais pas", veuillez la décocher. """)
+                raise osv.except_osv("""Vous devez vérifier les disponibilités""","""Erreur de validation du formulaire: un ou plusieurs
+                 de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée. 
+                 Vous devez valider les disponibilités de vos articles via le bouton "vérifier disponibilités".""")
                 return False
-        else:
-            raise osv.except_osv("""Vous devez vérifier les disponibilités""","""Erreur de validation du formulaire: un ou plusieurs
-             de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée. 
-             Vous devez valider les disponibilités de vos articles via le bouton "vérifier disponibilités".""")
-            return False
+        return True
     
     def to_uncheck_reservation_lines(self, cr, uid, ids):
         self.write(cr, uid, ids, {'reservation_line':self.uncheck_all_dispo(cr, uid, ids)})
@@ -485,28 +523,6 @@ class hotel_reservation(osv.osv):
             part_vals = self.onchange_partner_id( cr, uid, [], vals['partner_id'])
             for (cle, data) in part_vals['value'].items():        
                 vals[cle] = data
-        
-        #Vérif si résa dans les délais, sinon, in_option est cochée
-        now = datetime.now()
-        #Récup délai livraison le plus court
-        prod_obj = self.pool.get("product.product")
-        list_prod_ids = []
-        for lines in vals['reservation_line']:
-            list_prod_ids.append(lines[2]['reserve_product'])
-        checkin = strptime(vals['checkin'], '%Y-%m-%d %H:%M:%S')
-        #On détermine si la résa est en hors délai ou non
-        for prod in prod_obj.read(cr, uid, list_prod_ids, ['sale_delay','bloquant']):
-            d = timedelta(days=int(prod['sale_delay']))
-            #Si un des produits est hors délai
-            print("now :"+str(now))
-            print("checkin" + str(checkin))
-            if now - d <= checkin:
-                if prod['bloquant']:
-                    raise osv.except_osv("Réservation Hors Délais", '''Erreur, Votre réservation est "hors délai",
-                     comme nous ne pouvons vous assurer la livraison de vos emprunts dans les temps, votre réservation
-                     n'est pas enregistrée. Cependant, vous pouvez toujours la modifier pour qu'elle soit traitable (décaler heures manif, supprimer articles hors délais etc...)''')
-                else:
-                    vals['in_option'] = True
         #id = super(hotel_reservation, self).create(cr, uid, vals, context)        
         return super(hotel_reservation, self).create(cr, uid, vals, context)
         #TOCHECK: Vérif utilité, supprimer puis tester si tout fonctionne
