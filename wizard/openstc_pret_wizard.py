@@ -53,9 +53,10 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
                 if str(line.reserve_product.id) in dict_error_prods.keys():
                     #List contenant le résultat d'une requête sql calculée dans openstock.py renvoyant [qte_voulue, qte_dispo]
                     prod_error = dict_error_prods[str(line.reserve_product.id)]
-                    emprunt_values.append((0,0,{'product_id':line.reserve_product.id,
-                                                'qte': prod_error[0] - prod_error[1],
-                                                'price_unit':line.prix_unitaire}))
+                    if line.reserve_product.empruntable:
+                        emprunt_values.append((0,0,{'product_id':line.reserve_product.id,
+                                                    'qte': prod_error[0] - prod_error[1],
+                                                    'price_unit':line.prix_unitaire}))
             ret.update({'emprunt_line' : emprunt_values})
             print(ret)
         return ret

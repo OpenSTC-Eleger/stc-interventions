@@ -30,6 +30,10 @@
 				<field name="virtual_available" position="after">
 					<field name="seuil_confirm" />
 				</field>
+				<field name="purchase_ok" position="after">
+				    <field name="bloquant"/>
+				    <field name="empruntable"/>
+				</field>
 			</field>
 		</record>
 
@@ -41,7 +45,7 @@
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<field name="reservation_no" position="after">
-					<field name="name" />
+					<field name="name" attrs="{'readonly':[('state','in',('in_use','done'))]}"/>
 				</field>
 				<field name="date_order" select="1" position="replace">
 					<field name="date_order" string="Date de création" select="1"
@@ -50,63 +54,66 @@
 				</field>
 				<field name="shop_id" select="2" position="replace">
 					<field name="shop_id" string="Magasin" select="2" position="replace"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
 				</field>
 				<field name="pricelist_id" position="replace">
 					<field name="pricelist_id" string="Liste de prix"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
 				</field>
 				<field name="partner_id" on_change="onchange_partner_id(partner_id)"
 					select="1" position="replace">
 					<field name="partner_id" string="Demandeur"
 						on_change="onchange_partner_id(partner_id)" select="1"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
 					<field name="partner_mail" attrs="{'invisible':[('state','=','remplir')]}" />
 				</field>
 				<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
 					position="replace">
 					<field name="partner_order_id" string="Adresse de Commande"
 						domain="[('partner_id','=',partner_id)]"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+						attrs="{'invisible':[('state','&lt;&gt;',False)],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
 				</field>
 				<field name="partner_invoice_id" domain="[('partner_id','=',partner_id)]"
 					position="replace">
 					<field name="partner_invoice_id" string="Adresse de facturation"
 						domain="[('partner_id','=',partner_id)]"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+						attrs="{'invisible':[('state','&lt;&gt;',False)],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
 				</field>
 				<field name="partner_shipping_id" domain="[('partner_id','=',partner_id)]"
 					position="replace">
 					<field name="partner_shipping_id" string="Adresse de Livraison"
 						domain="[('partner_id','=',partner_id)]"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
 				</field>
 				<field name="adults" position="replace" />
 				<field name="childs" position="replace" />
 				<field name="checkin" colspan="1" position="replace">
 					<field name="checkin" string="Début de la Réservation"
-						colspan="1" attrs="{'readonly':[('state','=','done')]}" />
+						colspan="1" attrs="{'readonly':[('state','in',('in_use','done'))]}" />
 				</field>
 				<field name="checkout" on_change="on_change_checkout(checkin,checkout)"
 					position="replace">
 					<field name="checkout" string="Fin de la Réservation"
 						on_change="on_change_checkout(checkin,checkout,state,reservation_line)"
-						attrs="{'readonly':[('state','=','done')]}" />
+						attrs="{'readonly':[('state','in',('in_use','done'))]}" />
 				</field>
 
 
 				<field name="reservation_line" colspan="4" nolabel="1"
 					position="replace">
-					<field name="reservation_line" string="Lignes de Réservation"
-						colspan="4" nolabel="1"
-						on_change="on_change_reservation_line(reservation_line,state)">
+					<field name="reservation_line" string="Lignes de Réservation" required="1" 
+						colspan="4" nolabel="1"	on_change="on_change_reservation_line(reservation_line,state)"
+						attrs="{'readonly':[('state','in',('in_use','done'))]}">
 						<tree string="Ligne de réservation" editable="top">
 							<field name="categ_id" required="1" />
-							<field name="reserve_product" colspan="4"
+							<field name="reserve_product" colspan="1"
 								domain="[('categ_id','=',categ_id)]" required="1" />
 							<field name="qte_reserves" />
-							<field name="prix_unitaire" />
-							<field name="dispo" />
+							<field name="prix_unitaire" invisible="1"/>
+							<field name="dispo" readonly="1"/>
+							<field name="infos"/>
+							<field name="no_infos"/>
+							<field name="valide"/>
 						</tree>
 					</field>
 				</field>

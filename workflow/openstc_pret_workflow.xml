@@ -25,6 +25,14 @@
 			<field name="action">drafted_reservation()</field>
 		</record>
 
+		<record model="workflow.activity" id="hotel_reservation.act_done">
+			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
+			<field name="name">done</field>
+			<field name="flow_stop">True</field>
+			<field name="kind">function</field>
+			<field name="action">done_reservation()</field>
+		</record>
+		
 		<record model="workflow.activity" id="act_remplir">
 			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
 			<field name="name">remplir</field>
@@ -40,14 +48,13 @@
 			<field name="action">in_used_reservation()</field>
 		</record>
 
-		<record model="workflow.activity" id="hotel_reservation.act_done">
+		<record model="workflow.activity" id="act_to_uncheck">
 			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
-			<field name="name">done</field>
-			<field name="flow_stop">True</field>
+			<field name="name">to_uncheck</field>
 			<field name="kind">function</field>
-			<field name="action">done_reservation()</field>
+			<field name="action">to_uncheck_reservation_lines()</field>
 		</record>
-
+		
 		<record model="workflow.transition" id="t00">
 			<field name="act_from" ref="act_remplir" />
 			<field name="act_to" ref="hotel_reservation.act_draft" />
@@ -64,10 +71,22 @@
 
 		<record model="workflow.transition" id="t001">
 			<field name="act_from" ref="hotel_reservation.act_draft" />
-			<field name="act_to" ref="act_remplir" />
+			<field name="act_to" ref="act_to_uncheck" />
 			<field name="signal">reserv_modified</field>
 		</record>
 
+		<record model="workflow.transition" id="t003">
+			<field name="act_from" ref="hotel_reservation.act_confirm" />
+			<field name="act_to" ref="act_to_uncheck" />
+			<field name="signal">reserv_modified</field>
+		</record>
+		
+		<record model="workflow.transition" id="t004">
+			<field name="act_from" ref="act_to_uncheck" />
+			<field name="act_to" ref="act_remplir" />
+			<field name="condition">True</field>
+		</record>
+		
 
 		<record model="workflow.transition" id="t01">
 			<field name="act_from" ref="hotel_reservation.act_draft" />
@@ -97,6 +116,7 @@
 			<field name="act_to" ref="act_cancel" />
 			<field name="condition">is_not_drafted()</field>
 		</record>
+		
 		<record model="workflow.transition" id="hotel_reservation.t2">
 			<field name="act_from" ref="hotel_reservation.act_confirm" />
 			<field name="act_to" ref="act_in_use" />

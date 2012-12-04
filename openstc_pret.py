@@ -21,11 +21,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from datetime import datetime
+from datetime import datetime,timedelta
 
 from osv import fields, osv
 import netsvc
 from tools.translate import _
+from mx.DateTime.mxDateTime import strptime
 
 #----------------------------------------------------------
 # Fournitures
@@ -65,6 +66,8 @@ class product_product(osv.osv):
         "geo": fields.char("Position Géographique", 128),
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
         "seuil_confirm":fields.integer("Qté Max sans Validation", help="Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"),
+        "bloquant":fields.boolean("\"Non disponibilité\" bloquante", help="Un produit dont la non dispo est bloquante empêche la réservation de se poursuivre (elle reste en Brouillon)"),
+        "empruntable":fields.boolean("Se fournir à l'extèrieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures")
         }
 
     _defaults = {
@@ -77,12 +80,28 @@ product_product()
 class hotel_reservation_line(osv.osv):
     _name = "hotel_reservation.line"
     _inherit = "hotel_reservation.line"
+    
+    #Ligne valide si (infos XOR no_infos)
+    def _calc_line_is_valid(self, cr, uid, ids, name, args, context=None):
+        ret = {}
+        for line in self.browse(cr, uid, ids):
+            ret.update({line.id: (line.infos and not line.no_infos) or (not line.infos and line.no_infos)})
+        return ret
+
+    def _get_line_to_valide(self, cr, uid, ids, context=None):
+        return ids
+    
     _columns = {
         'categ_id': fields.many2one('product.category','Type d\'article'),
         "reserve_product": fields.many2one("product.product", "Articles réservés"),
         "qte_reserves":fields.integer("Quantité désirée"),
         "prix_unitaire": fields.float("Prix Unitaire", digit=(3,2)),
-        "dispo":fields.boolean("Disponible")
+        "dispo":fields.boolean("Disponible"),
+        "infos":fields.char("Informations supplémentaires",size=256),
+        "no_infos":fields.boolean("Ne sais pas"),
+        "valide":fields.function(_calc_line_is_valid, method=True, type="boolean", 
+                                 store={'hotel_reservation.line':(_get_line_to_valide, ['infos','no_infos'], 10),},
+                                 string="Ligne Valide")
         }
 
 hotel_reservation_line()
@@ -97,7 +116,7 @@ class hotel_reservation(osv.osv):
                 'in_option':fields.boolean("En Option", readonly = True, help=("""Une réservation en option signifie 
                 que votre demande est prise en compte mais qu'un ou plusieurs articles que vous voulez réserver ne 
                 sont pas disponible à cette date.""")),
-                'name':fields.char('Nom Manifestation', size=128),
+                'name':fields.char('Nom Manifestation', size=128, required=True),
                 'partner_mail':fields.char('Email Demandeur', size=128, required=False)
         }
     _defaults = {
@@ -109,9 +128,15 @@ class hotel_reservation(osv.osv):
     def confirmed_reservation(self,cr,uid,ids):
         #self.write(cr, uid, ids, {'state':'confirm'})
         if self.is_all_dispo(cr, uid, ids[0]):
-            self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
-            #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
-            return True
+            if self.is_all_valid(cr, uid, ids[0]):
+                self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
+                #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
+                return True
+            else:
+                raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
+                pour les articles réservés (lieu où les livrer et combien) soit cocher la case "ne sais pas".
+                Si vous avez rempli les infos supplémentaires et coché la case "ne sais pas", veuillez la décocher. """)
+                return False
         else:
             raise osv.except_osv("""Vous devez vérifier les disponibilités""","""Erreur de validation du formulaire: un ou plusieurs
              de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée. 
@@ -128,14 +153,24 @@ class hotel_reservation(osv.osv):
     
     def drafted_reservation(self, cr, uid, ids):
         if self.is_all_dispo(cr, uid, ids[0]):
-            self.write(cr, uid, ids, {'state':'draft'}, context={'check_dispo':'1'})
-            #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
-            return True
+            if self.is_all_valid(cr, uid, ids[0]):
+                self.write(cr, uid, ids, {'state':'draft'}, context={'check_dispo':'1'})
+                #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
+                return True
+            else:
+                raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
+                pour les articles réservés (lieu où les livrer et combien) soit cocher la case "ne sais pas".
+                Si vous avez rempli les infos supplémentaires et coché la case "ne sais pas", veuillez la décocher. """)
+                return False
         else:
             raise osv.except_osv("""Vous devez vérifier les disponibilités""","""Erreur de validation du formulaire: un ou plusieurs
              de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée. 
              Vous devez valider les disponibilités de vos articles via le bouton "vérifier disponibilités".""")
             return False
+    
+    def to_uncheck_reservation_lines(self, cr, uid, ids):
+        self.write(cr, uid, ids, {'reservation_line':self.uncheck_all_dispo(cr, uid, ids)})
+        return True
     
     def redrafted_reservation(self, cr, uid, ids):
         self.write(cr, uid, ids, {'state':'remplir'})
@@ -173,7 +208,8 @@ class hotel_reservation(osv.osv):
     
     def ARemplir_reservation(self, cr, uid, ids):
         #TOCHECK: Voir quand il faut mettre la résa à l'état "in_option" : Clique sur Suivant malgré non dispo ?
-        self.write(cr, uid, ids, {'state':'remplir', 'reservation_line':self.uncheck_all_dispo(cr, uid, ids)})
+        print("Mise à l'état remplir")
+        self.write(cr, uid, ids, {'state':'remplir'})
         return True
     
     #Cette fonction déclenche le signal "reserv_modified" du wkf pour indiquer qu'il faut refaire 
@@ -347,13 +383,19 @@ class hotel_reservation(osv.osv):
                 return False
         return True
     
+    def is_all_valid(self, cr, uid, id, context=None):
+        for line in self.browse(cr, uid, id, context).reservation_line:
+            if not line.valide:
+                return False
+        return True
+    
     #Renvoies actions bdd permettant de mettre toutes les dispo de la résa à False
     #Ne renvoie que les actions de mises à jours des lignes déjà enregistrées dans la réservation
-    def uncheck_all_dispo(self, cr, uid, ids, contex=None):
+    def uncheck_all_dispo(self, cr, uid, ids, context=None):
         line_ids = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id','in',ids)])
         reservation_line = []
         for line in line_ids:
-            reservation_line.append((1,line,{'dispo':False}))
+            reservation_line.append((1,line,{'dispo':False, 'valide':False}))
         return reservation_line
     
     #Lors de l'appui sur le bouton "Générer Check-In", on créé le checkin et on passe l'état de la résa à in_use
@@ -431,7 +473,7 @@ class hotel_reservation(osv.osv):
         for id in ids:
             email_obj.send_mail(cr, uid, email_tmpl_id, id)
         return
-         
+    
     def create(self, cr, uid, vals, context=None):
         #Si on vient de créer une nouvelle réservation et qu'on veut la sauvegarder (cas où l'on appuie sur
         #"vérifier disponibilités" juste après la création (openERP force la sauvegarde)
@@ -443,6 +485,28 @@ class hotel_reservation(osv.osv):
             part_vals = self.onchange_partner_id( cr, uid, [], vals['partner_id'])
             for (cle, data) in part_vals['value'].items():        
                 vals[cle] = data
+        
+        #Vérif si résa dans les délais, sinon, in_option est cochée
+        now = datetime.now()
+        #Récup délai livraison le plus court
+        prod_obj = self.pool.get("product.product")
+        list_prod_ids = []
+        for lines in vals['reservation_line']:
+            list_prod_ids.append(lines[2]['reserve_product'])
+        checkin = strptime(vals['checkin'], '%Y-%m-%d %H:%M:%S')
+        #On détermine si la résa est en hors délai ou non
+        for prod in prod_obj.read(cr, uid, list_prod_ids, ['sale_delay','bloquant']):
+            d = timedelta(days=int(prod['sale_delay']))
+            #Si un des produits est hors délai
+            print("now :"+str(now))
+            print("checkin" + str(checkin))
+            if now - d <= checkin:
+                if prod['bloquant']:
+                    raise osv.except_osv("Réservation Hors Délais", '''Erreur, Votre réservation est "hors délai",
+                     comme nous ne pouvons vous assurer la livraison de vos emprunts dans les temps, votre réservation
+                     n'est pas enregistrée. Cependant, vous pouvez toujours la modifier pour qu'elle soit traitable (décaler heures manif, supprimer articles hors délais etc...)''')
+                else:
+                    vals['in_option'] = True
         #id = super(hotel_reservation, self).create(cr, uid, vals, context)        
         return super(hotel_reservation, self).create(cr, uid, vals, context)
         #TOCHECK: Vérif utilité, supprimer puis tester si tout fonctionne
@@ -461,8 +525,9 @@ class hotel_reservation(osv.osv):
     def write(self, cr, uid, ids, vals, context=None):
         #OpenERP fait toujours un write des modifs faites sur le form lors d'un clic de bouton, ce qui peut 
         #conduire à un write(cr, uid, ids, {})
-        print(vals)
-        print(context)
+        if context == None:
+            context = {}
+        
         return super(hotel_reservation, self).write(cr, uid, ids, vals, context)
     
     def unlink(self, cr, uid, ids, context):
@@ -474,8 +539,9 @@ class hotel_reservation(osv.osv):
             #Affichage d'un wizard pour simuler une msgbox
         print('on_change_in_option')
         print(state)
-        if state and state in ('draft','confirm'):
-            return {'warning':{'title':'Réservation mise en option', 'message': 'Attention, certains produits ne sont pas disponibles, votre réservation est mise en option.'}}
+        if in_option:
+            return {'warning':{'title':'Réservation mise en option', 'message': '''Attention, Votre réservation est "hors délai"
+            , nous ne pouvons pas vous assurer que nous pourrons vous livrer.'''}}
         
         return {'value':{}}
     
@@ -492,39 +558,46 @@ class hotel_reservation(osv.osv):
         if state and state in ('confirm','draft'):
             #TODO: Mettre la mise à l'état "remplir" dans le wkf, peut-être via une activité intermédiaire
             self.trigger_reserv_modified(cr, uid, ids, context)
-            if ids:
+            """if ids:
                 #ret['value'] = {'state':'remplir', 'reservation_line': self.uncheck_all_dispo(cr, uid, ids, context)}
-                ret['value'] = {'state':'remplir'}
+                ret['value'] = {'state':'remplir'}"""
+            ret['value'].update({'state':'remplir'})
             ret['warning'] = {'title':'Modification(s) importante(s) de la réservation', 'message':"""Les modifications de la réservation (ajout/modification 
                                    d\'articles réservés ou des dates de réservation) impliquent de revalider la disponibilité des articles que vous
                                    souhaitez réserver. Veuillez cliquer à nouveau sur le bouton "Vérifier Disponibilités"."""}
         
-        if state and state in ("remplir","draft","confirm"):
+        """if state and state in ("remplir","draft","confirm"):
             if not reservation_line:
                 reservation_line = []
             reservation_line.extend(self.uncheck_all_dispo(cr, uid, ids, context))
-            ret.update({'reservation_line':reservation_line})
+            ret.update({'reservation_line':reservation_line})"""
         return ret
         
     def on_change_reservation_line(self, cr ,uid, ids, reservation_line=False, state=False, context=None):
+        print("début onchange reservation line")
         ret = {'value':{}}
-        """if reservation_line and ids:
-            self.write(cr, uid, ids, {'reservation_line':reservation_line})"""
+        if not reservation_line:
+            reservation_line = []
+        reservation_line.extend(self.uncheck_all_dispo(cr, uid, ids, context))
         if state and state in ('draft', 'confirm'):
-            for data in reservation_line:
-                #Toute modif de lignes produits entraîne une revalidation, seule la suppression d'une ligne outrepasse cette étape
-                #si aucune modif n'implique de re-valider les dispo, on laisse l'utilisateur poursuivre
-                if data[0] <> 4:
-                    self.trigger_reserv_modified(cr, uid, ids, context)
-                    ret['value'] = 'remplir'
-                    if not reservation_line:
-                        reservation_line = []
-                    reservation_line.extend(self.uncheck_all_dispo(cr, uid, ids, context))
-                    ret['value'] = {'reservation_line': reservation_line}
-                    ret['warning'] = {'title':'Modification(s) importante(s) de la réservation', 'message': """Les modifications de la réservation (ajout/modification 
-                                d\'articles réservés ou des dates de réservation) impliquent de revalider la disponibilité des articles que vous
-                                souhaitez réserver. Veuillez cliquer à nouveau sur le bouton "Vérifier Disponibilités"."""}
-                    break
+            self.trigger_reserv_modified(cr, uid, ids, context)
+            self.write(cr, uid, ids, {'reservation_line':self.uncheck_all_dispo(cr, uid, ids, context)})
+            ret['value'].update({'state':'remplir'})
+            ret['warning'] = {'title':'Modification(s) importante(s) de la réservation', 'message': """Les modifications de la réservation (ajout/modification 
+                       d\'articles réservés ou des dates de réservation) impliquent de revalider la disponibilité des articles que vous
+                        souhaitez réserver. Veuillez cliquer à nouveau sur le bouton "Vérifier Disponibilités"."""}
+        
+        """print(reservation_line)
+        ret = {'value':{}}
+        #need_modify = False
+        if state and state in ('draft', 'confirm'):
+            modif_lines = self.uncheck_all_dispo(cr, uid, ids, context)
+            self.trigger_reserv_modified(cr, uid, ids, context)
+            ret['value'].update({'state':'remplir'})
+            if not reservation_line:
+                reservation_line = []
+            reservation_line.extend(modif_lines)
+            ret['value'] = {'reservation_line': reservation_line}"""
         return ret
     
     def onchange_partner_id(self, cr, uid, ids, part):
