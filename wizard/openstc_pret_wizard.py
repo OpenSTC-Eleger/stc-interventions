@@ -75,16 +75,17 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
         for emprunt in self.browse(cr, uid, ids):
             origin = emprunt.origin
             for line in emprunt.emprunt_line:
-                
-                if line.partner_id in dict_partner.keys():
-                    dict_partner[line.partner_id.id].append((line.product_id, lien.qte))
+                line_values = [(0,0,{
+                                    'product_id':line.product_id.id, 
+                                    'product_qty':line.qte, 
+                                    'date_planned':line.date_expected,
+                                    'price_unit':line.price_unit,
+                                    'name':'emprunt: ' + line.product_id.name_template,
+                                    'date_planned':line.date_expected or datetime.now()})]
+                if line.partner_id.id in dict_partner.keys():
+                    dict_partner[line.partner_id.id].extend(line_values)
                 else:
-                    dict_partner[line.partner_id.id] = [(0,0,{'product_id':line.product_id.id, 
-                                                           'product_qty':line.qte, 
-                                                           'date_planned':line.date_expected,
-                                                           'price_unit':line.price_unit,
-                                                           'name':'emprunt: ' + line.product_id.name_template,
-                                                           'date_planned':line.date_expected or datetime.now()})]
+                    dict_partner[line.partner_id.id] = line_values
         
         #Pour chaque mairie (fournisseur), on crée un bon de commande
         for (partner_id, purchase_lines) in dict_partner.items():
@@ -100,15 +101,18 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
                 values[key] = value
             
             print(values)      
-            purchase_obj.create(cr, uid, values)
-        
+            purchase_id = purchase_obj.create(cr, uid, values)
+            wf_service = netsvc.LocalService('workflow')
+            wf_service.trg_validate(uid, 'purchase.order', purchase_id, 'purchase_confirm', cr)
+            """ self.pool.get("stock.move").search(cr, uid, [()])
+            self.pool.get("stock.move")"""
         return {
             'type': 'ir.actions.act_window',
             'res_model':'purchase.order',
             'view_type':'form',
             'view_mode':'tree,form',
-            'domain':'[("state","=","draft")]',
-            'target':'new'
+            'domain':'[("state","=","approved")]',
+            'target':'new',
         }
 
 openstc_pret_emprunt_wizard()

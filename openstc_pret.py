@@ -339,7 +339,7 @@ class hotel_reservation(osv.osv):
             #on vérifie si le produit est dispo en quantité suffisante : stock total - qtés déjà résevées - qtés voulues
             if qte_total_prod < data[1] + qte_voulue:
                 ok = False
-                dict_error_prod[data[0]] = [qte_voulue, data[1]]
+                dict_error_prod[data[0]] = [qte_voulue, qte_total_prod - data[1]]
             prod_list.remove(data[0])
         #Vérif dispo : Cas où on réserve un produit pour la première fois, autrement dit, s'il reste des occurences dans prod_list
         for prod_id in prod_list:
@@ -645,3 +645,13 @@ class product_category(osv.osv):
         'isroomtype': lambda *a: 1,
     }
 product_category()
+
+"""#Héritage de purchase_order pour forcer workflow jusqu'à génération stock lorsque généré par une résa
+class purchase_order(osv.osv):
+    _inherit = "pruchase.order"
+    _name = "purchase.order"
+    _columns = {}
+    
+    def create(self,cr, uid, args, context=None):
+        
+"""
