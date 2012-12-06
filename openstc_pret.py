@@ -490,17 +490,15 @@ class hotel_reservation(osv.osv):
                                             'name':'modèle de mail pour résa annulée', 
                                             'name':'Réservation Annulée',
                                             'model_id':ir_model[0],
-                                            'subject':'Votre Réservation du ${object.checkin.strftime("%d")} au ${object.checkout} a été annulée',
+                                            'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
                                             'email_from':'bruno.plancher@gmail.com',
                                             'email_to':'bruno.plancher@gmail.com',
-                                            'body_text':"""Votre Réservation normalement prévue du ${object.checkin} au 
-                                            ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,
-                                            pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx \n 
-                                            """,
-                                            'body_html':"""Votre Réservation normalement prévue du ${object.checkin} au 
-                                            ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée, 
-                                            pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx </br>
-                                            """
+                                            'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
+${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
+pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
+                                            'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
+${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
+pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
                                            })
             else:
                 email_tmpl_id = email_tmpl_id[0]

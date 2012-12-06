@@ -114,6 +114,8 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
             'domain':'[("state","=","approved")]',
             'target':'new',
         }
+        """
+        """
 
 openstc_pret_emprunt_wizard()
 
