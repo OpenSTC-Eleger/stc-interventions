@@ -38,6 +38,7 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
                 'origin':fields.char('Document d\'origine', size=32)
                 }
     
+    
     def default_get(self, cr, uid, fields, context=None):
         ret = super(openstc_pret_emprunt_wizard, self).default_get(cr, uid, fields, context)
         #Valeurs permettant d'initialiser les lignes d'emprunts en fonction des lignes de réservation de la résa source
@@ -142,3 +143,71 @@ class openstc_pret_warning_no_wizard(osv.osv_memory):
               }
 
 openstc_pret_warning_no_wizard()
+
+
+class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
+    _name = 'openstc.pret.envoie.mail.annulation.wizard'
+    _columns = {
+                'body_html':fields.text("Message du mail notifiant l'annulation"),
+                'email_template':fields.many2one('email.template','Modèle d\'Email')
+                }
+    
+    def default_get(self, cr, uid, fields, context=None):
+        ret = super(openstc_pret_envoie_mail_annulation_wizard, self).default_get(cr, uid, fields, context)
+        #Générer mail pré-rempli, selon email.template
+        #TOREMOVE: A déplacer vers un fichier init.xml
+        #Si le modèle n'existe pas, on le crée à la volée
+        id = context['active_id']
+        email_obj = self.pool.get("email.template")
+        email_tmpl_id = 0
+        print("envoyer mail pour résa annulée")
+        email_tmpl_id = email_obj.search(cr, uid, [('model','=','hotel.reservation'),('name','ilike','annulée')])
+        if not email_tmpl_id:
+            print("création email_template pour résa annulée")
+            ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=','hotel.reservation')])
+            email_tmpl_id = email_obj.create(cr, uid, {
+                                        'name':'modèle de mail pour résa annulée', 
+                                        'name':'Réservation Annulée',
+                                        'model_id':ir_model[0],
+                                        'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
+                                        'email_from':'bruno.plancher@gmail.com',
+                                        'email_to':'bruno.plancher@gmail.com',
+                                        'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
+                                        ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
+                                        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
+                                        'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
+                                        ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
+                                        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
+                                       })
+        else:
+            email_tmpl_id = email_tmpl_id[0]
+        mail_values = email_obj.generate_email(cr, uid, email_tmpl_id, id, context)
+        #TODO: ajouter les attachments au mail, voir sources de email.message
+        attachments = mail_values.pop('attachments') or {}
+        ret['body_html'] = mail_values['body_html']
+        ret['email_template'] = email_tmpl_id
+        return ret
+
+    #Bouton Pour Annuler Résa : Affiche le mail pré-rempli à envoyer à l'association pour signifier l'annulation
+    def do_cancel(self, cr, uid, ids, context=None):
+        if isinstance(ids, list):
+            ids = ids[0]
+        wizard = self.browse(cr, uid, ids)
+        mail_id = self.pool.get("email.template").send_mail(cr, uid, wizard.email_template, context['active_id'], False, context)
+        self.pool.get("mail.message").write(cr, uid, mail_id, {'body_html':wizard.body_html})
+        wf_service = netsvc.LocalService('workflow')
+        wf_service.trg_validate(uid, 'hotel.reservation', context['active_id'], 'cancel', cr)
+            
+        return {
+                'type':'ir.actions.act_window_close'
+                }
+    #TODO: Rajouter contrôle sur active_model dans context
+    def do_cancel_without_mail(self, cr, uid, ids, context=None):
+        wf_service = netsvc.LocalService('workflow')
+        wf_service.trg_validate(uid, 'hotel.reservation', context['active_id'], 'cancel', cr)
+            
+        return {
+                'type':'ir.actions.act_window_close'
+                }
+    
+openstc_pret_envoie_mail_annulation_wizard()

@@ -21,11 +21,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-
-
-
-
-
+ 
         <record id="openstc_task_category_search_view" model="ir.ui.view">
             <field name="name">openstc.task.category.search</field>
             <field name="model">openstc.task.category</field>

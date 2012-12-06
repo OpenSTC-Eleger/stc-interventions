@@ -117,15 +117,15 @@ class hotel_reservation(osv.osv):
         ret = {}
         for resa in self.browse(cr, uid, ids):
             ret[resa.id] = 'no'
-            now = datetime.now()
+            date_crea = strptime(resa.date_order, '%Y-%m-%d %H:%M:%S')
             checkin = strptime(resa.checkin, '%Y-%m-%d %H:%M:%S')    
             for line in resa.reservation_line:
                 #Vérif si résa dans les délais, sinon, in_option est cochée
                 d = timedelta(days=int(line.reserve_product.sale_delay))
-                print("now :"+str(now))
+                print("now :"+str(date_crea))
                 print("checkin :" + str(checkin))
                 #Si l'un des produits est hors délai
-                if now + d > checkin:
+                if date_crea + d > checkin:
                     if line.reserve_product.bloquant:
                         ret[resa.id] = 'block'
                     elif ret[resa.id] == 'no':
@@ -179,8 +179,8 @@ class hotel_reservation(osv.osv):
     
     #Mettre à l'état cancle et retirer les mouvements de stocks (supprimer mouvement ou faire le mouvement inverse ?)
     def cancelled_reservation(self, cr, uid, ids):
-        self.write(cr, uid, ids, {'state':'cancle', 'in_option':False})
-        self.envoyer_mail(cr, uid, ids, {"to":"","state":"error"})
+        self.write(cr, uid, ids, {'state':'cancle', 'reservation_line':self.uncheck_all_dispo(cr, uid, ids)})
+        
         return True
     
     
@@ -411,7 +411,8 @@ class hotel_reservation(osv.osv):
                 'type': 'ir.actions.act_window',
                 'res_id':ids[0]
                 }
-        
+    
+    
     #Vérifies les champs dispo de chaque ligne de résa pour dire si oui ou non la résa est OK pour la suite
     #TODO: Voir comment gérer le cas de la reprise d'une résa à revalider / incomplète où des champs dispo sont à True
     #=> Problème lorsque quelqu'un d'autre réserve un même produit

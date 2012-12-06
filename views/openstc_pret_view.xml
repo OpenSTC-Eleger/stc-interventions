@@ -118,7 +118,7 @@
 					</field>
 				</field>
 				<field name="state" position="after">
-					<button name="cancel" string="Annuler" states="draft,confirm" />
+					<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler" type="action" states="draft,confirm" />
 					<button name="redraft" string="Reprendre" states="cancle" />
 					<button name="to_draft" string="Suivant" states="remplir" />
 					<button name="verif_dispo" type="object" string="Vérifier Disponibilités"

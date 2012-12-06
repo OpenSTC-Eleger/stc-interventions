@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <openerp>
 	<data>
-
+		<!-- wizard de gestion des emprunts à l'extèrieur -->
 		<record model="ir.ui.view" id="view_openstc_pret_emprunt_wizard">
 			<field name="name">openstc.pret.emprunt.wizard</field>
 			<field name="model">openstc.pret.emprunt.wizard</field>
@@ -41,6 +41,8 @@
 			<field name="context">{'prod_error_ids':prod_error_ids,'reservation_id':reservation_id}</field>
 		</record>
 		
+		<!-- Wizard "pop-up" pour déclencher ou non le wizard des emprunts à l'extèrieur -->
+		
 			<record model="ir.ui.view" id="view_openstc_pret_warning_dispo_wizard">
 			<field name="name">openstc.pret.warning.dispo.wizard</field>
 			<field name="model">openstc.pret.warning.dispo.wizard</field>
@@ -62,5 +64,32 @@
 				</form>
 			</field>
 		</record>
+		
+		<!-- Wizard de modification et confirmation d'envoi du mail d'annulation d'une réservation -->					
+		<record model="ir.actions.act_window" id="action_view_openstc_pret_create_envoi_mail_annulation_wizard">
+			<field name="name">Envoi du mail d'annulation de la réservation</field>
+			<field name="res_model">openstc.pret.envoie.mail.annulation.wizard</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+			<field name="context">{'active_id':active_id}</field>
+		</record>
+		
+		<record model="ir.ui.view" id="view_openstc_pret_create_envoi_mail_annulation_wizard">
+			<field name="name">openstc.pret.envoie.mail.annulation.wizard</field>
+			<field name="model">openstc.pret.envoie.mail.annulation.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Envoi du mail d'annulation">
+				    <field name="body_html" />
+				    <newline />
+					<button icon="gtk-go-back" colspan="1" string="Retour" special="cancel"/>
+					<button icon="gtk-ok" colspan="1" name="do_cancel" type="object" string="Envoyer le mail"/>
+					<button icon="gtk-go-forward" colspan="1" string="Ne pas envoyer le mail" type="object" name="do_cancel_without_mail"/>
+					
+				</form>
+			</field>
+		</record>
+			
 	</data>
 </openerp>
