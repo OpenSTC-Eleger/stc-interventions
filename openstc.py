@@ -43,6 +43,7 @@ class service(osv.osv):
             'category_ids':fields.many2many('openstc.task.category', 'openstc_task_category_services_rel', 'service_id', 'task_category_id', 'Categories'),
             'technical': fields.boolean('Technical service'),
             'manager_id': fields.many2one('res.users', 'Manager'),
+            'asksBelongsto': fields.one2many('openstc.ask', 'service_id', "asks"),
     }
 service()
 
@@ -75,6 +76,7 @@ class site(osv.osv):
             'lenght': fields.integer('Lenght'),
             'width': fields.integer('Width'),
             'surface': fields.integer('Surface'),
+            'asksBelongsto': fields.one2many('openstc.ask', 'site1', "asks"),
     }
 
 site()
@@ -149,6 +151,7 @@ class users(osv.osv):
             'city_home': fields.char('City', size=128),
             'phone': fields.char('Phone Number', size=12),
             'is_manager': fields.boolean('Is manager'),
+            'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
     }
 users()
 
@@ -279,6 +282,7 @@ class intervention_assignement(osv.osv):
     _columns = {
             'name': fields.char('Affectation ', size=128, required=True),
             'code': fields.char('Code affectation', size=32, required=True),
+            'asksAssigned': fields.one2many('openstc.ask', 'intervention_assignement_id', "asks"),
     }
 intervention_assignement()
 
