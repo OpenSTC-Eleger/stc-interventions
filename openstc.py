@@ -167,6 +167,7 @@ class task(osv.osv):
 
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
+        'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'category_id':fields.many2one('openstc.task.category', 'Category'),
         'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
@@ -206,6 +207,7 @@ class openstc_task_category(osv.osv):
         'service_ids':fields.many2many('openstc.task.category', 'openstc_task_category_services_rel', 'task_category_id', 'service_id', 'Services'),
         'unit': fields.char('Unit', size=32),
         'quantity': fields.integer('Quantity'),
+        'tasksAssigned': fields.one2many('project.task', 'category_id', "tasks"),
     }
 
     _sql_constraints = [
