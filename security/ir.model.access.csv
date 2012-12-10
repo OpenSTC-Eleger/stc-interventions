@@ -26,7 +26,7 @@ access_openstc_site_type_qualifier,openstc_site_type qualifier,model_openstc_sit
 access_openstc_site_qualifier,openstc_site qualifier,model_openstc_site,openstc_qualifier,1,1,1,0
 access_openstc_openstc_partner_type_qualifier,openstc_openstc_partner_type qualifier,model_openstc_partner_type,openstc_qualifier,1,1,1,0
 access_openstc_res_partner_qualifier,openstc_res_partner  qualifier,model_res_partner,openstc_qualifier,1,1,1,0
-access_openstc_res_partner_address user,openstc_res_partner_address qualifier,base.model_res_partner_address,openstc_qualifier,1,0,0,0
+access_openstc_res_partner_address user,openstc_res_partner_address qualifier,base.model_res_partner_address,openstc_qualifier,1,1,1,0
 
 access_openstc_task_category_dst,openstc_task_category dst,model_openstc_task_category,openstc_dst,1,1,1,1
 access_openstc_intervention_assignement_dst,openstc_intervention_assignement dst,model_openstc_intervention_assignement,openstc_dst,1,1,1,1
@@ -43,6 +43,10 @@ access_openstc_ask_qualifier,openstc_ask qualifier,model_openstc_ask,openstc_age
 access_openstc_ask_qualifier,openstc_ask qualifier,model_openstc_ask,openstc_qualifier,1,1,1,0
 access_openstc_ask_qualifier,openstc_ask qualifier,model_openstc_ask,openstc_manager,1,1,1,0
 access_openstc_ask_employee,openstc_ask employee,model_openstc_ask,openstc_employee,1,1,1,0
+
+access_openstc_planning_qualifier,openstc_planning qualifier,model_openstc_planning,openstc_manager,1,1,1,1
+access_openstc_planning_employee,openstc_planning employee,model_openstc_planning,openstc_employee,1,0,0,0
+access_openstc_planning_agent,openstc_planning agent,model_openstc_planning,openstc_agent,1,0,1,0
 
 access_project_project_base_user,project_project base user,model_project_project,base.group_user,1,0,0,0
 access_project_project_qualifier,project_project qualifier,model_project_project,openstc_qualifier,1,1,1,1
