@@ -32,7 +32,7 @@ from mx.DateTime.mxDateTime import strptime
 # Fournitures
 #----------------------------------------------------------
 class product_product(osv.osv):
-    def _calc_qte_dispo_now(self, cr, uid, ids, name, args, context=None):
+    """def _calc_qte_dispo_now(self, cr, uid, ids, name, args, context=None):
         print("début calcul dispo")
         print(ids)
         if not isinstance(ids, list):
@@ -44,15 +44,34 @@ class product_product(osv.osv):
         print(str(debut)) 
         print(str(fin))
         ret = {}
-        stock_prod = self._product_available(cr, uid, ids, ['qty_available'])
+        stock_prod = self._product_available(cr, uid, ids, ['virtual_available'])
         #Par défaut, on indique la qté max pour chaque produit
         for id in ids:
-            ret[id] = stock_prod[id]['qty_available']
+            ret[id] = stock_prod[id]['virtual_available']
         #Puis pour les articles réservés, on en retranche le nombre réservés 
         for r in self.pool.get("hotel.reservation").get_nb_prod_reserved(cr, ids, str(debut), str(fin)).fetchall():
-            qte_total_prod = stock_prod[r[0]]['qty_available']
+            qte_total_prod = stock_prod[r[0]]['virtual_available']
             qte_reservee = r[1]
             ret[r[0]] = qte_total_prod - qte_reservee
+        print(ret)
+        return ret
+    """
+    def _calc_qte_dispo_now(self, cr, uid, ids, name, args, context=None):
+        print("début calcul qté dispo now")
+        cr.execute("""select hrl.reserve_product as prod_id, sum(hrl.qte_reserves) as qte_reserves
+        from hotel_reservation as hr, hotel_reservation_line as hrl
+        where hr.id = hrl.line_id
+        and hr.state in ('draft','confirm','in_use')
+        group by hrl.reserve_product;""")
+        list_prod_reserved = cr.fetchall()
+        stock_prod = self._product_available(cr, uid, ids, ['virtual_available'])
+        ret = {}
+        #Par défaut, on indique la qté max pour chaque produit
+        for id in ids:
+            ret[id] = stock_prod[id]['virtual_available']
+        #Puis pour les articles réservés, on en retranche le nombre réservés 
+        for prod in list_prod_reserved:
+            ret[prod[0]] -= prod[1]
         print(ret)
         return ret
     
@@ -62,7 +81,7 @@ class product_product(osv.osv):
     _inherit = "product.product"
     _description = "Task Category"
     _columns = {
-        "qte_dispo": fields.function(_calc_qte_dispo_now, store=True,string="Disponible Aujourd'hui", type="integer", readonly=True),
+        "qte_dispo": fields.function(_calc_qte_dispo_now, method=True, string="Disponible Aujourd'hui", type="integer"),
         "geo": fields.char("Position Géographique", 128),
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
         "seuil_confirm":fields.integer("Qté Max sans Validation", help="Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"),
@@ -140,8 +159,8 @@ class hotel_reservation(osv.osv):
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
                                             help=("""Une réservation mise en option signifie que votre demande est prise en compte mais
                                             dont on ne peut pas garantir la livraison à la date prévue.
-                                            Une réservation signifie que la réservation n'est pas prise en compte car nous ne pouvons pas 
-                                            garantir la livraison aux dates que vous avez prévues""")),
+                                            Une réservation bloquée signifie que la réservation n'est pas prise en compte car nous ne pouvons pas 
+                                            garantir la livraison aux dates indiquées""")),
                 #'in_option':fields.boolean("En Option", readonly = True, help=("""Une réservation en option signifie 
                 #votre demande est prise en compte mais qu'un ou plusieurs articles que vous voulez réserver ne 
                 #sont pas disponible à cette date.""")),
@@ -318,7 +337,7 @@ class hotel_reservation(osv.osv):
         ok = True
         #On vérifie que l'on a récupéré au moins un produit
         #Dictionnaire des qtés totales de chaque produit de la demande en cours
-        stock_prod = self.pool.get("product.product")._product_available(cr, uid, prod_list, ['qty_available'])
+        stock_prod = self.pool.get("product.product")._product_available(cr, uid, prod_list, ['virtual_available'])
         #Liste des produits non disponibles
         print(stock_prod)
         dict_error_prod = {}
@@ -332,7 +351,7 @@ class hotel_reservation(osv.osv):
         for data in results:
             #prod_desire = self.pool.get("product.product").browse(cr, uid, data[1])
             #print(prod_desire)
-            qte_total_prod = stock_prod[data[0]]['qty_available']
+            qte_total_prod = stock_prod[data[0]]['virtual_available']
             qte_voulue = demande_prod[str(data[0])]
             #Si l'un des produits n'est pas dispo, on annule la réservation des articles
             #TOCHECK:la réservation reste à l'état draft 
@@ -344,7 +363,7 @@ class hotel_reservation(osv.osv):
         #Vérif dispo : Cas où on réserve un produit pour la première fois, autrement dit, s'il reste des occurences dans prod_list
         for prod_id in prod_list:
              ok = True
-             qte_total_prod = stock_prod[prod_id]['qty_available']
+             qte_total_prod = stock_prod[prod_id]['virtual_available']
              qte_voulue = demande_prod[str(prod_id)]
              if qte_total_prod < qte_voulue:
                  ok = False
@@ -645,12 +664,40 @@ class product_category(osv.osv):
     }
 product_category()
 
-"""#Héritage de purchase_order pour forcer workflow jusqu'à génération stock lorsque généré par une résa
 class purchase_order(osv.osv):
-    _inherit = "pruchase.order"
+    _inherit = "purchase.order"
     _name = "purchase.order"
-    _columns = {}
+    _columns = {'is_emprunt':fields.boolean('Demande d\'emprunt', help="Indique qu'il s'agit d'une demande d'emprunt aurpès d'une mairie extèrieure et non d'un bon de commande")}        
+    _defaults = {
+                 'is_emprunt':lambda *a: 0,
+                 }
+
+    def emprunt_done(self, cr, uid, ids):
+        print("Ecriture state:done")
+        self.write(cr, uid, ids, {'state':'done'})
+        return True
     
-    def create(self,cr, uid, args, context=None):
-        
-"""
+    #Force purchase.order workflow to cancel its pickings (subflow returns cancel and reacticate workitem at picking activity)
+    def do_terminate_emprunt(self, cr, uid, ids, context=None):
+        list_picking_ids = []
+        #TOCHECK: Vérifier synthaxe dans .append()
+        wf_service = netsvc.LocalService('workflow')
+        for purchase in self.browse(cr, uid, ids):
+            print("Traitement d'un emprunt")
+            #values = [(2,pick.id) for pick in purchase.picking_ids]
+            #self.write(cr, uid, ids, {'picking_ids':values})
+            for picking in purchase.picking_ids:
+                print(picking.id)
+                print(purchase.id)
+                wf_service.trg_validate(uid, 'stock.picking', picking.id, 'button_cancel', cr)
+            wf_service.trg_write(uid, 'purchase.order', purchase.id, cr)
+            print(purchase.id)
+        print("Emprunt Ended")
+        #TODO: Faut-il enlever les liens du O2M picking_ids ?
+        return {
+                'res_model':'purchase.order',
+                'type:':'ir.actions.act_window',
+                'view_mode':'form',
+                'target':'current',
+                }
+purchase_order()

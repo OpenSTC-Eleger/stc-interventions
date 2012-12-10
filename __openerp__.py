@@ -24,11 +24,13 @@
         "wizard/openstc_pret_view_wizard.xml",
         
         'views/openstc_view.xml',
+        'views/openstc_pret_menus_view.xml',
         "views/openstc_pret_view.xml",
 
         'workflow/ask.xml',
         "workflow/openstc_pret_workflow.xml",
-
+        'workflow/purchase_workflow.xml',
+        
         "report/openstc_pret_qte_dispo_report_view.xml",
     ],
     "demo": [],

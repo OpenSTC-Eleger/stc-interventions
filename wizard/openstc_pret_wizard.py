@@ -95,7 +95,8 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
                       'location_id':default_location_id,
                       'partner_id':partner_id,
                       'order_line':purchase_lines,
-                      'origin': origin
+                      'origin': origin,
+                      'is_emprunt':True,
                       }
             #On insère les modifs de l'onchange sur partner_id pour compléter les champs obligatoires
             for (key, value) in purchase_obj.onchange_partner_id(cr, uid, False, partner_id)['value'].items():
@@ -105,18 +106,8 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
             purchase_id = purchase_obj.create(cr, uid, values)
             wf_service = netsvc.LocalService('workflow')
             wf_service.trg_validate(uid, 'purchase.order', purchase_id, 'purchase_confirm', cr)
-            """ self.pool.get("stock.move").search(cr, uid, [()])
-            self.pool.get("stock.move")"""
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model':'purchase.order',
-            'view_type':'form',
-            'view_mode':'tree,form',
-            'domain':'[("state","=","approved")]',
-            'target':'new',
-        }
-        """
-        """
+        #TODO: Nettoyer le context des valeurs personnalisées comme reservation_id ou prod_error_ids après exécution
+        return self.pool.get("hotel.reservation").verif_dispo(cr, uid, [context['reservation_id']], context)
 
 openstc_pret_emprunt_wizard()
 
