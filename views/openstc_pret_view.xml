@@ -35,7 +35,29 @@
 				</field>
 			</field>
 		</record>
-
+		
+		<record model="ir.ui.view" id="view_openstock_fournitures_checkout_form">
+			<field name="name">fourniture.product.checkout.form</field>
+			<field name="model">product.product</field>
+			<field name="inherit_id" ref="product.product_normal_form_view" />
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<page string="Suppliers" position="before">
+					<page string="Résumé des Détériorations">
+				    	<field name="checkout_lines" nolabel="1">
+					        <tree string="Résumé des détériorations (Etat des Lieux)" editable="top">
+					            <field name="checkout_id"/>
+					            <field name="date_order"/>
+					            <field name="etat_retour"/>
+					            <field name="qte_to_purchase"/>
+					            <field name="partner_id"/>
+					        </tree>
+					    </field>
+					</page>
+				</page>
+			</field>
+		</record>
+		
 		<!-- Vues Réservation d'articles -->
 		<record model="ir.ui.view" id="view_openstock_reservation_form">
 			<field name="name">open.pret_location.reservation.form</field>

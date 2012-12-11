@@ -26,6 +26,7 @@
 			<field name="type">tree</field>
 			<field name="arch" type="xml">
 				<tree string="Etats des lieux">
+				    <field name="reservation"/>
 		            <field name="date_order" colspan="1"/>
 		            <field name="partner_id" colspan="1"/>
 		            <field name="user_id" colspan="1"/>
@@ -49,7 +50,7 @@
 				    	<button name="open_purchase" type="object" string="Voir facture associée" colspan="1"
 				    	    attrs="{'invisible':[('purchase_id','=',False)]}"/>
 				    </group>
-				    <field name="checkout_lines" colspan="4">
+				    <field nolabel="1" name="checkout_lines" colspan="4">
 				        <tree string="Lignes d'Etat des lieux" editable="top">
 				            <field name="product_id"/>
 				            <field name="qte_reservee"/>

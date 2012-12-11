@@ -86,7 +86,8 @@ class product_product(osv.osv):
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
         "seuil_confirm":fields.integer("Qté Max sans Validation", help="Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"),
         "bloquant":fields.boolean("\"Non disponibilité\" bloquante", help="Un produit dont la non dispo est bloquante empêche la réservation de se poursuivre (elle reste en Brouillon)"),
-        "empruntable":fields.boolean("Se fournir à l'extèrieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures")
+        "empruntable":fields.boolean("Se fournir à l'extèrieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures"),
+        "checkout_lines":fields.one2many('openstc.pret.checkout.line', 'product_id', string="Lignes Etat des Lieux"),
         }
 
     _defaults = {

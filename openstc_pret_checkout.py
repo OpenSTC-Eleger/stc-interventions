@@ -29,7 +29,9 @@ import netsvc
 class openstc_pret_checkout_wizard(osv.osv):
     AVAILABLE_STATE_VALUES = [('draft','Brouillon'),('done','Cloturé')]
     _name = "openstc.pret.checkout"
+    _rec_name = 'name'
     _columns = {
+                'name': fields.related('reservation','name',type='char', string='Réservation Associée', store=True),
                 'reservation': fields.many2one('hotel.reservation','Réservation Associée', required=True),
                 'date_order': fields.datetime('Date de l\'Etat des lieux', readonly=True),
                 'user_id': fields.many2one('res.users', 'Saisie par'),
@@ -125,13 +127,16 @@ AVAILABLE_ETAT_SELECTION = [('ras','Ne Rien Planifier'),('to_repair','A Réparer
 class openstc_pret_checkout_line_wizard(osv.osv):
     _name = "openstc.pret.checkout.line"
     _columns = {
-                'checkout_id':fields.many2one('openstc.pret.checkout.line','Etat des Lieux', invisible=True),
+                'checkout_id':fields.many2one('openstc.pret.checkout','Etat des Lieux'),
                 'product_id':fields.many2one('product.product','Article', readonly=True),
                 'qte_reservee':fields.integer('Qté prêtée', readonly=True),
                 'etat_retour':fields.selection(AVAILABLE_ETAT_SELECTION, 'Etat après utilisation', required=True),
                 'qte_to_purchase':fields.integer('Qté à Racheter'),
-                'infos_supp':fields.char('Infos Supplémentaires',size=128)
+                'infos_supp':fields.char('Infos Supplémentaires',size=128),
+                'partner_id':fields.related('checkout_id','partner_id', type='many2one',relation='res.partner', string="Demandeur"),
+                'date_order':fields.related('checkout_id','date_order',type='datetime', string='Date Etat des Lieux')
             }
+
 
     def _check_qte_to_purchase(self, cr, uid, ids):
         for line in self.browse(cr, uid, ids):
