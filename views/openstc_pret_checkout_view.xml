@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<openerp>
+	<data>
+	    
+	    <record id="action_openstc_pret_view_checkout" model="ir.actions.act_window">
+			<field name="name">Voir Etats des Lieux</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">openstc.pret.checkout</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+		
+		<!-- Wizard pour gérer l'état des lieux des articles à leur retour à la mairie -->					
+		<record model="ir.actions.act_window" id="action_view_openstc_pret_create_checkout">
+			<field name="name">Générer Etat des lieux</field>
+			<field name="res_model">openstc.pret.checkout</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">current</field>
+			<field name="context">{'reservation_id':active_id}</field>
+		</record>
+		
+		<record model="ir.ui.view" id="view_openstc_pret_checkout_tree">
+			<field name="name">openstc.pret.checkout</field>
+			<field name="model">openstc.pret.checkout</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<tree string="Etats des lieux">
+		            <field name="date_order" colspan="1"/>
+		            <field name="partner_id" colspan="1"/>
+		            <field name="user_id" colspan="1"/>
+		            <field name="state" colspan="1"/>
+		        </tree>
+			</field>
+		</record>
+		
+		<record model="ir.ui.view" id="view_openstc_pret_create_checkout">
+			<field name="name">openstc.pret.checkout</field>
+			<field name="model">openstc.pret.checkout</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Etat des lieux">
+				    <field name="reservation"/>
+				    <field name="date_order"/>
+				    <field name="partner_id"/>
+				    <field name="user_id"/>
+				    <group col="3" colspan="2">
+				    	<field name="purchase_id"/>
+				    	<button name="open_purchase" type="object" string="Voir facture associée" colspan="1"
+				    	    attrs="{'invisible':[('purchase_id','=',False)]}"/>
+				    </group>
+				    <field name="checkout_lines" colspan="4">
+				        <tree string="Lignes d'Etat des lieux" editable="top">
+				            <field name="product_id"/>
+				            <field name="qte_reservee"/>
+				            <field name="etat_retour"/>
+				            <field name="qte_to_purchase"/>
+				            <field name="infos_supp"/>
+				        </tree>
+				    </field>
+				    <newline/>
+				    <field name="state"/>
+					<button icon="gtk-go-back" colspan="1" string="Retour" special="cancel" states="draft"/>
+					<button icon="gtk-ok" colspan="1" name="generer_actions" type="object" string="Générer les actions saisies" states="draft"/>
+					<button icon="gtk-go-forward" colspan="1" string="Ne pas générerles actions saisies" type="object" name="generer_no_actions" states="draft"/>
+				</form>
+			</field>
+		</record>
+	</data>
+</openerp>

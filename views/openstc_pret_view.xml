@@ -117,19 +117,18 @@
 					</field>
 				</field>
 				<field name="state" position="after">
+					<field name="in_option" on_change="onchange_in_option(in_option,state)" />
 					<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler" type="action" states="draft,confirm" />
 					<button name="redraft" string="Reprendre" states="cancle" />
 					<button name="to_draft" string="Suivant" states="remplir" />
 					<button name="verif_dispo" type="object" string="Vérifier Disponibilités"
 						states="remplir" />
-					<button name="do_checkin" type="object"
-						string="Générer Check-In des articles" states="confirm" />
-					<field name="in_option" on_change="onchange_in_option(in_option,state)" />
+					<button name="%(action_view_openstc_pret_deliver_products_wizard)d" type="action"
+						string="Mettre à Disposition les articles" states="confirm" />
 				</field>
 				<button name="done" string="Create Folio" states="confirm"
 					position="replace">
-					<button name="done" string="Générer Check-Out articles"
-						states="in_use" />
+					<button name="%(action_view_openstc_pret_create_checkout)d" string="Retour des articles" type="action" states="in_use" />
 				</button>
 				<button name="confirm" string="Confirm" states="draft"
 					position="replace">
@@ -313,13 +312,6 @@
 			</field>
 		</record>
 
-		<record id="action_openstock_view_reservation_folio" model="ir.actions.act_window">
-			<field name="name">Voir Check-In - Check-Out</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.folio</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-		</record>
 		<!-- Actions Prêts/Locations -->
 		<record id="action_openstock_pret_location_view_product" model="ir.actions.act_window">
 			<field name="name">Prêts / Locations</field>

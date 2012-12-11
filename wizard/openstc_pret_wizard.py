@@ -202,3 +202,27 @@ class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
                 }
     
 openstc_pret_envoie_mail_annulation_wizard()
+
+#Pop-up permettant de savoir si, pour mettre à disposition les articles, on fait une livraison ou le demandeur vient les chercher
+class openstc_pret_deliver_products_wizard(osv.osv_memory):
+    _name = "openstc.pret.deliver.products.wizard"
+    _columns = {
+                }
+    #Résa mise à "en cours d'utilisation" avec création d'une intervention
+    def put_in_use_with_intervention(self, cr, uid, ids, context=None):
+        if 'active_id' in context:
+            resa = self.pool.get("hotel.reservation").browse(cr, uid, context['active_id'])
+            #TODO: Générer intervention de livraison
+            wf_service = netsvc.LocalService('workflow')
+            wf_service.trg_validate(uid, 'hotel.reservation', resa.id, 'put_in_use', cr)
+        return {'type':'ir.actions.act_window_close'}
+    
+    def put_in_use_without_intervention(self, cr, uid, ids,context=None):
+        if 'active_id' in context:
+            resa = self.pool.get("hotel.reservation").browse(cr, uid, context['active_id'])
+            wf_service = netsvc.LocalService('workflow')
+            wf_service.trg_validate(uid, 'hotel.reservation', resa.id, 'put_in_use', cr)
+        return {'type':'ir.actions.act_window_close'}
+    
+openstc_pret_deliver_products_wizard()
+

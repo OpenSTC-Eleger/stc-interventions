@@ -112,8 +112,8 @@
 			action="action_view_openstc_pret_emprunt_wizard" parent="menu_action_view_articles"
 			sequence="2" />
 
-		<menuitem id="menu_action_openstock_view_reservation_folio"
-			action="action_openstock_view_reservation_folio" name="Voir Etats des lieux retour d'articles"
+		<menuitem id="menu_action_openstc_pret_view_checkout"
+			action="action_openstc_pret_view_checkout" name="Voir Etats des lieux retour d'articles"
 			parent="menu_action_view_articles" sequence="4" />
 		
 		<menuitem id="menu_action_openstc_pret_voir_emprunts_ext"
