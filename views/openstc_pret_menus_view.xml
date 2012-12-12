@@ -17,10 +17,9 @@
 			<field name="res_model">hotel.reservation</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','draft')]</field>
 		</record>
 
-		<record id="action_openstock_view_reservation_confirmed" model="ir.actions.act_window">
+		<!-- <record id="action_openstock_view_reservation_confirmed" model="ir.actions.act_window">
 			<field name="name">Réservations Confirmées</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="res_model">hotel.reservation</field>
@@ -74,7 +73,7 @@
 			<field name="view_mode">tree,form</field>
 			<field name="domain">[('state','=','in_use')]</field>
 		</record>
-
+		-->
 		<record id="action_openstock_view_reservation_new" model="ir.actions.act_window">
 			<field name="name">Créer une nouvelle réservation</field>
 			<field name="type">ir.actions.act_window</field>
@@ -121,23 +120,26 @@
 			parent="menu_action_view_articles" sequence="3" />
 		
 		<!-- MenuItems Gestion des Réservations -->
-
+		<menuitem id="menu_action_openstc_pret_resa_semaine_view"
+			action="action_openstc_pret_resa_semaine_view" name="Réservation de la semaine a traiter"
+			parent="menu_action_view_reservations" sequence="1" />
+		
 		<menuitem id="menu_action_openstock_view_reservation_new"
 			action="action_openstock_view_reservation_new" name="Créer une nouvelle réservation"
 			parent="menu_action_view_reservations" sequence="2" />
-
-		<menuitem id="menu_action_openstock_view_reservation_a_remplir"
-			action="action_openstock_view_reservation_a_remplir" name="Réservations en Brouillon"
-			parent="menu_action_view_reservations" sequence="3" />
-
+		
+		<menuitem id="menu_action_openstock_view_reservation" action="action_openstock_view_reservation"
+			name="Réservations" parent="menu_action_view_reservations"
+			sequence="3" />
+<!--
 		<menuitem id="menu_action_openstock_view_reservation_a_revalider"
 			action="action_openstock_view_reservation_a_revalider" name="Réservations A re-vérifier"
 			parent="menu_action_view_reservations" sequence="4" />
-
-		<menuitem id="menu_action_openstock_view_reservation" action="action_openstock_view_reservation"
-			name="Réservations à Valider" parent="menu_action_view_reservations"
-			sequence="5" />
-
+			
+		<menuitem id="menu_action_openstock_view_reservation_a_remplir"
+			action="action_openstock_view_reservation_a_remplir" name="Réservations en Brouillon"
+			parent="menu_action_view_reservations" sequence="3" />
+		
 		<menuitem id="menu_action_openstock_view_reservation_confirmed"
 			action="action_openstock_view_reservation_confirmed" name="Réservations Confirmées"
 			parent="menu_action_view_reservations" sequence="6" />
@@ -152,7 +154,7 @@
 
 		<menuitem id="menu_action_openstock_view_reservation_cancel"
 			action="action_openstock_view_reservation_cancel" name="Réservations Annulées"
-			parent="menu_action_view_reservations" sequence="9" />
+			parent="menu_action_view_reservations" sequence="9" /> -->
 
 		<!-- Groupe Factice pour cacher les menus aux utilisateurs (sauf l'admin) -->
 		<record id="group_view_all_menus" model="res.groups">

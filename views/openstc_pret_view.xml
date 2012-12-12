@@ -334,6 +334,21 @@
 			</field>
 		</record>
 
+		<record model="ir.ui.view" id="view_openstc_all_reservations_search_view">
+			<field name="name">openstc.pret.reservation.all</field>
+			<field name="model">hotel.reservation</field>
+			<field name="type">search</field>
+			<field name="arch" type="xml">
+				<search string="Réservations">
+					<filter string="Disponibilités a vérifier" domain="[('state','=','remplir'), ('in_option','&lt;&gt;','block')]" help="Réservations dont dispos sont a vérifier"/>
+					<filter string="En Attente de mise a dispo" domain="[('state','in',('draft','confirm'))]" help="Réservations validées ou en attente de validation"/>
+					<filter string="En cours d'utilisation" domain="[('state','=','in_use')]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
+					<filter string="Non actives" domain="[('state','=','done')]" help="Réservations cloturées ou annulées"/>
+					<filter string="Litiges" domain="['|',('state','=','cancle'),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
+				</search>
+			</field>
+		</record>
+		
 		<!-- Actions Prêts/Locations -->
 		<record id="action_openstock_pret_location_view_product" model="ir.actions.act_window">
 			<field name="name">Prêts / Locations</field>
@@ -356,6 +371,17 @@
 			<field name="context">{'from_product':'1', 'product_ids':active_ids}</field>
 		</record>
 
+		<record id="action_openstc_pret_resa_semaine_view" model="ir.actions.act_window">
+			<field name="name">Réservations de la semaine à traiter</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel.reservation</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('state','not in',('cancle','done'))]</field>
+			<field name="context">{'resa_semaine':1}</field>
+			<field name="target">current</field>
+		</record>
+		
 		<record id="action_open_pret_location_reservation_create_values" model="ir.values">
 			<field name="name">Réserver article(s)</field>
 			<field name="key2">client_action_multi</field>
