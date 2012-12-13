@@ -90,6 +90,30 @@
 				</form>
 			</field>
 		</record>
-			
+		
+		<!-- Wizard précédent l'état in_use d'une résa, permettant de choisir si l'on livre la résa ou si le demandeur passe la prendre -->					
+		<record model="ir.actions.act_window" id="action_view_openstc_pret_deliver_products_wizard">
+			<field name="name">Mise a dispo des produits</field>
+			<field name="res_model">openstc.pret.deliver.products.wizard</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+			<field name="context">{'active_id':active_id}</field>
+		</record>
+		
+		<record model="ir.ui.view" id="view_openstc_pret_deliver_products_wizard">
+			<field name="name">openstc.pret.deliver.products.wizard</field>
+			<field name="model">openstc.pret.deliver.products.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Comment mettre les articles à disposition">
+				    <label colspan="4" string="Pour mettre les articles à dispositions, voulez-vous créer une intervention de livraison ou le demandeur vient les chercher sur place ?" />
+				    <newline />
+					<button icon="gtk-go-back" colspan="1" string="Retour" special="cancel"/>
+					<button icon="gtk-ok" colspan="1" name="put_in_use_with_intervention" type="object" string="Générer une intervention"/>
+					<button icon="gtk-go-forward" colspan="1" string="Ne pas générer d'intervention" type="object" name="put_in_use_without_intervention"/>
+				</form>
+			</field>
+		</record>
 	</data>
 </openerp>

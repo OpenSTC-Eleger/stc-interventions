@@ -24,8 +24,9 @@
         "wizard/openstc_pret_view_wizard.xml",
         
         'views/openstc_view.xml',
-        'views/openstc_pret_menus_view.xml',
+        "views/openstc_pret_checkout_view.xml",
         "views/openstc_pret_view.xml",
+        'views/openstc_pret_menus_view.xml',
 
         'workflow/ask.xml',
         "workflow/openstc_pret_workflow.xml",

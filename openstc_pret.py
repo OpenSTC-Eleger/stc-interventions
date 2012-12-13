@@ -86,7 +86,8 @@ class product_product(osv.osv):
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
         "seuil_confirm":fields.integer("Qté Max sans Validation", help="Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"),
         "bloquant":fields.boolean("\"Non disponibilité\" bloquante", help="Un produit dont la non dispo est bloquante empêche la réservation de se poursuivre (elle reste en Brouillon)"),
-        "empruntable":fields.boolean("Se fournir à l'extèrieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures")
+        "empruntable":fields.boolean("Se fournir à l'extèrieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures"),
+        "checkout_lines":fields.one2many('openstc.pret.checkout.line', 'product_id', string="Lignes Etat des Lieux"),
         }
 
     _defaults = {
@@ -529,6 +530,24 @@ pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240
         for id in ids:
             email_obj.send_mail(cr, uid, email_tmpl_id, id)
         return
+    #Surcharge methode pour renvoyer uniquement les resas a traiter jusqu'au vendredi prochain, si on veut la vue associee aux resas a traiter par le responsable
+    def search(self, cr, uid,args, offset=0, limit=None, order=None, context=None, count=False):
+        #datetime.datetime.now() + datetime.timedelta(days=int(datetime.datetime.now().weekday()) / 4) * (7 - int(datetime.datetime.now().weekday())) + (4 - int(datetime.datetime.now().weekday()) * (1 - int(datetime.datetime.now().weekday()) / 4))
+        if 'resa_semaine' in context:
+            now = datetime.now()
+            delta_day = 0
+            if now.weekday() >= 4:
+                #Si on dépasse jeudi, on fait les calculs pour retomber sur lundi prochain
+                #7 - now.weekday() pour tomber sur lundi, +4 pour tomber sur vendredi à chaque fois
+                delta_day = 7 + 4 - now.weekday()
+            else:
+                #Sinon, c'est qu'on est inférieur à jeudi, on reste dans la meme semaine
+                delta_day = 4 - now.weekday()
+            end_date = now + timedelta(days=delta_day)
+            args.extend(['|',('checkout','<=',str(end_date)),('checkin','<=',str(end_date))])
+            del context['resa_semaine']
+        ret = super(hotel_reservation,self).search(cr, uid,args, offset, limit, order, context, count)
+        return ret
     
     def create(self, cr, uid, vals, context=None):
         #Si on vient de créer une nouvelle réservation et qu'on veut la sauvegarder (cas où l'on appuie sur
