@@ -13,7 +13,6 @@
 					string="Products" position="replace">
 					<tree string="Produits">
 						<field name="name" />
-						<field name="qte_dispo" />
 						<field name="list_price" />
 						<field name="seuil_confirm" />
 					</tree>
@@ -280,6 +279,8 @@
 			</field><!-- end tag of xml arch -->
 		</record>
 
+		
+		
 		<record model="ir.ui.view" id="view_openstock_reservation_folio1_tree">
 			<field name="name">hotel.folio.tree</field>
 			<field name="inherit_id" ref="hotel.view_hotel_folio1_tree" />
@@ -295,85 +296,21 @@
 			</field>
 		</record>
 
-		<!-- Actions Mouvements Internes -->
-		<record id="action_openstock_view_fournitures" model="ir.actions.act_window">
-			<field name="name">Ressources</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">product.product</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-		</record>
-
-		<record id="action_openstock_view_reservation" model="ir.actions.act_window">
-			<field name="name">Réservations à Valider</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','draft')]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_confirmed" model="ir.actions.act_window">
-			<field name="name">Réservations Confirmées</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','confirm')]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_cancel" model="ir.actions.act_window">
-			<field name="name">Réservations Annulées</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','cancle')]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_a_remplir" model="ir.actions.act_window">
-			<field name="name">Réservations en Brouillon</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','remplir'),('in_option','in',('no','in_option'))]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_a_revalider" model="ir.actions.act_window">
-			<field name="name">Réservations Bloquées</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','remplir'),('in_option','=','block')]</field>
-		</record>
-
-
-		<record id="action_openstock_view_reservation_done" model="ir.actions.act_window">
-			<field name="name">Réservations Terminées</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','done')]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_in_use" model="ir.actions.act_window">
-			<field name="name">Réservations en cours d'utilisation</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','in_use')]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_new" model="ir.actions.act_window">
-			<field name="name">Créer une nouvelle réservation</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">form</field>
+		<record model="ir.ui.view" id="view_openstc_pret_voir_emprunt_ext">
+			<field name="name">purchase.order.emprunt.form</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.purchase_order_form" />
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<field name="invoiced" position="after">
+				    <field name="is_emprunt"/>
+				</field>
+				<button name="action_cancel" states="approved,except_picking,except_invoice,wait" string="Cancel Purchase Order" type="object" icon="gtk-cancel" position="replace">
+					<button name="action_cancel" attrs="{'invisible':['|',('is_emprunt','=',True),('state','not in',('approved','except_picking','except_invoice','wait'))]}" string="Cancel Purchase Order" type="object" icon="gtk-cancel"/>
+					<button name="do_terminate_emprunt" type="object" attrs="{'invisible':['|',('is_emprunt','=',False),('state','&lt;&gt;','approved')]}" string="Renvoyer articles à la collecticité" icon="gtk-ok"/>
+					<button name="purchase_cancel" attrs="{'invisible':['|',('is_emprunt','=',False),('state','&lt;&gt;','except_picking')]}" string="Annuler emprunt" icon="gtk-cancel"/>
+				</button>
+			</field>
 		</record>
 
 		<record id="action_openstock_view_reservation_folio" model="ir.actions.act_window">
@@ -391,19 +328,6 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-
-		<!-- <record id="action_open_pret_location_reservation_create_form" model="ir.actions.act_window"> 
-			<field name="name" >Réserver article(s)</field> <field name="type" >ir.actions.act_window</field> 
-			<field name="res_model" >hotel.reservation</field> <field name="view_type" 
-			>form</field> <field name="view_mode" >form</field> <field name="src_model">product.product</field> 
-			<field name="view_id" ref="hotel_reservation.view_hotel_reservation_form"/> 
-			<field name="target">current</field> <field name="context">{'from_product':'1', 
-			'product_ids':active_ids}</field> </record> <record id="action_open_pret_location_reservation_create_values" 
-			model="ir.values"> <field name="name">Réserver article(s)</field> <field 
-			name="key2">client_action_multi</field> <field eval="1" name="object"/> <field 
-			name="value" eval="'ir.actions.act_window,' + str(ref('action_open_pret_location_reservation_create_form'))" 
-			/> <field name="key">action</field> <field name="model">product.product</field> 
-			</record> -->
 
 		<record id="action_open_pret_location_reservation_create_form"
 			model="ir.actions.act_window">
@@ -430,69 +354,6 @@
 		<!-- calendar views -->
 
 
-		<!-- Menus Mouvements Internes -->
-		<menuitem icon="terp-project" id="base.menu_main_openstock" 
-		    name="Prêt - Location" sequence="10" />
-
-		<menuitem id="menu_action_view_reservations" name="Gestion des Réservations"
-			parent="base.menu_main_openstock" sequence="2" />
-
-		<menuitem id="menu_action_view_articles" name="Gestion des Ressources"
-			parent="base.menu_main_openstock" sequence="1" />
-
-		<!-- MenuItems Gestion des Ressources -->
-		<menuitem id="menu_action_view_fournitures" action="action_openstock_view_fournitures"
-			name="Choisir Ressources à réserver" parent="menu_action_view_articles"
-			sequence="1" />
-
-		<menuitem id="menu_action_view_emprunt_ext" name="Emprunter des Ressources à l'extérieur"
-			action="action_view_openstc_pret_emprunt_wizard" parent="menu_action_view_articles"
-			sequence="2" />
-
-		<menuitem id="menu_action_openstock_view_reservation_folio"
-			action="action_openstock_view_reservation_folio" name="Voir Check-In - Check-Out"
-			parent="menu_action_view_articles" sequence="3" />
-
-		<!-- MenuItems Gestion des Réservations -->
-
-		<menuitem id="menu_action_openstock_view_reservation_new"
-			action="action_openstock_view_reservation_new" name="Créer une nouvelle réservation"
-			parent="menu_action_view_reservations" sequence="2" />
-
-		<menuitem id="menu_action_openstock_view_reservation_a_remplir"
-			action="action_openstock_view_reservation_a_remplir" name="Réservations en Brouillon"
-			parent="menu_action_view_reservations" sequence="3" />
-
-		<menuitem id="menu_action_openstock_view_reservation_a_revalider"
-			action="action_openstock_view_reservation_a_revalider" name="Réservations A re-vérifier"
-			parent="menu_action_view_reservations" sequence="4" />
-
-		<menuitem id="menu_action_openstock_view_reservation" action="action_openstock_view_reservation"
-			name="Réservations à Valider" parent="menu_action_view_reservations"
-			sequence="5" />
-
-		<menuitem id="menu_action_openstock_view_reservation_confirmed"
-			action="action_openstock_view_reservation_confirmed" name="Réservations Confirmées"
-			parent="menu_action_view_reservations" sequence="6" />
-
-		<menuitem id="menu_action_openstock_view_reservation_in_use"
-			action="action_openstock_view_reservation_in_use" name="Réservations En cours d'utilisation"
-			parent="menu_action_view_reservations" sequence="7" />
-
-		<menuitem id="menu_action_openstock_view_reservation_done"
-			action="action_openstock_view_reservation_done" name="Réservations Terminées"
-			parent="menu_action_view_reservations" sequence="8" />
-
-		<menuitem id="menu_action_openstock_view_reservation_cancel"
-			action="action_openstock_view_reservation_cancel" name="Réservations Annulées"
-			parent="menu_action_view_reservations" sequence="9" />
-
-		<!-- Groupe Factice pour cacher les menus aux utilisateurs (sauf l'admin) -->
-		<record id="group_view_all_menus" model="res.groups">
-			<field name="name">Voir tous les menus</field>
-		</record>
-
-		<menuitem id="hotel.hotel_management_menu" name="Hotel Management"
-			groups="group_view_all_menus" />
+		
 	</data>
 </openerp>
