@@ -40,9 +40,9 @@
 			<field name="target">new</field>
 			<field name="context">{'prod_error_ids':prod_error_ids,'reservation_id':reservation_id}</field>
 		</record>
-		
+
 		<!-- Wizard "pop-up" pour déclencher ou non le wizard des emprunts à l'extèrieur -->
-		
+
 			<record model="ir.ui.view" id="view_openstc_pret_warning_dispo_wizard">
 			<field name="name">openstc.pret.warning.dispo.wizard</field>
 			<field name="model">openstc.pret.warning.dispo.wizard</field>
@@ -51,8 +51,8 @@
 				<form string="Des articles ne sont pas dispo">
 					<label string="Attention, certains des articles que vous voulez réserver ne sont pas disponibles." colspan="4"/>
 					<newline/>
-					<label string="Vous avez les droits pour déclencher une demande d'emprunt des articles manquants 
-					    			auprès de collectivités extérieurs, voulez le faire ? 
+					<label string="Vous avez les droits pour déclencher une demande d'emprunt des articles manquants
+					    			auprès de collectivités extérieurs, voulez le faire ?
 					    			Si oui, cliquez sur le bouton 'Commencer l'emprunt' où vous pourrez choisir dans quelles
 					    			collectivités vous voulez emprunter (la relation avec ces collectivités ne sera
 					    			pas gérée dans le processus, Vous devez faire la prise de contact habituelle
@@ -64,8 +64,8 @@
 				</form>
 			</field>
 		</record>
-		
-		<!-- Wizard de modification et confirmation d'envoi du mail d'annulation d'une réservation -->					
+
+		<!-- Wizard de modification et confirmation d'envoi du mail d'annulation d'une réservation -->
 		<record model="ir.actions.act_window" id="action_view_openstc_pret_create_envoi_mail_annulation_wizard">
 			<field name="name">Envoi du mail d'annulation de la réservation</field>
 			<field name="res_model">openstc.pret.envoie.mail.annulation.wizard</field>
@@ -74,7 +74,7 @@
 			<field name="target">new</field>
 			<field name="context">{'active_id':active_id}</field>
 		</record>
-		
+
 		<record model="ir.ui.view" id="view_openstc_pret_create_envoi_mail_annulation_wizard">
 			<field name="name">openstc.pret.envoie.mail.annulation.wizard</field>
 			<field name="model">openstc.pret.envoie.mail.annulation.wizard</field>
@@ -86,21 +86,11 @@
 					<button icon="gtk-go-back" colspan="1" string="Retour" special="cancel"/>
 					<button icon="gtk-ok" colspan="1" name="do_cancel" type="object" string="Envoyer le mail"/>
 					<button icon="gtk-go-forward" colspan="1" string="Ne pas envoyer le mail" type="object" name="do_cancel_without_mail"/>
-					
+
 				</form>
 			</field>
 		</record>
-		
-		<!-- Wizard précédent l'état in_use d'une résa, permettant de choisir si l'on livre la résa ou si le demandeur passe la prendre -->					
-		<record model="ir.actions.act_window" id="action_view_openstc_pret_deliver_products_wizard">
-			<field name="name">Mise a dispo des produits</field>
-			<field name="res_model">openstc.pret.deliver.products.wizard</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">form</field>
-			<field name="target">new</field>
-			<field name="context">{'active_id':active_id}</field>
-		</record>
-		
+
 		<record model="ir.ui.view" id="view_openstc_pret_deliver_products_wizard">
 			<field name="name">openstc.pret.deliver.products.wizard</field>
 			<field name="model">openstc.pret.deliver.products.wizard</field>
@@ -115,5 +105,17 @@
 				</form>
 			</field>
 		</record>
+
+		<!-- Wizard précédent l'état in_use d'une résa, permettant de choisir si l'on livre la résa ou si le demandeur passe la prendre -->
+		<record model="ir.actions.act_window" id="action_view_openstc_pret_deliver_products_wizard">
+			<field name="name">Mise a dispo des produits</field>
+			<field name="res_model">openstc.pret.deliver.products.wizard</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+			<field name="context">{'active_id':active_id}</field>
+		</record>
+
+
 	</data>
 </openerp>

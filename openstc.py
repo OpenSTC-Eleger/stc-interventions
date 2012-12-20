@@ -165,12 +165,40 @@ class task(osv.osv):
     _description = "Task ctm"
     _inherit = "project.task"
 
+        # Compute: effective_hours, total_hours, progress
+    def _hours_get(self, cr, uid, ids, field_names, args, context=None):
+        res = {}
+        for task in self.browse(cr, uid, ids, context=context):
+            res[task.id] = {'effective_hours': task.effective_hours, 'total_hours': (task.remaining_hours or 0.0) + task.effective_hours}
+            res[task.id]['delay_hours'] = res[task.id]['total_hours'] - task.planned_hours
+            res[task.id]['progress'] = 0.0
+            if (task.remaining_hours + task.effective_hours):
+                res[task.id]['progress'] = round(min(100.0 * task.effective_hours/ res[task.id]['total_hours'], 99.99),2)
+            if task.state in ('done','cancelled'):
+                res[task.id]['progress'] = 100.0
+        return res
+
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'category_id':fields.many2one('openstc.task.category', 'Category'),
         'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
+        'planned_hours': fields.float('Planned Hours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
+        'effective_hours': fields.float('Effective Hours', help='Time spent'),
+        'remaining_hours': fields.float('Remaining Hours', digits=(16,2), help="Total remaining time, can be re-estimated periodically by the assignee of the task."),
+        'total_hours': fields.function(_hours_get, string='Total Hours', multi='hours', help="Computed as: Time Spent + Remaining Time.",
+            store = {
+                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
+            }),
+        'progress': fields.function(_hours_get, string='Progress (%)', multi='hours', group_operator="avg", help="If the task has a progress of 99.99% you should close the task if it's finished or reevaluate the time",
+            store = {
+                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours','state'], 10),
+            }),
+        'delay_hours': fields.function(_hours_get, string='Delay Hours', multi='hours', help="Computed as difference between planned hours by the project manager and the total hours of the task.",
+            store = {
+                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
+            }),
     }
 task()
 

@@ -5,6 +5,7 @@ access_account_analytic_account_qualifier,account.analytic.account qualifier,ana
 access_res_users,res_users,model_res_users,base.group_user,1,0,0,0
 access_res_users,res_users,model_res_users,openstc_dst,1,1,1,1
 access_openstc_planning,openstc_planning,model_openstc_planning,openstc_dst,1,1,1,1
+access_account_analytic_line_project_employee,account.analytic.line employee,analytic.model_account_analytic_line,openstc_employee,1,0,0,0
 access_account_analytic_line_project_dst,account.analytic.line dst,analytic.model_account_analytic_line,openstc_dst,1,1,1,1
 access_account_analytic_line_project_manager,account.analytic.line manager,analytic.model_account_analytic_line,openstc_manager,1,1,1,1
 
@@ -18,6 +19,7 @@ access_openstc_site_employee,openstc_site employee,model_openstc_site,openstc_em
 access_openstc_openstc_partner_type_employee,openstc_openstc_partner_type employee,model_openstc_partner_type,openstc_employee,1,0,0,0
 access_openstc_res_partner_employee,openstc_res_partner employee,model_res_partner,openstc_employee,1,0,0,0
 access_openstc_res_partner_address user,openstc_res_partner_address employee,base.model_res_partner_address,openstc_employee,1,0,0,0
+
 
 access_openstc_task_category_qualifier,openstc_task_category qualifier,model_openstc_task_category,openstc_qualifier,1,1,1,0
 access_openstc_intervention_assignement_qualifier,openstc_intervention_assignement qualifier,model_openstc_intervention_assignement,openstc_qualifier,1,1,1,0
@@ -39,19 +41,22 @@ access_openstc_res_partner_address user,openstc_res_partner_address dst,base.mod
 
 
 access_openstc_ask_dst,openstc_ask dst,model_openstc_ask,openstc_dst,1,1,1,1
-access_openstc_ask_qualifier,openstc_ask qualifier,model_openstc_ask,openstc_agent,1,1,1,0
+access_openstc_ask_agent,openstc_ask qualifier,model_openstc_ask,openstc_agent,1,1,1,0
 access_openstc_ask_qualifier,openstc_ask qualifier,model_openstc_ask,openstc_qualifier,1,1,1,0
-access_openstc_ask_qualifier,openstc_ask qualifier,model_openstc_ask,openstc_manager,1,1,1,0
-access_openstc_ask_employee,openstc_ask employee,model_openstc_ask,openstc_employee,1,1,1,0
+access_openstc_ask_manager,openstc_ask qualifier,model_openstc_ask,openstc_manager,1,1,1,0
+access_openstc_ask_employee,openstc_ask employee,model_openstc_ask,openstc_employee,1,0,0,0
+access_openstc_ask_accueil,openstc_ask accueil,model_openstc_ask,openstc_accueil,1,1,1,0
 
 access_openstc_planning_qualifier,openstc_planning qualifier,model_openstc_planning,openstc_manager,1,1,1,1
 access_openstc_planning_employee,openstc_planning employee,model_openstc_planning,openstc_employee,1,0,0,0
+access_openstc_planning_accueil,openstc_planning accueil,model_openstc_planning,openstc_accueil,1,0,0,0
 access_openstc_planning_agent,openstc_planning agent,model_openstc_planning,openstc_agent,1,0,1,0
 
 access_project_project_base_user,project_project base user,model_project_project,base.group_user,1,0,0,0
 access_project_project_qualifier,project_project qualifier,model_project_project,openstc_qualifier,1,1,1,1
-access_project_project_agent,project_project agent,model_project_project,openstc_agent,1,1,0,0
+access_project_project_agent,project_project agent,model_project_project,openstc_agent,1,,0,0
 access_project_project_employee,project_project employee,model_project_project,openstc_employee,1,0,0,0
+access_project_project_accueil,project_project accueil,model_project_project,openstc_accueil,1,0,0,0
 access_project_project_manager,project_project manager,model_project_project,openstc_manager,1,1,1,1
 access_project_project_dst,project_project dst,model_project_project,openstc_dst,1,1,1,1
 access_project_vs_hours,project.vs.hours,model_project_vs_hours,,1,0,0,0
@@ -60,10 +65,12 @@ access_project_task_dst,project_task dst,model_project_task,openstc_dst,1,1,1,1
 access_project_task_qualifier,project_task qualifier,model_project_task,openstc_qualifier,1,0,0,0
 access_project_task_agent,project_task agent,model_project_task,openstc_agent,1,1,0,0
 access_project_task_employee,project_task employee,model_project_task,openstc_employee,1,0,0,0
+access_project_task_accueil,project_task accueil,model_project_task,openstc_accueil,1,0,0,0
 access_project_task_manager,project_task manager,model_project_task,openstc_manager,1,1,1,1
 
 
-access_project_task_type,project_task_type employee,model_project_task_type,openstc_employee,1,0,0,0
+access_project_task_type_employee,project_task_type employee,model_project_task_type,openstc_employee,1,0,0,0
+access_project_task_type_accueil,project_task_type accueil,model_project_task_type,openstc_accueil,1,0,0,0
 access_project_task_history_qualifier,project_task_history qualifier,model_project_task_history,openstc_qualifier,1,0,1,0
 access_project_task_history_agent,project_task_history agent,model_project_task_history,openstc_agent,1,0,1,0
 access_project_task_work_dst,project_task_work dst,model_project_task_work,openstc_dst,1,1,1,1
