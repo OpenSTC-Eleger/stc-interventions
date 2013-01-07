@@ -134,7 +134,7 @@ res_partner()
 
 class users(osv.osv):
     _name = "res.users"
-    _description = "res users stc"
+    _description = "res users st"
     _inherit = "res.users"
     _rec_name = "name"
 
