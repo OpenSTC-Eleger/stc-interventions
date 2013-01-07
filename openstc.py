@@ -134,7 +134,7 @@ res_partner()
 
 class users(osv.osv):
     _name = "res.users"
-    _description = "res users ctm"
+    _description = "res users stc"
     _inherit = "res.users"
     _rec_name = "name"
 
@@ -151,10 +151,24 @@ class users(osv.osv):
             'city_home': fields.char('City', size=128),
             'phone': fields.char('Phone Number', size=12),
             'is_manager': fields.boolean('Is manager'),
+            'team_id': fields.many2one('openstc.team', 'Team'),
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
     }
 users()
 
+class team(osv.osv):
+    _name = "openstc.team"
+    _description = "rteam stc"
+    _rec_name = "name"
+
+    _columns = {
+            'name': fields.char('name', size=128),
+            'manager_id': fields.many2one('res.users', 'Manager'),
+            'service_ids': fields.many2many('openstc.service', 'openstc_team_services_rel', 'team_id', 'service_id', 'Services'),
+            'user_ids': fields.one2many('res.users', 'team_id', "Users"),
+            'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
+    }
+team()
 
 #----------------------------------------------------------
 # Tâches
@@ -184,6 +198,7 @@ class task(osv.osv):
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'category_id':fields.many2one('openstc.task.category', 'Category'),
         'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
+        'team_id': fields.many2one('openstc.team', 'Team'),
 #        'planned_hours': fields.float('Planned Hours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
 #        'effective_hours': fields.float('Effective Hours', help='Time spent'),
 #        'remaining_hours': fields.float('Remaining Hours', digits=(16,2), help="Total remaining time, can be re-estimated periodically by the assignee of the task."),
