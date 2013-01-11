@@ -151,21 +151,22 @@ class users(osv.osv):
             'city_home': fields.char('City', size=128),
             'phone': fields.char('Phone Number', size=12),
             'is_manager': fields.boolean('Is manager'),
-            'team_id': fields.many2one('openstc.team', 'Team'),
+            #'team_ids': fields.many2many('openstc.team', 'openstc_user_teams_rel', 'user_id', 'team_id', 'Teams'),
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
     }
 users()
 
 class team(osv.osv):
     _name = "openstc.team"
-    _description = "rteam stc"
+    _description = "team stc"
     _rec_name = "name"
 
     _columns = {
             'name': fields.char('name', size=128),
             'manager_id': fields.many2one('res.users', 'Manager'),
             'service_ids': fields.many2many('openstc.service', 'openstc_team_services_rel', 'team_id', 'service_id', 'Services'),
-            'user_ids': fields.one2many('res.users', 'team_id', "Users"),
+            'user_ids': fields.many2many('res.users', 'openstc_team_users_rel', 'team_id', 'user_id', 'Users'),
+            #'user_ids': fields.one2many('res.users', 'team_id', "Users"),
             'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
     }
 team()
@@ -288,18 +289,22 @@ openstc_task_category()
 
 class project(osv.osv):
     _name = "project.project"
-    _description = "Interventon ctm"
+    _description = "Interventon stc"
     _inherit = "project.project"
 
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
-        'service_id': fields.related('ask_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
+        #'service_id': fields.related('ask_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'date_deadline': fields.date('Deadline',select=True),
         'site1': fields.many2one('openstc.site', 'Site principal'),
         #'analytic_account_id': fields.many2one('account.analytic.account', 'Analytic Account', help="Link this project to an analytic account if you need financial management on projects. It enables you to connect projects with budgets, planning, cost and revenue analysis, timesheets on projects, etc.", ondelete="cascade", required=False),
-        'state': fields.selection([('toscheduled', 'toScheduled'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
+        'state': fields.selection([('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
                                   'State', readonly=True, required=True, help=''),
+
+        'service_id': fields.many2one('openstc.service', 'Service'),
+        'description': fields.text('Description'),
+        'site_details': fields.text('Précision sur le site'),
     }
 
 

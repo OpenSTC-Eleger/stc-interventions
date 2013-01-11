@@ -57,7 +57,7 @@ access_openstc_planning_agent,openstc_planning agent,model_openstc_planning,open
 
 access_project_project_base_user,project_project base user,model_project_project,base.group_user,1,0,0,0
 access_project_project_qualifier,project_project qualifier,model_project_project,openstc_qualifier,1,1,1,1
-access_project_project_agent,project_project agent,model_project_project,openstc_agent,1,,0,0
+access_project_project_agent,project_project agent,model_project_project,openstc_agent,1,0,0,0
 access_project_project_employee,project_project employee,model_project_project,openstc_employee,1,0,0,0
 access_project_project_accueil,project_project accueil,model_project_project,openstc_accueil,1,0,0,0
 access_project_project_manager,project_project manager,model_project_project,openstc_manager,1,1,1,1
