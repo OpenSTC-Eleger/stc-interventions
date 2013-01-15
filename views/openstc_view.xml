@@ -985,7 +985,7 @@
    	 	<menuitem action="action_openstc_view_employees5"
    			id="menu_action_openstc_view_employees"
    			parent="menu_configuration"
-   			groups="openstc_dst,openstc_manager"
+   			groups="openstc_dst"
    			sequence="4"/>
 
    	 	<menuitem action="action_openstc_view_team"
@@ -1000,7 +1000,7 @@
    		<!--  partner -->
    		<menuitem
    			id="menu_openstc_partner"
-   			groups="openstc_dst,openstc_manager"
+   			groups="openstc_dst"
    			name="Demandeurs"
    			parent="menu_configuration"
    			sequence="6"/>
@@ -1008,13 +1008,13 @@
    		<menuitem action="action_openstc_view_partner"
    			id="menu_action_openstc_view_partner"
    			parent="menu_openstc_partner"
-   			groups="openstc_dst,openstc_manager"
+   			groups="openstc_dst"
    			sequence="1"/>
 
    		<menuitem action="action_openstc_view_partner_type"
    			id="menu_action_openstc_view_partner_type"
    			parent="menu_openstc_partner"
-   			groups="openstc_dst,openstc_manager"
+   			groups="openstc_dst"
    			sequence="2"/>
 
 
