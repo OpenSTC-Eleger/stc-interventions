@@ -240,7 +240,7 @@ class openstc_task_category(osv.osv):
     _name = "openstc.task.category"
     _description = "Task Category"
     _columns = {
-        'name': fields.char('Name', size=64, required=True, translate=True, select=True),
+        'name': fields.char('Name', size=64, required=True, select=True),
         'code': fields.char('Code', size=32),
         'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
         'parent_id': fields.many2one('openstc.task.category','Parent Category', select=True, ondelete='cascade'),
