@@ -305,6 +305,7 @@ class project(osv.osv):
         'service_id': fields.many2one('openstc.service', 'Service'),
         'description': fields.text('Description'),
         'site_details': fields.text('Précision sur le site'),
+        'cancel_reason': fields.text('Cancel reason'),
     }
 
 
@@ -347,6 +348,7 @@ class project_work(osv.osv):
     _columns = {
         'manager_id': fields.related('ask_id', 'manager_id', type='many2one', string='Services'),
         #'user_id': fields.many2one('res.users', 'Done by', required=False, select="1"),
+        'team_id': fields.many2one('openstc.team', 'Done by', required=False, select="1"),
     }
 
 project_work()
@@ -634,5 +636,14 @@ class openstc_planning(osv.osv):
 openstc_planning()
 
 
+class todo(osv.osv):
+    _name = "openstc.todo"
+    _description = "todo stc"
+    _rec_name = "title"
 
+    _columns = {
+            'title': fields.char('title', size=128),
+            'completed': fields.boolean('Completed'),
+    }
+team()
 
