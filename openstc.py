@@ -169,6 +169,7 @@ class team(osv.osv):
             #'user_ids': fields.one2many('res.users', 'team_id', "Users"),
             'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
     }
+
 team()
 
 #----------------------------------------------------------
@@ -414,6 +415,7 @@ class ask(osv.osv):
 
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True),
+        'create_date' : fields.datetime('Create Date', readonly=True),
         'current_date': fields.datetime('Date'),
         'confirm_by_dst': fields.boolean('Confirm by DST'),
         'description': fields.text('Description'),
@@ -645,5 +647,5 @@ class todo(osv.osv):
             'title': fields.char('title', size=128),
             'completed': fields.boolean('Completed'),
     }
-team()
+todo()
 
