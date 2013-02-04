@@ -295,6 +295,7 @@ class project(osv.osv):
 
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
+        'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
         #'service_id': fields.related('ask_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'date_deadline': fields.date('Deadline',select=True),
@@ -416,6 +417,8 @@ class ask(osv.osv):
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True),
         'create_date' : fields.datetime('Create Date', readonly=True),
+        'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
+        'write_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'current_date': fields.datetime('Date'),
         'confirm_by_dst': fields.boolean('Confirm by DST'),
         'description': fields.text('Description'),
