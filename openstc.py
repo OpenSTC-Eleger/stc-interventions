@@ -134,7 +134,7 @@ res_partner()
 
 class users(osv.osv):
     _name = "res.users"
-    _description = "res users ctm"
+    _description = "res users st"
     _inherit = "res.users"
     _rec_name = "name"
 
@@ -151,10 +151,26 @@ class users(osv.osv):
             'city_home': fields.char('City', size=128),
             'phone': fields.char('Phone Number', size=12),
             'is_manager': fields.boolean('Is manager'),
+            #'team_ids': fields.many2many('openstc.team', 'openstc_user_teams_rel', 'user_id', 'team_id', 'Teams'),
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
     }
 users()
 
+class team(osv.osv):
+    _name = "openstc.team"
+    _description = "team stc"
+    _rec_name = "name"
+
+    _columns = {
+            'name': fields.char('name', size=128),
+            'manager_id': fields.many2one('res.users', 'Manager'),
+            'service_ids': fields.many2many('openstc.service', 'openstc_team_services_rel', 'team_id', 'service_id', 'Services'),
+            'user_ids': fields.many2many('res.users', 'openstc_team_users_rel', 'team_id', 'user_id', 'Users'),
+            #'user_ids': fields.one2many('res.users', 'team_id', "Users"),
+            'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
+    }
+
+team()
 
 #----------------------------------------------------------
 # Tâches
@@ -165,11 +181,41 @@ class task(osv.osv):
     _description = "Task ctm"
     _inherit = "project.task"
 
+        # Compute: effective_hours, total_hours, progress
+#    def _hours_get(self, cr, uid, ids, field_names, args, context=None):
+#        res = {}
+#        for task in self.browse(cr, uid, ids, context=context):
+#            res[task.id] = {'effective_hours': task.effective_hours, 'total_hours': (task.remaining_hours or 0.0) + task.effective_hours}
+#            res[task.id]['delay_hours'] = res[task.id]['total_hours'] - task.planned_hours
+#            res[task.id]['progress'] = 0.0
+#            if (task.remaining_hours + task.effective_hours):
+#                res[task.id]['progress'] = round(min(100.0 * task.effective_hours/ res[task.id]['total_hours'], 99.99),2)
+#            if task.state in ('done','cancelled'):
+#                res[task.id]['progress'] = 100.0
+#        return res
+
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
+        'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'category_id':fields.many2one('openstc.task.category', 'Category'),
         'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
+        'team_id': fields.many2one('openstc.team', 'Team'),
+#        'planned_hours': fields.float('Planned Hours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
+#        'effective_hours': fields.float('Effective Hours', help='Time spent'),
+#        'remaining_hours': fields.float('Remaining Hours', digits=(16,2), help="Total remaining time, can be re-estimated periodically by the assignee of the task."),
+#        'total_hours': fields.function(_hours_get, string='Total Hours', multi='hours', help="Computed as: Time Spent + Remaining Time.",
+#            store = {
+#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
+#            }),
+#        'progress': fields.function(_hours_get, string='Progress (%)', multi='hours', group_operator="avg", help="If the task has a progress of 99.99% you should close the task if it's finished or reevaluate the time",
+#            store = {
+#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours','state'], 10),
+#            }),
+#        'delay_hours': fields.function(_hours_get, string='Delay Hours', multi='hours', help="Computed as difference between planned hours by the project manager and the total hours of the task.",
+#            store = {
+#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
+#            }),
     }
 task()
 
@@ -195,7 +241,7 @@ class openstc_task_category(osv.osv):
     _name = "openstc.task.category"
     _description = "Task Category"
     _columns = {
-        'name': fields.char('Name', size=64, required=True, translate=True, select=True),
+        'name': fields.char('Name', size=64, required=True, select=True),
         'code': fields.char('Code', size=32),
         'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
         'parent_id': fields.many2one('openstc.task.category','Parent Category', select=True, ondelete='cascade'),
@@ -206,6 +252,7 @@ class openstc_task_category(osv.osv):
         'service_ids':fields.many2many('openstc.task.category', 'openstc_task_category_services_rel', 'task_category_id', 'service_id', 'Services'),
         'unit': fields.char('Unit', size=32),
         'quantity': fields.integer('Quantity'),
+        'tasksAssigned': fields.one2many('project.task', 'category_id', "tasks"),
     }
 
     _sql_constraints = [
@@ -243,15 +290,24 @@ openstc_task_category()
 
 class project(osv.osv):
     _name = "project.project"
-    _description = "Interventon ctm"
+    _description = "Interventon stc"
     _inherit = "project.project"
 
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
-        'service_id': fields.related('ask_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
+        'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
+        #'service_id': fields.related('ask_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'date_deadline': fields.date('Deadline',select=True),
         'site1': fields.many2one('openstc.site', 'Site principal'),
+        #'analytic_account_id': fields.many2one('account.analytic.account', 'Analytic Account', help="Link this project to an analytic account if you need financial management on projects. It enables you to connect projects with budgets, planning, cost and revenue analysis, timesheets on projects, etc.", ondelete="cascade", required=False),
+        'state': fields.selection([('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
+                                  'State', readonly=True, required=True, help=''),
+
+        'service_id': fields.many2one('openstc.service', 'Service'),
+        'description': fields.text('Description'),
+        'site_details': fields.text('Précision sur le site'),
+        'cancel_reason': fields.text('Cancel reason'),
     }
 
 
@@ -293,7 +349,8 @@ class project_work(osv.osv):
 
     _columns = {
         'manager_id': fields.related('ask_id', 'manager_id', type='many2one', string='Services'),
-        'user_id': fields.many2one('res.users', 'Done by', required=False, select="1"),
+        #'user_id': fields.many2one('res.users', 'Done by', required=False, select="1"),
+        'team_id': fields.many2one('openstc.team', 'Done by', required=False, select="1"),
     }
 
 project_work()
@@ -359,6 +416,9 @@ class ask(osv.osv):
 
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True),
+        'create_date' : fields.datetime('Create Date', readonly=True),
+        'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
+        'write_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'current_date': fields.datetime('Date'),
         'confirm_by_dst': fields.boolean('Confirm by DST'),
         'description': fields.text('Description'),
@@ -581,5 +641,14 @@ class openstc_planning(osv.osv):
 openstc_planning()
 
 
+class todo(osv.osv):
+    _name = "openstc.todo"
+    _description = "todo stc"
+    _rec_name = "title"
 
+    _columns = {
+            'title': fields.char('title', size=128),
+            'completed': fields.boolean('Completed'),
+    }
+todo()
 

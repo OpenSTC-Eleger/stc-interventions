@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-<data noupdate="1">
+<data>
 
 	<!--  GROUPS -->
 
-    <record id="openstc_employee" model="res.groups">
+	<record id="openstc_employee" model="res.groups">
         <field name="name">OpenSTC/Employee</field>
         <field name="category_id" ref="base.module_category_project_management"/>
         <field name="implied_ids" eval="[(4,ref('base.group_user'))]"/>
     </record>
 
+    <record id="openstc_accueil" model="res.groups">
+        <field name="name">OpenSTC/Accueil</field>
+        <field name="category_id" ref="base.module_category_project_management"/>
+        <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
+    </record>
+
     <record id="openstc_agent" model="res.groups">
         <field name="name">OpenSTC/Agent</field>
+        <field name="category_id" ref="base.module_category_project_management"/>
+        <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
+    </record>
+
+    <record id="openstc_chef" model="res.groups">
+        <field name="name">OpenSTC/Chef d'équipe</field>
         <field name="category_id" ref="base.module_category_project_management"/>
         <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
     </record>
@@ -36,42 +48,49 @@
 
     <!--  RULES -->
 
+	<!-- read access of interventions belongs to services user and interventions create by him -->
     <record model="ir.rule" id="ask_rule">
         <field name="name">Ask Rule</field>
         <field name="model_id" ref="model_openstc_ask"/>
-        <field name="domain_force">[('service_id','in',[g.id for g in user.service_ids])]</field>
-        <field eval="1" name="perm_unlink"/>
-        <field eval="1" name="perm_write"/>
+        <field name="domain_force">['|',('service_id','in',[g.id for g in user.service_ids]),('write_uid',"=",user.id)]</field>
+        <field eval="0" name="perm_unlink"/>
+        <field eval="0" name="perm_write"/>
         <field eval="1" name="perm_read"/>
-        <field eval="1" name="perm_create"/>
+        <field eval="0" name="perm_create"/>
     </record>
 
 
     <record model="ir.rule" id="project_dst_rule">
         <field name="name">Project Rule</field>
         <field name="model_id" ref="model_project_project"/>
-        <field name="domain_force">[('service_id','in',[g.id for g in user.service_ids])]</field>
-        <field eval="[(6,0,[ref('dst_user')])]" name="groups"/>
+        <field name="domain_force">['|',('service_id','in',[g.id for g in user.service_ids]),('write_uid',"=",user.id)]</field>
+        <!--  <field eval="[(6,0,[ref('openstc_dst'),ref('openstc_qualifier'),ref('openstc_manager')])]" name="groups"/> -->
+        <field eval="0" name="perm_unlink"/>
+        <field eval="0" name="perm_write"/>
+        <field eval="1" name="perm_read"/>
+        <field eval="0" name="perm_create"/>
+    </record>
+
+    <!--
+    <record model="ir.rule" id="task_rule">
+        <field name="name">Task Rule</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">['|','|',('create_uid','=',user.id),('user_id','=',user.id),('dst_group_id','in',[g.id for g in user.groups_id])]</field>
         <field eval="1" name="perm_unlink"/>
         <field eval="1" name="perm_write"/>
         <field eval="1" name="perm_read"/>
         <field eval="1" name="perm_create"/>
     </record>
-
-    <record model="ir.rule" id="task_rule">
-        <field name="name">Task Rule</field>
-        <field name="model_id" ref="model_project_task"/>
-        <field name="domain_force">['|','|',('create_uid','=',user.id),('user_id','=',user.id),('dst_group_id','in',[g.id for g in user.groups_id])]</field>
-        <field eval="1" name="global"/>
-    </record>
+    -->
 
 
-    <record model="ir.rule" id="site_rule">
+    <!--  <record model="ir.rule" id="site_rule">
         <field name="name">Site Rule</field>
         <field name="model_id" ref="model_openstc_site"/>
         <field name="domain_force">[('service','in',[s.id for s in user.service_ids])]</field>
         <field eval="1" name="global"/>
     </record>
+    -->
 
 </data>
 </openerp>
