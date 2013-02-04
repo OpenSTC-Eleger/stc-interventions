@@ -343,8 +343,8 @@
 					<filter string="Disponibilités a vérifier" domain="[('state','=','remplir'), ('in_option','&lt;&gt;','block')]" help="Réservations dont dispos sont a vérifier"/>
 					<filter string="En Attente de mise a dispo" domain="[('state','in',('draft','confirm'))]" help="Réservations validées ou en attente de validation"/>
 					<filter string="En cours d'utilisation" domain="[('state','=','in_use')]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
-					<filter string="Non actives" domain="[('state','=','done')]" help="Réservations cloturées ou annulées"/>
-					<filter string="Litiges" domain="['|',('state','=','cancle'),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
+					<filter string="Terminées" domain="[('state','=','done')]" help="Réservations cloturées ou annulées"/>
+					<filter string="Litigieuses" domain="['|',('state','=','cancle'),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
 				</search>
 			</field>
 		</record>

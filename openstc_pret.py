@@ -32,37 +32,15 @@ from mx.DateTime.mxDateTime import strptime
 # Fournitures
 #----------------------------------------------------------
 class product_product(osv.osv):
-    """def _calc_qte_dispo_now(self, cr, uid, ids, name, args, context=None):
-        print("début calcul dispo")
-        print(ids)
-        if not isinstance(ids, list):
-            ids = [ids]
-        #Pour cela, on regarde toutes les réservations de produits qui sont prévues ou à prévoir durant aujourd'hui
-        aujourdhui = datetime.now()
-        debut = aujourdhui.replace(hour=0, minute=0, second=0)
-        fin = aujourdhui.replace(hour=23, minute=59, second=59)
-        print(str(debut)) 
-        print(str(fin))
-        ret = {}
-        stock_prod = self._product_available(cr, uid, ids, ['virtual_available'])
-        #Par défaut, on indique la qté max pour chaque produit
-        for id in ids:
-            ret[id] = stock_prod[id]['virtual_available']
-        #Puis pour les articles réservés, on en retranche le nombre réservés 
-        for r in self.pool.get("hotel.reservation").get_nb_prod_reserved(cr, ids, str(debut), str(fin)).fetchall():
-            qte_total_prod = stock_prod[r[0]]['virtual_available']
-            qte_reservee = r[1]
-            ret[r[0]] = qte_total_prod - qte_reservee
-        print(ret)
-        return ret
-    """
+
     def _calc_qte_dispo_now(self, cr, uid, ids, name, args, context=None):
         print("début calcul qté dispo now")
         cr.execute("""select hrl.reserve_product as prod_id, sum(hrl.qte_reserves) as qte_reserves
         from hotel_reservation as hr, hotel_reservation_line as hrl
         where hr.id = hrl.line_id
+        and hrl.reserve_product in %s
         and hr.state in ('draft','confirm','in_use')
-        group by hrl.reserve_product;""")
+        group by hrl.reserve_product;""", (tuple(ids),))
         list_prod_reserved = cr.fetchall()
         stock_prod = self._product_available(cr, uid, ids, ['virtual_available'])
         ret = {}
@@ -91,7 +69,6 @@ class product_product(osv.osv):
         }
 
     _defaults = {
-        'isroom': lambda *a: 1,
         'seuil_confirm': 0,
     }
 
@@ -184,6 +161,8 @@ class hotel_reservation(osv.osv):
                         ne nous permet pas de vous livrer dans les temps.""")
                     self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
                     #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
+                    #TODO: Si montant > 0 euros, générer sale order puis dérouler wkf jusqu'a édition facture
+                    #Calcul montant de la résa
                     return True
                 else:
                     raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
@@ -696,15 +675,12 @@ class purchase_order(osv.osv):
         self.write(cr, uid, ids, {'state':'done'})
         return True
     
-    #Force purchase.order workflow to cancel its pickings (subflow returns cancel and reacticate workitem at picking activity)
+    #Force purchase.order workflow to cancel its pickings (subflow returns cancel and reactivate workitem at picking activity)
     def do_terminate_emprunt(self, cr, uid, ids, context=None):
         list_picking_ids = []
-        #TOCHECK: Vérifier synthaxe dans .append()
         wf_service = netsvc.LocalService('workflow')
         for purchase in self.browse(cr, uid, ids):
             print("Traitement d'un emprunt")
-            #values = [(2,pick.id) for pick in purchase.picking_ids]
-            #self.write(cr, uid, ids, {'picking_ids':values})
             for picking in purchase.picking_ids:
                 print(picking.id)
                 print(purchase.id)
@@ -712,11 +688,11 @@ class purchase_order(osv.osv):
             wf_service.trg_write(uid, 'purchase.order', purchase.id, cr)
             print(purchase.id)
         print("Emprunt Ended")
-        #TODO: Faut-il enlever les liens du O2M picking_ids ?
         return {
                 'res_model':'purchase.order',
                 'type:':'ir.actions.act_window',
                 'view_mode':'form',
                 'target':'current',
                 }
-purchase_order()
+purchase_order()   
+    

@@ -124,13 +124,14 @@
 			action="action_openstc_pret_resa_semaine_view" name="Réservation de la semaine a traiter"
 			parent="menu_action_view_reservations" sequence="1" />
 		
-		<menuitem id="menu_action_openstock_view_reservation_new"
-			action="action_openstock_view_reservation_new" name="Créer une nouvelle réservation"
-			parent="menu_action_view_reservations" sequence="2" />
-		
 		<menuitem id="menu_action_openstock_view_reservation" action="action_openstock_view_reservation"
 			name="Réservations" parent="menu_action_view_reservations"
-			sequence="3" />
+			sequence="2" />
+		
+		<menuitem id="menu_action_openstock_view_reservation_new"
+			action="action_openstock_view_reservation_new" name="Créer une nouvelle réservation"
+			parent="menu_action_view_reservations" sequence="3" />
+		
 <!--
 		<menuitem id="menu_action_openstock_view_reservation_a_revalider"
 			action="action_openstock_view_reservation_a_revalider" name="Réservations A re-vérifier"
