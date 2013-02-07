@@ -133,7 +133,7 @@ class hotel_reservation(osv.osv):
         return ids
     
     _columns = {
-                'state': fields.selection([('draft', 'A Valider'),('confirm','Confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Brouillon')], 'Etat',readonly=True),
+                'state': fields.selection([('draft', 'A Valider'),('confirm','Confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Brouillon'),('recur_waiting','Récurrence Planifiée')], 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
                                             help=("""Une réservation mise en option signifie que votre demande est prise en compte mais
                                             dont on ne peut pas garantir la livraison à la date prévue.
@@ -143,11 +143,13 @@ class hotel_reservation(osv.osv):
                 #votre demande est prise en compte mais qu'un ou plusieurs articles que vous voulez réserver ne 
                 #sont pas disponible à cette date.""")),
                 'name':fields.char('Nom Manifestation', size=128, required=True),
-                'partner_mail':fields.char('Email Demandeur', size=128, required=False)
+                'partner_mail':fields.char('Email Demandeur', size=128, required=False),
+                'is_recur':fields.boolean('Issue d\'une Récurrence', readonly=True),
         }
     _defaults = {
                  'in_option': lambda *a :0,
-                 'state': lambda *a: 'remplir'
+                 'state': lambda *a: 'remplir',
+                 'is_recur': lambda *a: 0,
         }
     _order = "checkin, in_option"
 
@@ -159,10 +161,33 @@ class hotel_reservation(osv.osv):
                     if resa.in_option == 'block':
                         raise osv.except_osv("Erreur","""Votre réservation est bloquée car la date de début de votre manifestion
                         ne nous permet pas de vous livrer dans les temps.""")
-                    self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
-                    #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
-                    #TODO: Si montant > 0 euros, générer sale order puis dérouler wkf jusqu'a édition facture
+                    
+                    #TODO: Envoi mail d'info au demandeur : Demande prise en compte et validée
                     #Calcul montant de la résa
+                    amount = self.get_amount_resa(cr, uid, ids)
+                    if amount > 0.0:
+                    #Si montant > 0 euros, générer sale order puis dérouler wkf jusqu'a édition facture
+                        folio_id = self.create_folio(cr, uid, ids)
+                        wf_service = netsvc.LocalService('workflow')
+                        wf_service.trg_validate(uid, 'hotel.folio', folio_id, 'order_confirm', cr)
+                        folio = self.pool.get("hotel.folio").browse(cr, uid, folio_id)
+                        move_ids = []
+                        for picking in folio.order_id.picking_ids:
+                            for move in picking.move_lines:
+                                #On crée les mvts stocks inverses pour éviter que les stocks soient impactés
+                                self.pool.get("stock.move").copy(cr, uid, move.id, {'picking_id':move.picking_id.id,'location_id':move.location_dest_id.id,'location_dest_id':move.location_id.id,'state':'draft'})
+                        #On mets a jour le browse record pour qu'il intégre les nouveaux stock moves
+                        folio.refresh()
+                        #On applique et on termine tous les stock moves (ceux créés de base par sale order et ceux créés ce dessus
+                        for picking in folio.order_id.picking_ids:
+                            move_ids.extend([x.id for x in picking.move_lines])
+                        self.pool.get("stock.move").action_done(cr, uid, move_ids)
+                        """
+                        folio.refresh()
+                        move_ids = []
+                        self.pool.get("stock.move").search(cr, uid,)
+                        self.pool.get("stock.move").action_done(cr, uid, move_ids)"""
+                    self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
                     return True
                 else:
                     raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
@@ -216,6 +241,33 @@ class hotel_reservation(osv.osv):
         self.write(cr, uid, ids, {'state':'in_use'})
         return True
     def done_reservation(self, cr, uid, ids):
+        if isinstance(ids, list):
+            ids = ids[0]
+        resa = self.browse(cr, uid, ids)
+        if resa.is_recur:
+            #TODO: create invoice from scratch
+            pass
+        else:
+            wf_service = netsvc.LocalService("workflow")
+            inv_ids = []
+            attach_ids = []
+            #Create invoice from each folio
+            for folio in resa.folio_id:
+                wf_service.trg_validate(uid, 'hotel.folio', folio.id, 'manual_invoice', cr)
+            resa.refresh()
+            #Validate invoice(s) created
+            for folio in resa.folio_id:
+                for inv in folio.order_id.invoice_ids:
+                    print(inv.state)
+                    wf_service.trg_validate(uid, 'account.invoice', inv.id, 'invoice_open', cr)
+                    inv_ids.append(inv.id)
+            """#Get invoice PDFs (ir.attachment), we use an SQL query because base_calendar overrides search method or attachments and crashes with ('res_id', 'in', [ids])
+            cr.execute("select id from ir_attachment where res_model='account.invoice' and res_id in %s", (tuple(inv_ids),))
+        #Create a copy of attachments to current reservation
+        for attach_id in cr.fetchall():
+            if isinstance(attach_id, list):
+                attach_id = attach_id[0]
+            self.pool.get("ir.attachment").copy(cr, uid, attach_id, {'model':self._name, 'res_id':ids})"""
         self.write(cr, uid, ids, {'state':'done'})
         return True
     def is_drafted(self, cr, uid, ids):
@@ -436,8 +488,8 @@ class hotel_reservation(osv.osv):
             reservation_line.append((1,line,{'dispo':False, 'valide':False}))
         return reservation_line
     
-    #Lors de l'appui sur le bouton "Générer Check-In", on créé le checkin et on passe l'état de la résa à in_use
-    def do_checkin(self, cr, uid, ids, context=None):
+    #polymorphism of _create_folio
+    def create_folio(self, cr, uid, ids, context=None):
         for reservation in self.browse(cr,uid,ids):
             for line in reservation.reservation_line:
                 folio=self.pool.get('hotel.folio').create(cr,uid,{
@@ -454,25 +506,41 @@ class hotel_reservation(osv.osv):
                                                                                        'checkin_date':reservation['checkin'],
                                                                                        'checkout_date':reservation['checkout'],
                                                                                        'product_id':line.reserve_product.id,
-                                                                                       'name':reservation['reservation_no'],
+                                                                                       'name':line.reserve_product.name_template,
                                                                                        'product_uom':line.reserve_product.uom_id.id,
-                                                                                       'price_unit':line.reserve_product.lst_price,
+                                                                                       'price_unit':self.get_prod_price(cr, uid, [reservation.id], line.reserve_product, context),
                                                                                        'product_uom_qty':line.qte_reserves
 
                                                                                        })],
                                                                    })
                 cr.execute('insert into hotel_folio_reservation_rel (order_id,invoice_id) values (%s,%s)', (reservation.id, folio))
-        wf_service = netsvc.LocalService('workflow')
+        """wf_service = netsvc.LocalService('workflow')
         if folio and folio > 0:
             for id in ids:
-                wf_service.trg_validate(uid, 'hotel.reservation', id, 'put_in_use', cr)
-        return {
+                wf_service.trg_validate(uid, 'hotel.reservation', id, 'put_in_use', cr)"""
+        return folio
+        """return {
                 'view_mode': 'form,tree',
                 'res_model': 'hotel.folio',
                 'type': 'ir.actions.act_window',
                 'res_id':folio,
                 'target':'new'
-                }
+                }"""
+    
+    def get_prod_price(self, cr, uid, ids, record, context=None):
+        #TODO: Add table prices
+        return record.product_tmpl_id.standard_price
+    
+    def get_amount_resa(self, cr, uid, ids, context=None):
+        for resa in self.browse(cr, uid, ids ,context):
+            amount = 0.0
+            for line in resa.reservation_line:
+                #TODO: for each prod, gets price from table price
+                #TOREMOVE: for each prod, gets price from pricelist
+                amount += self.get_prod_price(cr, uid, ids, line.reserve_product, context) * line.qte_reserves
+        return amount
+    
+    
     #Vals: Dict containing "to" (required) and "state" in ("error","draft", "confirm") (required)
     def envoyer_mail(self, cr, uid, ids, vals=None, context=None):
         #TOREMOVE: A déplacer vers un fichier init.xml

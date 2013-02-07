@@ -118,7 +118,7 @@ class openstc_pret_checkout_wizard(osv.osv):
         for checkout in self.browse(cr, uid, ids):
             wf_service = netsvc.LocalService('workflow')
             wf_service.trg_validate(uid, 'hotel.reservation', checkout.reservation.id, 'done', cr)
-            self.write(cr, uid, ids, {'state':'done'})
+            #self.write(cr, uid, ids, {'state':'done'})
         return{'type':'ir.actions.act_window_close'}
         
 openstc_pret_checkout_wizard()

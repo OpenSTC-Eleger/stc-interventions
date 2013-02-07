@@ -16,7 +16,7 @@
 			<field name="res_model">openstc.pret.checkout</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">form</field>
-			<field name="target">current</field>
+			<field name="target">new</field>
 			<field name="context">{'reservation_id':active_id}</field>
 		</record>
 		
