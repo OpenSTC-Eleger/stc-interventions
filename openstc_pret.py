@@ -508,7 +508,7 @@ class hotel_reservation(osv.osv):
                                                                                        'product_id':line.reserve_product.id,
                                                                                        'name':line.reserve_product.name_template,
                                                                                        'product_uom':line.reserve_product.uom_id.id,
-                                                                                       'price_unit':self.get_prod_price(cr, uid, [reservation.id], line.reserve_product, context),
+                                                                                       'price_unit':self.get_prod_price(cr, uid, [reservation.id], line, context),
                                                                                        'product_uom_qty':line.qte_reserves
 
                                                                                        })],
@@ -527,9 +527,9 @@ class hotel_reservation(osv.osv):
                 'target':'new'
                 }"""
     
+    #param record: browse_record hotel.reservation.line
     def get_prod_price(self, cr, uid, ids, record, context=None):
-        #TODO: Add table prices
-        return record.product_tmpl_id.standard_price
+        return record.reserve_product.product_tmpl_id.standard_price
     
     def get_amount_resa(self, cr, uid, ids, context=None):
         for resa in self.browse(cr, uid, ids ,context):
@@ -537,7 +537,7 @@ class hotel_reservation(osv.osv):
             for line in resa.reservation_line:
                 #TODO: for each prod, gets price from table price
                 #TOREMOVE: for each prod, gets price from pricelist
-                amount += self.get_prod_price(cr, uid, ids, line.reserve_product, context) * line.qte_reserves
+                amount += self.get_prod_price(cr, uid, ids, line, context) * line.qte_reserves
         return amount
     
     

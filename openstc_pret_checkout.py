@@ -122,7 +122,7 @@ class openstc_pret_checkout_wizard(osv.osv):
         return{'type':'ir.actions.act_window_close'}
         
 openstc_pret_checkout_wizard()
-
+AVAILABLE_STATE_TREATMENT_SELECTION = [('draft','Non Planifié'),('in_progress','En cours de Traitement'),('done','Remis en Etat')]
 AVAILABLE_ETAT_SELECTION = [('ras','Ne Rien Planifier'),('to_repair','A Réparer'),('to_purchase','A Racheter')]
 class openstc_pret_checkout_line_wizard(osv.osv):
     _name = "openstc.pret.checkout.line"
@@ -131,10 +131,14 @@ class openstc_pret_checkout_line_wizard(osv.osv):
                 'product_id':fields.many2one('product.product','Article', readonly=True),
                 'qte_reservee':fields.integer('Qté prêtée', readonly=True),
                 'etat_retour':fields.selection(AVAILABLE_ETAT_SELECTION, 'Etat après utilisation', required=True),
+                'state':fields.selection(AVAILABLE_STATE_TREATMENT_SELECTION, 'Avancement', readonly=True),
                 'qte_to_purchase':fields.integer('Qté à Racheter'),
                 'infos_supp':fields.char('Infos Supplémentaires',size=128),
-                'partner_id':fields.related('checkout_id','partner_id', type='many2one',relation='res.partner', string="Demandeur"),
-                'date_order':fields.related('checkout_id','date_order',type='datetime', string='Date Etat des Lieux')
+                'partner_id':fields.related('checkout_id','partner_id', type='many2one',relation='res.partner', string="Emprunteur concerné"),
+                'date_order':fields.related('checkout_id','date_order',type='datetime', string='Date Etat des Lieux'),
+            }
+    _defaults = {
+            'state':lambda *a: 'draft',
             }
 
 

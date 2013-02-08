@@ -45,12 +45,16 @@
 				<page string="Suppliers" position="before">
 					<page string="Résumé des Détériorations">
 				    	<field name="checkout_lines" nolabel="1">
-					        <tree string="Résumé des détériorations (Etat des Lieux)" editable="top">
+					        <tree string="Résumé des détériorations (Etat des Lieux)" editable="top"
+					            colors="blue:state=='draft' and etat_retour=='to_repair';orange:state=='draft' and etat_retour=='to_purchase';
+					            green:state=='in_progress'">
 					            <field name="checkout_id"/>
 					            <field name="date_order"/>
 					            <field name="etat_retour"/>
+					            <field name="infos_supp"/>
 					            <field name="qte_to_purchase"/>
 					            <field name="partner_id"/>
+					            <field name="state"/>
 					        </tree>
 					    </field>
 					</page>
