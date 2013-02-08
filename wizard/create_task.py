@@ -149,7 +149,7 @@ class CreateTaskMemory(osv.osv_memory):
                     'planned_hours': task.planned_hours or False,
                     'state': 'open',
                     'date_deadline': this.inter_date_deadline or False,
-                    'dst_group_id': 18,
+                    #'dst_group_id': 18,
                     'user_id': task.user_id.id or False,
                     'category_id': task.category_id.id or False,
                     'ask_id': this.ask_id.id or False,

@@ -199,7 +199,7 @@ class task(osv.osv):
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'category_id':fields.many2one('openstc.task.category', 'Category'),
-        'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
+        #'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
         'team_id': fields.many2one('openstc.team', 'Team'),
 #        'planned_hours': fields.float('Planned Hours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
 #        'effective_hours': fields.float('Effective Hours', help='Time spent'),

@@ -1379,10 +1379,6 @@ msgstr "Services"
 msgid "Add task"
 msgstr "Création des tâches"
 
-#. module: openstc
-#: field:project.task,dst_group_id:0
-msgid "DST Group"
-msgstr "Groupe DST"
 
 #. module: project
 #: model:process.node,name:project.process_node_drafttask0
@@ -1443,12 +1439,6 @@ msgstr "Mois en cours"
 #: field:project.task.work,user_id:0
 msgid "Done by"
 msgstr "Assigné à"
-
-
-#. module: openstc
-#: help:project.task,dst_group_id:0
-msgid "The group corresponding to DST"
-msgstr "Le groupe est celui du DST"
 
 #. module: project
 #: view:project.task:0
