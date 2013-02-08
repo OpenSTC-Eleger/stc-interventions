@@ -1,3 +1,5 @@
 eclipse.preferences.version=1
 encoding//wizard/openstc_pret_wizard.py=utf-8
 encoding/openstc.py=utf-8
+encoding/openstc_pret.py=utf-8
+encoding/openstc_pret_checkout.py=utf-8

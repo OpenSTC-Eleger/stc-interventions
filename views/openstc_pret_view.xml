@@ -45,12 +45,16 @@
 				<page string="Suppliers" position="before">
 					<page string="Résumé des Détériorations">
 				    	<field name="checkout_lines" nolabel="1">
-					        <tree string="Résumé des détériorations (Etat des Lieux)" editable="top">
+					        <tree string="Résumé des détériorations (Etat des Lieux)" editable="top"
+					            colors="blue:state=='draft' and etat_retour=='to_repair';orange:state=='draft' and etat_retour=='to_purchase';
+					            green:state=='in_progress'">
 					            <field name="checkout_id"/>
 					            <field name="date_order"/>
 					            <field name="etat_retour"/>
+					            <field name="infos_supp"/>
 					            <field name="qte_to_purchase"/>
 					            <field name="partner_id"/>
+					            <field name="state"/>
 					        </tree>
 					    </field>
 					</page>
@@ -87,6 +91,7 @@
 						on_change="onchange_partner_id(partner_id)" select="1"
 						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
 					<field name="partner_mail" attrs="{'invisible':[('state','=','remplir')]}" />
+					<field name="site_id"/>
 				</field>
 				<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
 					position="replace">
@@ -119,7 +124,6 @@
 						attrs="{'readonly':[('state','in',('in_use','done'))]}" />
 				</field>
 
-
 				<field name="reservation_line" colspan="4" nolabel="1"
 					position="replace">
 					<field name="reservation_line" string="Lignes de Réservation" required="1" 
@@ -151,12 +155,17 @@
 				<button name="done" string="Create Folio" states="confirm"
 					position="replace">
 					<button name="%(action_view_openstc_pret_create_checkout)d" string="Retour des articles" type="action" states="in_use" />
+					<!-- <button name="create_folio" type="object" string="Générer Folio" states="done"/> -->
 				</button>
 				<button name="confirm" string="Confirm" states="draft"
 					position="replace">
 					<button name="confirm" string="Confirmer" states="draft" />
 				</button>
-
+				<page string="Reservation" position="after">
+				    <page string="Folios Associés">
+				        <field name="folio_id"/>
+				    </page>
+				</page>
 			</field><!-- end tag of xml arch -->
 		</record>
 
@@ -226,7 +235,7 @@
 				<field name="partner_id" on_change="onchange_partner_id(partner_id)"
 					required="1" string="Guest Name" colspan="4" position="replace">
 					<field name="partner_id" on_change="onchange_partner_id(partner_id)"
-						required="1" string="Demandeur" colspan="4" />
+						required="1" string="Demandeur" colspan="4"/>
 				</field>
 				<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
 					string="Booking Contact" position="replace">
@@ -300,7 +309,21 @@
 			</field><!-- end tag of xml arch -->
 		</record>
 
-		
+		<record model="ir.ui.view" id="view_openstock_reservation_calendar">
+			<field name="name">hotel.reservation.calendar</field>
+			<field name="model">hotel.reservation</field>
+			<field name="inherit_id" ref="hotel_reservation.hotel_calendar_view"/>
+			<field name="type">calendar</field>
+			<field name="arch" type="xml">
+				<xpath expr="//calendar" position="replace">
+					<calendar string="Planning des Réservations" color="site_id" date_start="checkin" date_stop="checkout" day_length="24">
+					    <field name="name"/>
+					    <field name="partner_id"/>
+					    <field name="site_id"/>
+					</calendar>
+				</xpath>
+			</field>
+		</record>
 		
 		<record model="ir.ui.view" id="view_openstock_reservation_folio1_tree">
 			<field name="name">hotel.folio.tree</field>
@@ -343,8 +366,8 @@
 					<filter string="Disponibilités a vérifier" domain="[('state','=','remplir'), ('in_option','&lt;&gt;','block')]" help="Réservations dont dispos sont a vérifier"/>
 					<filter string="En Attente de mise a dispo" domain="[('state','in',('draft','confirm'))]" help="Réservations validées ou en attente de validation"/>
 					<filter string="En cours d'utilisation" domain="[('state','=','in_use')]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
-					<filter string="Non actives" domain="[('state','=','done')]" help="Réservations cloturées ou annulées"/>
-					<filter string="Litiges" domain="['|',('state','=','cancle'),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
+					<filter string="Terminées" domain="[('state','=','done')]" help="Réservations cloturées ou annulées"/>
+					<filter string="Litigieuses" domain="['|',('state','=','cancle'),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
 				</search>
 			</field>
 		</record>
