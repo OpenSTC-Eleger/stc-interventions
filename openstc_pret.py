@@ -78,6 +78,12 @@ class hotel_reservation_line(osv.osv):
     _name = "hotel_reservation.line"
     _inherit = "hotel_reservation.line"
     
+    """def name_get(self, cr, uid, ids, context=None):
+        ret = []
+        for line in self.browse(cr, uid, ids, context):
+            ret.append((line.id,'%s %s' % (line.qte_reserves, line.reserve_product)))
+        return ret"""
+    
     #Ligne valide si (infos XOR no_infos)
     def _calc_line_is_valid(self, cr, uid, ids, name, args, context=None):
         ret = {}
@@ -98,7 +104,11 @@ class hotel_reservation_line(osv.osv):
         "no_infos":fields.boolean("Ne sais pas"),
         "valide":fields.function(_calc_line_is_valid, method=True, type="boolean", 
                                  store={'hotel_reservation.line':(_get_line_to_valide, ['infos','no_infos'], 10),},
-                                 string="Ligne Valide")
+                                 string="Ligne Valide"),
+        "name":fields.char('Libellé', size=128),
+        #"parent_name":fields.related('line_id','name', type='char'),
+        #"parent_checkin":fields.related('line_id','checkin',type='datetime'),
+        #"parent_checkout":fields.related('line_id','checkout',type='datetime'),
         }
 
 hotel_reservation_line()
@@ -145,6 +155,7 @@ class hotel_reservation(osv.osv):
                 'name':fields.char('Nom Manifestation', size=128, required=True),
                 'partner_mail':fields.char('Email Demandeur', size=128, required=False),
                 'is_recur':fields.boolean('Issue d\'une Récurrence', readonly=True),
+                'site_id':fields.many2one('openstc.site','Site (Lieu)'),
         }
     _defaults = {
                  'in_option': lambda *a :0,
