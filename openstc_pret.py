@@ -57,10 +57,9 @@ class product_product(osv.osv):
 
     _name = "product.product"
     _inherit = "product.product"
-    _description = "Task Category"
+    _description = "Produit"
     _columns = {
         "qte_dispo": fields.function(_calc_qte_dispo_now, method=True, string="Disponible Aujourd'hui", type="integer"),
-        "geo": fields.char("Position Géographique", 128),
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
         "seuil_confirm":fields.integer("Qté Max sans Validation", help="Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"),
         "bloquant":fields.boolean("\"Non disponibilité\" bloquante", help="Un produit dont la non dispo est bloquante empêche la réservation de se poursuivre (elle reste en Brouillon)"),
@@ -156,6 +155,7 @@ class hotel_reservation(osv.osv):
                 'partner_mail':fields.char('Email Demandeur', size=128, required=False),
                 'is_recur':fields.boolean('Issue d\'une Récurrence', readonly=True),
                 'site_id':fields.many2one('openstc.site','Site (Lieu)'),
+                'prod_id':fields.many2one('product.product','Ressource'),
         }
     _defaults = {
                  'in_option': lambda *a :0,
@@ -193,11 +193,6 @@ class hotel_reservation(osv.osv):
                         for picking in folio.order_id.picking_ids:
                             move_ids.extend([x.id for x in picking.move_lines])
                         self.pool.get("stock.move").action_done(cr, uid, move_ids)
-                        """
-                        folio.refresh()
-                        move_ids = []
-                        self.pool.get("stock.move").search(cr, uid,)
-                        self.pool.get("stock.move").action_done(cr, uid, move_ids)"""
                     self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
                     return True
                 else:
@@ -502,33 +497,32 @@ class hotel_reservation(osv.osv):
     #polymorphism of _create_folio
     def create_folio(self, cr, uid, ids, context=None):
         for reservation in self.browse(cr,uid,ids):
+            room_lines = []
             for line in reservation.reservation_line:
-                folio=self.pool.get('hotel.folio').create(cr,uid,{
-                                                                  'date_order':reservation.date_order,
-                                                                  'shop_id':reservation.shop_id.id,
-                                                                  'partner_id':reservation.partner_id.id,
-                                                                  'pricelist_id':reservation.pricelist_id.id,
-                                                                  'partner_invoice_id':reservation.partner_invoice_id.id,
-                                                                  'partner_order_id':reservation.partner_order_id.id,
-                                                                  'partner_shipping_id':reservation.partner_shipping_id.id,
-                                                                  'checkin_date': reservation.checkin,
-                                                                  'checkout_date': reservation.checkout,
-                                                                  'room_lines': [(0,0,{'folio_id':line['id'],
-                                                                                       'checkin_date':reservation['checkin'],
-                                                                                       'checkout_date':reservation['checkout'],
-                                                                                       'product_id':line.reserve_product.id,
-                                                                                       'name':line.reserve_product.name_template,
-                                                                                       'product_uom':line.reserve_product.uom_id.id,
-                                                                                       'price_unit':self.get_prod_price(cr, uid, [reservation.id], line, context),
-                                                                                       'product_uom_qty':line.qte_reserves
+                room_lines.append((0,0,{
+                   'checkin_date':reservation['checkin'],
+                   'checkout_date':reservation['checkout'],
+                   'product_id':line.reserve_product.id,
+                   'name':line.reserve_product.name_template,
+                   'product_uom':line.reserve_product.uom_id.id,
+                   'price_unit':self.get_prod_price(cr, uid, [reservation.id], line, context),
+                   'product_uom_qty':line.qte_reserves
 
-                                                                                       })],
-                                                                   })
-                cr.execute('insert into hotel_folio_reservation_rel (order_id,invoice_id) values (%s,%s)', (reservation.id, folio))
-        """wf_service = netsvc.LocalService('workflow')
-        if folio and folio > 0:
-            for id in ids:
-                wf_service.trg_validate(uid, 'hotel.reservation', id, 'put_in_use', cr)"""
+                   }))
+            folio=self.pool.get('hotel.folio').create(cr,uid,{
+                  'date_order':reservation.date_order,
+                  'shop_id':reservation.shop_id.id,
+                  'partner_id':reservation.partner_id.id,
+                  'pricelist_id':reservation.pricelist_id.id,
+                  'partner_invoice_id':reservation.partner_invoice_id.id,
+                  'partner_order_id':reservation.partner_order_id.id,
+                  'partner_shipping_id':reservation.partner_shipping_id.id,
+                  'checkin_date': reservation.checkin,
+                  'checkout_date': reservation.checkout,
+                  'room_lines':room_lines,
+           })
+            cr.execute('insert into hotel_folio_reservation_rel (order_id,invoice_id) values (%s,%s)', (reservation.id, folio))
+
         return folio
         """return {
                 'view_mode': 'form,tree',
@@ -727,6 +721,38 @@ class hotel_folio(osv.osv):
     _inherit = "hotel.folio"
     _name = "hotel.folio"
     _order = "checkout_date desc"
+    
+    #Rewrite with source coming from hotel module, permits to send real sale_order ids to sale.order methods
+    def action_wait(self, cr, uid, ids, *args):
+        sale_ids = []
+        for folio in self.browse(cr, uid, ids):
+            if folio.order_id:
+                sale_ids.append(folio.order_id.id)
+        
+        res = self.pool.get('sale.order').action_wait(cr, uid, sale_ids, *args)
+        for o in self.browse(cr, uid, ids):
+            if (o.order_policy == 'manual') and (not o.invoice_ids):
+                self.write(cr, uid, [o.id], {'state': 'manual'})
+            else:
+                self.write(cr, uid, [o.id], {'state': 'progress'})
+        return res
+    
+    #Rewrite with source coming from hotel module, permits to send real sale_order ids to sale.order methods
+    def action_invoice_create(self, cr, uid, ids, grouped=False, states=['confirmed','done']):
+        sale_ids = []
+        for folio in self.browse(cr, uid, ids):
+            if folio.order_id:
+                sale_ids.append(folio.order_id.id)
+        i = self.pool.get('sale.order').action_invoice_create(cr, uid, sale_ids, grouped=False, states=['confirmed','done'])
+        for line in self.browse(cr, uid, ids, context={}):
+            self.write(cr, uid, [line.id], {'invoiced':True})
+            if grouped:
+               self.write(cr, uid, [line.id], {'state' : 'progress'})
+            else:
+               self.write(cr, uid, [line.id], {'state' : 'progress'})
+        return i 
+
+hotel_folio()
     
 class product_category(osv.osv):
     _name = "product.category"

@@ -368,6 +368,11 @@
 					<filter string="En cours d'utilisation" domain="[('state','=','in_use')]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
 					<filter string="Terminées" domain="[('state','=','done')]" help="Réservations cloturées ou annulées"/>
 					<filter string="Litigieuses" domain="['|',('state','=','cancle'),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
+					<newline />
+					<filter string="Voir seulement les Salles" domain="[('reservation_line.reserve_product.is_salle','=',True)]"
+					    help="n'affiche que les réservations concernant une salle"/>
+					<field name="prod_id" string="Ressource" widget="selection"
+					    filter_domain="[('reservation_line.reserve_product','=',self)]"/>
 				</search>
 			</field>
 		</record>
