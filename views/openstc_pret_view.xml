@@ -91,7 +91,6 @@
 				</field>
 				<field name="date_order" select="1" position="replace">
 					<field name="date_order" string="Date de création" select="1"
-						position="replace"
 						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')]}" />
 				</field>
 				<field name="shop_id" select="2" position="replace">
@@ -104,9 +103,13 @@
 				</field>
 				<field name="partner_id" on_change="onchange_partner_id(partner_id)"
 					select="1" position="replace">
+					<field name="openstc_partner_id" on_change="onchange_openstc_partner_id(openstc_partner_id)"
+					    attrs="{'required':[('state','in',('confirm','draft'))],'invisible':[('state','=','remplir')],'readonly':[('state','not in',('confirm','draft'))]}"/>
+					
 					<field name="partner_id" string="Demandeur"
-						on_change="onchange_partner_id(partner_id)" select="1"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
+						on_change="onchange_partner_id(partner_id)" select="1" invisible="1"
+						attrs="{'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
+					
 					<field name="partner_mail" attrs="{'invisible':[('state','=','remplir')]}" />
 					<field name="site_id"/>
 				</field>
@@ -133,20 +136,19 @@
 				<field name="childs" position="replace" />
 				<field name="checkin" colspan="1" position="replace">
 					<field name="checkin" string="Début de la Réservation"
-						colspan="1" attrs="{'readonly':[('state','in',('in_use','done'))]}" />
+						colspan="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
 				</field>
 				<field name="checkout" on_change="on_change_checkout(checkin,checkout)"
 					position="replace">
 					<field name="checkout" string="Fin de la Réservation"
-						on_change="on_change_checkout(checkin,checkout,state,reservation_line)"
-						attrs="{'readonly':[('state','in',('in_use','done'))]}" />
+						on_change="on_change_checkout(checkin,checkout)"
+						attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
 				</field>
 
 				<field name="reservation_line" colspan="4" nolabel="1"
 					position="replace">
-					<field name="reservation_line" string="Lignes de Réservation" required="1" 
-						colspan="4" nolabel="1"	on_change="on_change_reservation_line(reservation_line,state)"
-						attrs="{'readonly':[('state','in',('in_use','done'))]}">
+					<field name="reservation_line" string="Lignes de Réservation" required="1" colspan="4"
+					     nolabel="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}">
 						<tree string="Ligne de réservation" editable="top">
 							<field name="categ_id" required="1" />
 							<field name="reserve_product" colspan="1"
@@ -162,13 +164,6 @@
 				</field>
 				<field name="state" position="after">
 					<field name="in_option" on_change="onchange_in_option(in_option,state)" />
-					<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler" type="action" states="draft,confirm" />
-					<button name="redraft" string="Reprendre" states="cancle" />
-					<button name="to_draft" string="Suivant" states="remplir" />
-					<button name="verif_dispo" type="object" string="Vérifier Disponibilités"
-						states="remplir" />
-					<button name="%(action_view_openstc_pret_deliver_products_wizard)d" type="action"
-						string="Mettre à Disposition les articles" states="confirm" />
 				</field>
 				<button name="done" string="Create Folio" states="confirm"
 					position="replace">
@@ -177,7 +172,15 @@
 				</button>
 				<button name="confirm" string="Confirm" states="draft"
 					position="replace">
-					<button name="confirm" string="Confirmer" states="draft" />
+					<group colspan="1" col="1">
+						<button name="confirm" string="Confirmer" states="draft" icon="gtk-go-forward"/>
+					    <button name="redraft" string="Reprendre" states="cancle" />
+						<button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/>
+						<button name="verif_dispo" type="object" string="Vérifier Disponibilités" states="remplir" icon="gtk-execute"/>
+						<button name="%(action_view_openstc_pret_deliver_products_wizard)d" type="action" string="Mettre à Disposition les articles" states="confirm" icon="gtk-go-forward"/>
+						<button name="back_to_remplir" string="Modifier votre réservation" icon="gtk-go-back" states="draft"/>
+						<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler" type="action" states="draft,confirm" icon="gtk-cancel"/>
+					</group>
 				</button>
 				<page string="Reservation" position="after">
 				    <page string="Folios Associés">

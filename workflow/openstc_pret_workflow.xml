@@ -72,7 +72,13 @@
 			<field name="condition">need_confirm()</field>
 		</record>
 		
-		<record model="workflow.transition" id="trans_aremplir_recur_waiting">
+		<record model="workflow.transition" id="trans_openstc_pret_draft_remplir">
+			<field name="act_from" ref="hotel_reservation.act_draft" />
+			<field name="act_to" ref="act_remplir" />
+			<field name="signal">back_to_remplir</field>
+		</record>
+		
+		<record model="workflow.transition" id="trans_openstc_pret_aremplir_recur_waiting">
 			<field name="act_from" ref="act_remplir" />
 			<field name="act_to" ref="act_recur_waiting" />
 			<field name="condition">(is_recur == True)</field>
@@ -86,6 +92,12 @@
 			<field name="condition">not_need_confirm()</field>
 		</record>
 
+		
+		<record model="workflow.transition" id="trans_openstc_pret_reservation_remplir_uncheck">
+			<field name="act_from" ref="act_remplir" />
+			<field name="act_to" ref="act_to_uncheck" />
+			<field name="signal">reserv_modified</field>
+		</record>
 
 		<record model="workflow.transition" id="t001">
 			<field name="act_from" ref="hotel_reservation.act_draft" />
@@ -99,7 +111,7 @@
 			<field name="signal">reserv_modified</field>
 		</record>
 		
-		<record model="workflow.transition" id="trans_recur_waiting_uncheck">
+		<record model="workflow.transition" id="trans_openstc_pret_recur_waiting_uncheck">
 			<field name="act_from" ref="act_recur_waiting" />
 			<field name="act_to" ref="act_to_uncheck" />
 			<field name="signal">reserv_modified</field>
@@ -124,7 +136,7 @@
 			<field name="signal">cancel</field>
 		</record>
 
-		<record model="workflow.transition" id="trans_recur_waiting_cancel">
+		<record model="workflow.transition" id="trans_openstc_pret_recur_waiting_cancel">
 			<field name="act_from" ref="act_recur_waiting" />
 			<field name="act_to" ref="act_cancel" />
 			<field name="signal">cancel</field>
@@ -153,13 +165,13 @@
 			<field name="signal">put_in_use</field>
 		</record>
 		
-		<record model="workflow.transition" id="trans_recur_waiting_in_use">
+		<record model="workflow.transition" id="trans_openstc_pret_recur_waiting_in_use">
 			<field name="act_from" ref="act_recur_waiting" />
 			<field name="act_to" ref="act_in_use" />
 			<field name="signal">put_in_use</field>
 		</record>
 		
-		<record model="workflow.transition" id="t06">
+		<record model="workflow.transition" id="trans_openstc_pret_in_use_done">
 			<field name="act_from" ref="act_in_use" />
 			<field name="act_to" ref="hotel_reservation.act_done" />
 			<field name="signal">done</field>

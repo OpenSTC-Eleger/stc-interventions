@@ -113,6 +113,13 @@ class hotel_reservation_line(osv.osv):
      'qte_reserves':lambda *a: 1,
         }
 
+    def write(self, cr, uid, ids, vals, context=None):
+        res = super(hotel_reservation_line, self).write(cr, uid, ids, vals, context=context)
+        if 'reserve_product' in vals or 'qte_reserves' in vals:
+            resa_ids = self.read_group(cr, uid, [('id','in',ids),('line_id','<>',False)], ['line_id'], ['line_id'],context=context)
+            self.pool.get("hotel.reservation").trigger_reserv_modified(cr, uid, [x['line_id'][0] for x in resa_ids], context)
+        return res 
+
 hotel_reservation_line()
 
 class hotel_reservation(osv.osv):
@@ -145,7 +152,7 @@ class hotel_reservation(osv.osv):
         return ids
     
     _columns = {
-                'state': fields.selection([('draft', 'A Valider'),('confirm','Confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Brouillon'),('recur_waiting','Récurrence Planifiée')], 'Etat',readonly=True),
+                'state': fields.selection([('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('recur_waiting','Récurrence Planifiée')], 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
                                             help=("""Une réservation mise en option signifie que votre demande est prise en compte mais
                                             dont on ne peut pas garantir la livraison à la date prévue.
@@ -159,6 +166,7 @@ class hotel_reservation(osv.osv):
                 'is_recur':fields.boolean('Issue d\'une Récurrence', readonly=True),
                 'site_id':fields.many2one('openstc.site','Site (Lieu)'),
                 'prod_id':fields.many2one('product.product','Ressource'),
+                'openstc_partner_id':fields.many2one('res.partner','Demandeur', help="Personne demandant la réservation."),
         }
     _defaults = {
                  'in_option': lambda *a :0,
@@ -289,7 +297,7 @@ class hotel_reservation(osv.osv):
         return not self.is_drafter
     
     def need_confirm(self, cr, uid, ids):
-        #TODO: Rajouter le test sur res.group => si responsable(s) (à définir lesquels), renvoyer False
+        """#TODO: Rajouter le test sur res.group => si responsable(s) (à définir lesquels), renvoyer False
         reservations = self.browse(cr, uid, ids)
         #if group <> "Responsable":
         etape_validation = False
@@ -297,9 +305,8 @@ class hotel_reservation(osv.osv):
             for line in resa.reservation_line:
                 if line.qte_reserves > line.reserve_product.seuil_confirm:
                     etape_validation = True
-        print("need_confirm")
-        print(etape_validation)
-        return etape_validation
+        return etape_validation"""
+        return True
     
     def not_need_confirm(self, cr, uid, ids):
         return not self.need_confirm(cr, uid, ids)
@@ -316,7 +323,7 @@ class hotel_reservation(osv.osv):
         wf_service = netsvc.LocalService('workflow')
         for id in ids:
             wf_service.trg_validate(uid, 'hotel.reservation', id, 'reserv_modified', cr)
-        return
+        return True
     
     #Fonction (liée à une action) permettant de pré-remplir la fiche de réservation en fonction des infos du ou des articles sélectionnés
     def default_get(self, cr, uid, fields, context=None):
@@ -586,6 +593,17 @@ pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240
         for id in ids:
             email_obj.send_mail(cr, uid, email_tmpl_id, id)
         return
+    
+    """def fields_get(self, cr, uid, fields, context=None):
+        res = super(hotel_reservation, self).fields_get(cr, uid, fields, context)
+        #Values to put on fields
+        state = {'state':{'draft':[('required',False)]}}
+        #fields to be redefined
+        my_fields = {
+            'partner_id':state
+            }
+        return"""
+    
     #Surcharge methode pour renvoyer uniquement les resas a traiter jusqu'au vendredi prochain, si on veut la vue associee aux resas a traiter par le responsable
     def search(self, cr, uid,args, offset=0, limit=None, order=None, context=None, count=False):
         #datetime.datetime.now() + datetime.timedelta(days=int(datetime.datetime.now().weekday()) / 4) * (7 - int(datetime.datetime.now().weekday())) + (4 - int(datetime.datetime.now().weekday()) * (1 - int(datetime.datetime.now().weekday()) / 4))
@@ -636,8 +654,10 @@ pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240
         #conduire à un write(cr, uid, ids, {})
         if context == None:
             context = {}
-        
-        return super(hotel_reservation, self).write(cr, uid, ids, vals, context)
+        res = super(hotel_reservation, self).write(cr, uid, ids, vals, context)
+        if 'checkin' in vals or 'checkout' in vals:
+            self.trigger_reserv_modified(cr, uid, ids, context)
+        return res
     
     def unlink(self, cr, uid, ids, context):
         #renvoi des articles dans le stock
@@ -654,60 +674,8 @@ pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240
         
         return {'value':{}}
     
-    def on_change_checkout(self, cr, uid, ids, checkin=False, checkout=False, state=False, reservation_line = False, context=None):
-        print("on_change_checkout")
-        print(state)
-        ret = super(hotel_reservation, self).on_change_checkout(cr, uid, ids, checkin, checkout, context)
-        print(ids)
-        #TODO: Permet d'enregistrer les lignes de réservations lors d'un onchange
-        """if reservation_line and ids:
-            self.write(cr, uid, ids, {'reservation_line':reservation_line})"""
-        #Fin TOCHECK
-        
-        if state and state in ('confirm','draft'):
-            #TODO: Mettre la mise à l'état "remplir" dans le wkf, peut-être via une activité intermédiaire
-            self.trigger_reserv_modified(cr, uid, ids, context)
-            """if ids:
-                #ret['value'] = {'state':'remplir', 'reservation_line': self.uncheck_all_dispo(cr, uid, ids, context)}
-                ret['value'] = {'state':'remplir'}"""
-            ret['value'].update({'state':'remplir'})
-            ret['warning'] = {'title':'Modification(s) importante(s) de la réservation', 'message':"""Les modifications de la réservation (ajout/modification 
-                                   d\'articles réservés ou des dates de réservation) impliquent de revalider la disponibilité des articles que vous
-                                   souhaitez réserver. Veuillez cliquer à nouveau sur le bouton "Vérifier Disponibilités"."""}
-        
-        """if state and state in ("remplir","draft","confirm"):
-            if not reservation_line:
-                reservation_line = []
-            reservation_line.extend(self.uncheck_all_dispo(cr, uid, ids, context))
-            ret.update({'reservation_line':reservation_line})"""
-        return ret
-        
-    def on_change_reservation_line(self, cr ,uid, ids, reservation_line=False, state=False, context=None):
-        print("début onchange reservation line")
-        ret = {'value':{}}
-        if not reservation_line:
-            reservation_line = []
-        reservation_line.extend(self.uncheck_all_dispo(cr, uid, ids, context))
-        if state and state in ('draft', 'confirm'):
-            self.trigger_reserv_modified(cr, uid, ids, context)
-            self.write(cr, uid, ids, {'reservation_line':self.uncheck_all_dispo(cr, uid, ids, context)})
-            ret['value'].update({'state':'remplir'})
-            ret['warning'] = {'title':'Modification(s) importante(s) de la réservation', 'message': """Les modifications de la réservation (ajout/modification 
-                       d\'articles réservés ou des dates de réservation) impliquent de revalider la disponibilité des articles que vous
-                        souhaitez réserver. Veuillez cliquer à nouveau sur le bouton "Vérifier Disponibilités"."""}
-        
-        """print(reservation_line)
-        ret = {'value':{}}
-        #need_modify = False
-        if state and state in ('draft', 'confirm'):
-            modif_lines = self.uncheck_all_dispo(cr, uid, ids, context)
-            self.trigger_reserv_modified(cr, uid, ids, context)
-            ret['value'].update({'state':'remplir'})
-            if not reservation_line:
-                reservation_line = []
-            reservation_line.extend(modif_lines)
-            ret['value'] = {'reservation_line': reservation_line}"""
-        return ret
+    def onchange_openstc_partner_id(self, cr, uid, ids, openstc_partner_id=False, context=None):
+        return {'value':{'partner_id':openstc_partner_id}}
     
     def onchange_partner_id(self, cr, uid, ids, part):
         vals = super(hotel_reservation, self).onchange_partner_id(cr, uid, ids, part)
