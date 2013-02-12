@@ -215,6 +215,7 @@
             </field>
         </record>  -->
 
+		<!-- employees -->
 
        <record id="action_openstc_view_employees5" model="ir.actions.act_window">
             <field name="name">Employés municipaux</field>
@@ -224,6 +225,45 @@
             <field name="view_mode">tree,form</field>
             <!--   <field name="context">{"search_default_draft": 1, "search_default_open":1, "search_default_project_id": project_id}</field>
             <field name="search_view_id" ref="view_users_form_filter3"/> -->
+        </record>
+
+
+		<record model="ir.ui.view" id="view_openstc_absent_type_form">
+            <field name="name">openstc.absent.type.form</field>
+            <field name="model">openstc.absent.type</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Team">
+                	<group colspan="2" col="2">
+                    	<separator string="General" colspan="2"/>
+                		<field name="name"/>
+                		<field name="code"/>
+                		<field name="description"/>
+                	</group>
+                </form>
+            </field>
+        </record>
+
+		<record id="view_openstc_absent_type_tree" model="ir.ui.view">
+            <field name="name">openstc.absent.type.tree</field>
+            <field name="model">openstc.absent.type</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Absent Types" >
+               		<field name="name"/>
+               		<field name="code"/>
+               		<field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+       <record id="action_openstc_view_absent_type" model="ir.actions.act_window">
+            <field name="name">Types d'abscence</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.absent.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
         </record>
 
 
@@ -982,11 +1022,24 @@
    			groups="openstc_dst"
    			sequence="3"/>
 
+   		<menuitem
+   			id="menu_openstc_employees"
+   			groups="openstc_dst"
+   			name="Employées"
+   			parent="menu_configuration"
+   			sequence="4"/>
+
    	 	<menuitem action="action_openstc_view_employees5"
    			id="menu_action_openstc_view_employees"
-   			parent="menu_configuration"
+   			parent="menu_openstc_employees"
    			groups="openstc_dst"
-   			sequence="4"/>
+   			sequence="1"/>
+
+   	 	<menuitem action="action_openstc_view_absent_type"
+   			id="menu_action_openstc_view_absent_type"
+   			parent="menu_openstc_employees"
+   			groups="openstc_dst"
+   			sequence="2"/>
 
    	 	<menuitem action="action_openstc_view_team"
    			id="menu_action_openstc_view_teams"
@@ -1024,16 +1077,16 @@
 
 
 		<!--  Dashboard -->
-   		<menuitem id="base.menu_project_report"
+   		<!--  <menuitem id="base.menu_project_report"
    			name="Reporting"
             groups="openstc_dst"
-            parent="base.menu_main_pm" sequence="2"/>
+            parent="base.menu_main_pm" sequence="2"/> -->
 
         <!-- Dashboard Task -->
-        <menuitem id="project.project_report_task"
+        <!--  <menuitem id="project.project_report_task"
         	name="Tasks"
         	groups="openstc_dst"
-            parent="base.menu_project_report"/>
+            parent="base.menu_project_report"/> -->
 
         <!--  <menuitem action="project.action_view_task_history_burndown"
         	groups="openstc_dst"
@@ -1046,35 +1099,35 @@
             parent="project.project_report_task" />
          -->
 
-        <menuitem action="project.action_project_task_user_tree"
+        <!-- <menuitem action="project.action_project_task_user_tree"
             groups="openstc_dst" id="project.menu_project_task_user_tree"
-            parent="project.project_report_task"/>
+            parent="project.project_report_task"/>-->
 
-   		<menuitem
+   		<!-- <menuitem
             id="project.next_id_86"
             name="Dashboard"
             groups="openstc_dst"
             sequence="0"
-            parent="base.menu_project_report"/>
+            parent="base.menu_project_report"/>-->
 
 
-        <menuitem
+        <!-- <menuitem
             action="project.open_board_project"
             icon="terp-graph"
             id="project.menu_board_project"
             parent="project.next_id_86"
             groups="openstc_dst"
-            sequence="1"/>
+            sequence="1"/>-->
 
 
-        <act_window
+        <!-- <act_window
             context="{'search_default_project_id': [active_id], 'default_project_id': active_id}"
             id="project.act_project_project_2_project_task_all"
             name="Tasks"
             res_model="project.task"
             src_model="project.project"
             view_mode="tree,form,calendar,graph"
-            view_type="form"/>
+            view_type="form"/>-->
 
     	<!--  <record id="project.menu_open_view_project_all" model="ir.ui.menu">
       		<field name="name">Interventions all</field>
@@ -1085,6 +1138,8 @@
 		 <delete model="ir.ui.menu" id="project.menu_project_config_project" />
 		 <delete model="ir.actions.act_window" id="project.open_task_type_form" />
 		 <delete model="ir.rule" id="project.task_visibility_rule" />
+
+		 <delete model="ir.ui.menu" id="project.menu_definitions" />
 
 		 <!--  <delete model="res.groups" id="group_project_user" />
 		 <delete model="res.groups" id="group_project_manager" />

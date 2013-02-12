@@ -197,8 +197,13 @@ class task(osv.osv):
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
+        'parent_id': fields.many2one('project.task', 'Parent Task'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
+        'absent_type_id':fields.many2one('openstc.absent.type', 'Type d''abscence'),
         'category_id':fields.many2one('openstc.task.category', 'Category'),
+        'state': fields.selection([('absent', 'Absent'),('draft', 'New'),('open', 'In Progress'),('pending', 'Pending'), ('done', 'Done'), ('cancelled', 'Cancelled')], 'State', readonly=True, required=True,
+                                  help='If the task is created the state is \'Draft\'.\n If the task is started, the state becomes \'In Progress\'.\n If review is needed the task is in \'Pending\' state.\
+                                  \n If the task is over, the states is set to \'Done\'.'),
         #'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
         'team_id': fields.many2one('openstc.team', 'Team'),
 #        'planned_hours': fields.float('Planned Hours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
@@ -283,6 +288,18 @@ class openstc_task_category(osv.osv):
 
 openstc_task_category()
 
+
+
+class openstc_absent_type(osv.osv):
+    _name = "openstc.absent.type"
+    _description = ""
+    _columns = {
+            'name': fields.char('Affectation ', size=128, required=True),
+            'code': fields.char('Code affectation', size=32, required=True),
+            'description': fields.text('Description'),
+    }
+openstc_absent_type()
+
 #----------------------------------------------------------
 # Interventions
 #----------------------------------------------------------
@@ -301,7 +318,7 @@ class project(osv.osv):
         'date_deadline': fields.date('Deadline',select=True),
         'site1': fields.many2one('openstc.site', 'Site principal'),
         #'analytic_account_id': fields.many2one('account.analytic.account', 'Analytic Account', help="Link this project to an analytic account if you need financial management on projects. It enables you to connect projects with budgets, planning, cost and revenue analysis, timesheets on projects, etc.", ondelete="cascade", required=False),
-        'state': fields.selection([('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
+        'state': fields.selection([('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
                                   'State', readonly=True, required=True, help=''),
 
         'service_id': fields.many2one('openstc.service', 'Service'),
@@ -374,6 +391,7 @@ class project_task_history(osv.osv):
     _inherit = "project.task.history"
 
     _columns = {
+        'state': fields.selection([('absent', 'Absent'),('draft', 'New'),('open', 'In Progress'),('pending', 'Pending'), ('done', 'Done'), ('cancelled', 'Cancelled')], 'State'),
 
     }
 
