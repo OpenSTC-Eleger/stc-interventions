@@ -384,11 +384,11 @@
 			<field name="type">search</field>
 			<field name="arch" type="xml">
 				<search string="Réservations">
-					<filter string="Disponibilités a vérifier" domain="[('state','=','remplir'), ('in_option','&lt;&gt;','block')]" help="Réservations dont dispos sont a vérifier"/>
-					<filter string="En Attente de mise a dispo" domain="[('state','in',('draft','confirm'))]" help="Réservations validées ou en attente de validation"/>
-					<filter string="En cours d'utilisation" domain="[('state','=','in_use')]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
-					<filter string="Terminées" domain="[('state','=','done')]" help="Réservations cloturées ou annulées"/>
-					<filter string="Litigieuses" domain="['|',('state','=','cancle'),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
+					<filter string="En cours de Confirmation" domain="['&amp;',('state','in',('remplir','draft')), ('in_option','&lt;&gt;','block')]" help="Réservations en cours de traitement, elles sont soit en Brouillon, soit en attente de validation."/>
+					<filter string="En Attente de mise a dispo" domain="[('state','in',('confirm',))]" help="Réservations validées, le demandeur a été notifié que sa demande est confirmée, il faudra procéder A la mise A disposition des ressources."/>
+					<filter string="En cours d'utilisation" domain="[('state','in',('in_use',))]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
+					<filter string="Terminées" domain="[('state','in',('done',))]" help="Réservations cloturées ou annulées"/>
+					<filter string="Litigieuses" domain="['|',('state','in',('cancle',)),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
 					<newline />
 					<filter string="Voir seulement les Salles" domain="[('reservation_line.reserve_product.is_salle','=',True)]"
 					    help="n'affiche que les réservations concernant une salle"/>

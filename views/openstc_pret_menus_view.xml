@@ -88,7 +88,7 @@
 			<field name="res_model">hotel.reservation</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">calendar,tree,form</field>
-			<field name="domain">[('state','not in',('done','cancle','remplir','draft'))]</field>
+			<field name="domain">[('state','not in',('done','cancle','remplir'))]</field>
 		</record>
 		
 		<record id="action_openstc_pret_voir_emprunts_ext" model="ir.actions.act_window">
