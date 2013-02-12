@@ -62,6 +62,8 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
             print(ret)
         return ret
     
+    
+    
     def do_emprunt(self,cr,uid,ids,context=None):
         
         if context is None:
@@ -128,12 +130,22 @@ class openstc_pret_emprunt_line_wizard(osv.osv_memory):
               }
 openstc_pret_emprunt_line_wizard()
 
-class openstc_pret_warning_no_wizard(osv.osv_memory): 
+class openstc_pret_warning_dispo_wizard(osv.osv_memory):
     _name = "openstc.pret.warning.dispo.wizard"
-    _columns={
-              }
-
-openstc_pret_warning_no_wizard()
+    
+    def view_planning(self, cr, uid, ids, context=None):
+        if 'all_prods' in context:
+            return {
+                'type':'ir.actions.act_window',
+                'view_type':'form',
+                'view_mode':'calendar,tree,form',
+                'domain':[('reservation_line.reserve_product','in',context['all_prods'])],
+                'target':'new',
+                'res_model':'hotel.reservation',
+                }
+        return osv.except_osv("Erreur","Le OpenSTC A perdu la référence des ressources A afficher, veuillez re-cliquer sur vérif dispo A partir du formulaire de réservation.")
+    
+openstc_pret_warning_dispo_wizard()
 
 
 class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
@@ -200,6 +212,8 @@ class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
         return {
                 'type':'ir.actions.act_window_close'
                 }
+    
+    
     
 openstc_pret_envoie_mail_annulation_wizard()
 

@@ -63,12 +63,14 @@ class product_product(osv.osv):
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
         "seuil_confirm":fields.integer("Qté Max sans Validation", help="Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"),
         "bloquant":fields.boolean("\"Non disponibilité\" bloquante", help="Un produit dont la non dispo est bloquante empêche la réservation de se poursuivre (elle reste en Brouillon)"),
-        "empruntable":fields.boolean("Se fournir à l'extèrieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures"),
+        "empruntable":fields.boolean("Se fournir à l'extérieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures"),
         "checkout_lines":fields.one2many('openstc.pret.checkout.line', 'product_id', string="Lignes Etat des Lieux"),
+        'need_infos_supp':fields.boolean('Nécessite Infos Supp ?', help="Indiquer si, pour une Réservation, cette ressource nécessite des infos supplémentaires A saisir par le demandeur.")
         }
 
     _defaults = {
         'seuil_confirm': 0,
+        'need_infos_supp': lambda *a:0,
     }
 
 product_product()
@@ -105,9 +107,10 @@ class hotel_reservation_line(osv.osv):
                                  store={'hotel_reservation.line':(_get_line_to_valide, ['infos','no_infos'], 10),},
                                  string="Ligne Valide"),
         "name":fields.char('Libellé', size=128),
-        #"parent_name":fields.related('line_id','name', type='char'),
-        #"parent_checkin":fields.related('line_id','checkin',type='datetime'),
-        #"parent_checkout":fields.related('line_id','checkout',type='datetime'),
+        }
+    
+    _defaults = {
+     'qte_reserves':lambda *a: 1,
         }
 
 hotel_reservation_line()
@@ -410,15 +413,15 @@ class hotel_reservation(osv.osv):
         #Si on a cliqué sur "vérifier dispo", on fait seulement un update des lignes de résa sur le champs dispo
         if 'update_line_dispo' in context:    
             line_prod_ids_dispo = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id', '=',id),('reserve_product','in',prod_list_all)])
-            print (line_prod_ids_dispo)
+            #print (line_prod_ids_dispo)
             line_prod_ids_non_dispo = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id', '=',id),('reserve_product','in',dict_error_prod.keys())])
-            print(line_prod_ids_non_dispo)
+            #print(line_prod_ids_non_dispo)
             
             list_for_update = []
             #Par défaut tous les produits sont dispo
             for line_id in line_prod_ids_dispo:
                 list_for_update.append((1, line_id,{'dispo':True},))
-            print(list_for_update)
+            #print(list_for_update)
             if list_for_update:    
                 self.write(cr, uid, [id], {'reservation_line':list_for_update})
                 
@@ -426,7 +429,7 @@ class hotel_reservation(osv.osv):
             #Et on mets à jour les lignes dont le produit n'est pas dispo
             for line_id in line_prod_ids_non_dispo:
                 list_for_update.append((1, line_id,{'dispo':False}),)
-            print(list_for_update)
+            #print(list_for_update)
             if list_for_update:
                 self.write(cr, uid, [id], {'reservation_line':list_for_update})
                         
@@ -440,7 +443,7 @@ class hotel_reservation(osv.osv):
                 raise osv.except_osv("Produit(s) non disponible(s)","Votre réservation n'a pas aboutie car \
                 les produits suivants ne sont disponibles pour la période " + checkin + " - " + checkout + ":\
                 " + prod_error_str)
-        return dict_error_prod
+        return dict_error_prod, prod_list_all
     
     #Bouton pour vérif résa, mets à jour les champs dispo de chaque ligne de résa
     def verif_dispo(self,cr ,uid, ids, context=None):
@@ -448,16 +451,17 @@ class hotel_reservation(osv.osv):
         list_prod_error = {}
         ok = True
         for id in ids:
-            list_prod_error = self.check_dispo(cr, uid, id, context)
+            list_prod_error, prod_list_all = self.check_dispo(cr, uid, id, context)
             if list_prod_error:
                 ok = False
-        #S'il y a une erreur de dispo, on affichage une wizard donnant accès à l'action d'emprunt des articles
+        #S'il y a une erreur de dispo, on affiche un wizard donnant accès à l'action d'emprunt des articles ou de visualisation du planning
         if not ok:
            ret = {'view_mode':'form',
                    'res_model':'openstc.pret.warning.dispo.wizard',
                    'type':'ir.actions.act_window',
                    'context':{'prod_error_ids':list_prod_error,
-                              'reservation_id':id},
+                              'reservation_id':id,
+                              'all_prods':prod_list_all},
                   'target':'new',
                   }
             
@@ -481,7 +485,7 @@ class hotel_reservation(osv.osv):
     
     def is_all_valid(self, cr, uid, id, context=None):
         for line in self.browse(cr, uid, id, context).reservation_line:
-            if not line.valide:
+            if not line.valide and line.reserve_product.need_infos_supp:
                 return False
         return True
     
@@ -505,7 +509,7 @@ class hotel_reservation(osv.osv):
                    'product_id':line.reserve_product.id,
                    'name':line.reserve_product.name_template,
                    'product_uom':line.reserve_product.uom_id.id,
-                   'price_unit':self.get_prod_price(cr, uid, [reservation.id], line, context),
+                   'price_unit':self.get_prod_price(cr, uid, [reservation.id], line, context) if line.prix_unitaire == 0.0 else line.prix_unitaire,
                    'product_uom_qty':line.qte_reserves
 
                    }))

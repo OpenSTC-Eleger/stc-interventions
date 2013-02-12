@@ -2,6 +2,23 @@
 <openerp>
 	<data>
 
+	    <record id="openstc_res_company_inherit_main_form" model="ir.ui.view">
+            <field name="name">res.company.inherit.form</field>
+            <field name="model">res.company</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+				<page string="Configuration" position="inside">
+                	<separator string="Préférences de la Collectivité" colspan="4">
+				    	<group colspan="4" col="6">
+							
+				    	</group>
+				    </separator>
+				</page>
+	   		</field>
+	   	</record>
+	    
+	    
 		<!-- Vue Produits mère pour l'ensemble du projet OpenStock -->
 		<record model="ir.ui.view" id="view_openstock_fournitures_tree">
 			<field name="name">fourniture.product.tree</field>
@@ -109,7 +126,8 @@
 					position="replace">
 					<field name="partner_shipping_id" string="Adresse de Livraison"
 						domain="[('partner_id','=',partner_id)]"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
+						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" 
+						on_change="onchange_partner_shipping_id(partner_shipping_id)"/>
 				</field>
 				<field name="adults" position="replace" />
 				<field name="childs" position="replace" />
@@ -134,7 +152,7 @@
 							<field name="reserve_product" colspan="1"
 								domain="[('categ_id','=',categ_id)]" required="1" />
 							<field name="qte_reserves" />
-							<field name="prix_unitaire" invisible="1"/>
+							<field name="prix_unitaire" />
 							<field name="dispo" readonly="1"/>
 							<field name="infos"/>
 							<field name="no_infos"/>
@@ -316,7 +334,7 @@
 			<field name="type">calendar</field>
 			<field name="arch" type="xml">
 				<xpath expr="//calendar" position="replace">
-					<calendar string="Planning des Réservations" color="site_id" date_start="checkin" date_stop="checkout" day_length="24">
+					<calendar string="Planning des Réservations" color="site_id" date_start="checkin" date_stop="checkout" day_length="24" mode="week">
 					    <field name="name"/>
 					    <field name="partner_id"/>
 					    <field name="site_id"/>

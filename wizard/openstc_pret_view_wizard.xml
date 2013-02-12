@@ -51,16 +51,15 @@
 				<form string="Des articles ne sont pas dispo">
 					<label string="Attention, certains des articles que vous voulez réserver ne sont pas disponibles." colspan="4"/>
 					<newline/>
-					<label string="Vous avez les droits pour déclencher une demande d'emprunt des articles manquants
-					    			auprès de collectivités extérieurs, voulez le faire ?
-					    			Si oui, cliquez sur le bouton 'Commencer l'emprunt' où vous pourrez choisir dans quelles
-					    			collectivités vous voulez emprunter (la relation avec ces collectivités ne sera
-					    			pas gérée dans le processus, Vous devez faire la prise de contact habituelle
-					    			pour confirmer l'emprunt auprès des collectivités)." colspan="4"/>
+					<label string="Une ou plusieurs dates ne sont disponibles pour les ressources sélectionnées.
+					    Vous pouvez visualiser le planning pour adapter vos dates de réservation.
+					    Vous avez aussi les droits pour déclencher une demande d'emprunt des articles manquants
+		    			auprès de collectivités extérieurs, si vous voulez le faire ,cliquez sur 'Commencer l'Emprunt'." colspan="4"/>
 					<newline />
 					<button icon="gtk-cancel" colspan="1" string="Annuler"
 						special="cancel"/>
 					<button colspan="1" name="%(action_view_openstc_pret_create_emprunt_wizard)d" string="Commencer l'emprunt" type="action" />
+					<button colspan="1" name="view_planning" string="Visualiser Planning" type="object"/>
 				</form>
 			</field>
 		</record>
