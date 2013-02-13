@@ -152,7 +152,7 @@ class hotel_reservation(osv.osv):
         return ids
     
     _columns = {
-                'state': fields.selection([('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('recur_waiting','Récurrence Planifiée')], 'Etat',readonly=True),
+                'state': fields.selection([('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation'),('recur_waiting','Récurrence Planifiée')], 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
                                             help=("""Une réservation mise en option signifie que votre demande est prise en compte mais
                                             dont on ne peut pas garantir la livraison à la date prévue.
@@ -204,6 +204,7 @@ class hotel_reservation(osv.osv):
                         for picking in folio.order_id.picking_ids:
                             move_ids.extend([x.id for x in picking.move_lines])
                         self.pool.get("stock.move").action_done(cr, uid, move_ids)
+                    self.envoyer_mail(cr, uid, ids, {'state':'validated'})
                     self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
                     return True
                 else:
@@ -216,6 +217,11 @@ class hotel_reservation(osv.osv):
                  de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée. 
                  Vous devez valider les disponibilités de vos articles via le bouton "vérifier disponibilités".""")
                 return False
+        return True
+    
+    def waiting_confirm(self, cr, uid, ids, context=None):
+        self.envoyer_mail(cr, uid, ids, {'state':'waiting'}, context)
+        self.write(cr, uid, ids, {'state':'wait_confirm'})
         return True
     
     #Mettre à l'état cancle et retirer les mouvements de stocks (supprimer mouvement ou faire le mouvement inverse ?)
@@ -297,7 +303,7 @@ class hotel_reservation(osv.osv):
         return not self.is_drafter
     
     def need_confirm(self, cr, uid, ids):
-        """#TODO: Rajouter le test sur res.group => si responsable(s) (à définir lesquels), renvoyer False
+        #TODO: Rajouter le test sur res.group => si responsable(s) (à définir lesquels), renvoyer False
         reservations = self.browse(cr, uid, ids)
         #if group <> "Responsable":
         etape_validation = False
@@ -305,8 +311,8 @@ class hotel_reservation(osv.osv):
             for line in resa.reservation_line:
                 if line.qte_reserves > line.reserve_product.seuil_confirm:
                     etape_validation = True
-        return etape_validation"""
-        return True
+        return etape_validation
+        #return True
     
     def not_need_confirm(self, cr, uid, ids):
         return not self.need_confirm(cr, uid, ids)
@@ -516,7 +522,7 @@ class hotel_reservation(osv.osv):
                    'product_id':line.reserve_product.id,
                    'name':line.reserve_product.name_template,
                    'product_uom':line.reserve_product.uom_id.id,
-                   'price_unit':self.get_prod_price(cr, uid, [reservation.id], line, context) if line.prix_unitaire == 0.0 else line.prix_unitaire,
+                   'price_unit':line.prix_unitaire,
                    'product_uom_qty':line.qte_reserves
 
                    }))
@@ -563,35 +569,52 @@ class hotel_reservation(osv.osv):
         #Si le modèle n'existe pas, on le crée à la volée
         email_obj = self.pool.get("email.template")
         email_tmpl_id = 0
-        print(vals)
-        if ('to' or 'state') in vals.keys() and vals['state'] == "error":
-            print("envoyer mail pour résa annulée")
-            email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','annulée')])
-            if not email_tmpl_id:
-                print("création email_template pour résa annulée")
-                ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=',self._name)])
-                email_tmpl_id = email_obj.create(cr, uid, {
-                                            'name':'modèle de mail pour résa annulée', 
-                                            'name':'Réservation Annulée',
-                                            'model_id':ir_model[0],
-                                            'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
-                                            'email_from':'bruno.plancher@gmail.com',
-                                            'email_to':'bruno.plancher@gmail.com',
-                                            'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
-${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
-                                            'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
-${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
-                                           })
-            else:
-                email_tmpl_id = email_tmpl_id[0]
-        
-        #Envoi du mail proprement dit, email_tmpl_id définit quel mail sera envoyé
-        print(email_tmpl_id)
-        print(ids)
-        for id in ids:
-            email_obj.send_mail(cr, uid, email_tmpl_id, id)
+        if 'state' in vals.keys():
+            if vals['state'] == "error":
+                email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','annulée')])
+                if not email_tmpl_id:
+                    ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=',self._name)])
+                    email_tmpl_id = email_obj.create(cr, uid, {
+                                                'name':'modèle de mail pour résa annulée', 
+                                                'name':'Réservation Annulée',
+                                                'model_id':ir_model[0],
+                                                'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
+                                                'email_from':'bruno.plancher@gmail.com',
+                                                'email_to':'bruno.plancher@gmail.com',
+                                                'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
+    ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
+    pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
+                                                'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
+    ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
+    pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
+                                               })
+            elif vals['state'] == 'validated':
+                email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Valid%')])
+            elif vals['state'] == 'waiting':
+                email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Attente')])
+            if email_tmpl_id:
+                #Search for product attaches to be added to email
+                prod_ids = []
+                for resa in self.browse(cr, uid, ids):
+                    prod_ids.extend([line.reserve_product.id for line in resa.reservation_line])
+                cr.execute("select id, res_id from ir_attachment where res_id in %s and res_model=%s order by res_id", (tuple(prod_ids), 'product.product'))
+                #format sql return to concat attaches with each prod_id
+                prod_attaches = {}
+                for item in cr.fetchall():
+                    prod_attaches.setdefault(item[1],[])
+                    prod_attaches[item[1]].append(item[0])
+                if isinstance(email_tmpl_id, list):
+                    email_tmpl_id = email_tmpl_id[0]
+                #Envoi du mail proprement dit, email_tmpl_id définit quel mail sera envoyé
+                for resa in self.browse(cr, uid, ids):
+                    attach_values = []
+                    for line in resa.reservation_line:
+                        if prod_attaches.has_key(line.reserve_product.id):
+                            attach_values.extend([(4,attach_id) for attach_id in prod_attaches[line.reserve_product.id]])
+                    mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, resa.id)
+                    self.pool.get("mail.message").write(cr, uid, [mail_id], {'attachment_ids':attach_values})
+                    self.pool.get("mail.message").send(cr, uid, [mail_id])
+                    
         return
     
     """def fields_get(self, cr, uid, fields, context=None):
@@ -689,42 +712,7 @@ pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240
     
 hotel_reservation()
 
-class hotel_folio(osv.osv):
-    _inherit = "hotel.folio"
-    _name = "hotel.folio"
-    _order = "checkout_date desc"
-    
-    #Rewrite with source coming from hotel module, permits to send real sale_order ids to sale.order methods
-    def action_wait(self, cr, uid, ids, *args):
-        sale_ids = []
-        for folio in self.browse(cr, uid, ids):
-            if folio.order_id:
-                sale_ids.append(folio.order_id.id)
-        
-        res = self.pool.get('sale.order').action_wait(cr, uid, sale_ids, *args)
-        for o in self.browse(cr, uid, ids):
-            if (o.order_policy == 'manual') and (not o.invoice_ids):
-                self.write(cr, uid, [o.id], {'state': 'manual'})
-            else:
-                self.write(cr, uid, [o.id], {'state': 'progress'})
-        return res
-    
-    #Rewrite with source coming from hotel module, permits to send real sale_order ids to sale.order methods
-    def action_invoice_create(self, cr, uid, ids, grouped=False, states=['confirmed','done']):
-        sale_ids = []
-        for folio in self.browse(cr, uid, ids):
-            if folio.order_id:
-                sale_ids.append(folio.order_id.id)
-        i = self.pool.get('sale.order').action_invoice_create(cr, uid, sale_ids, grouped=False, states=['confirmed','done'])
-        for line in self.browse(cr, uid, ids, context={}):
-            self.write(cr, uid, [line.id], {'invoiced':True})
-            if grouped:
-               self.write(cr, uid, [line.id], {'state' : 'progress'})
-            else:
-               self.write(cr, uid, [line.id], {'state' : 'progress'})
-        return i 
 
-hotel_folio()
     
 class product_category(osv.osv):
     _name = "product.category"

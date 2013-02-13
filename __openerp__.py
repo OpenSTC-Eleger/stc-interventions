@@ -16,6 +16,7 @@
     """,
     "data": [
         'security/openstc_security.xml',
+        'views/openstc_pret_data.xml',
         'security/ir.model.access.csv',
 
         'wizard/create_task_view.xml',
@@ -33,6 +34,7 @@
         'workflow/purchase_workflow.xml',
         
         "report/openstc_pret_qte_dispo_report_view.xml",
+        "unit tests/unit_tests.xml",
     ],
     "demo": [],
     "test": [],

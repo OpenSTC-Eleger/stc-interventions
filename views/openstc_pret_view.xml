@@ -173,13 +173,13 @@
 				<button name="confirm" string="Confirm" states="draft"
 					position="replace">
 					<group colspan="1" col="1">
-						<button name="confirm" string="Confirmer" states="draft" icon="gtk-go-forward"/>
-					    <button name="redraft" string="Reprendre" states="cancle" />
+						<button name="confirm" string="Valider la réservation" states="draft" icon="gtk-go-forward"/>
+					    <button name="redraft" string="Recommencer la réservation" states="cancle" />
 						<button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/>
 						<button name="verif_dispo" type="object" string="Vérifier Disponibilités" states="remplir" icon="gtk-execute"/>
 						<button name="%(action_view_openstc_pret_deliver_products_wizard)d" type="action" string="Mettre à Disposition les articles" states="confirm" icon="gtk-go-forward"/>
-						<button name="back_to_remplir" string="Modifier votre réservation" icon="gtk-go-back" states="draft"/>
-						<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler" type="action" states="draft,confirm" icon="gtk-cancel"/>
+						<button name="back_to_remplir" string="Modifier la réservation" icon="gtk-go-back" states="draft"/>
+						<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Refuser la réservation" type="action" states="draft,confirm" icon="gtk-cancel"/>
 					</group>
 				</button>
 				<page string="Reservation" position="after">
