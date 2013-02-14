@@ -9,34 +9,44 @@
 			<field name="email_to">${object.partner_mail or ''}</field>
 			<field name="subject">Votre Réservation: ${object.name or 'inconnu'} est validée</field>
 			<field name="body_html"><![CDATA[
-			    <h2>Message Automatique</h2>
-			    
-			    <p>Votre Réservation a bien été enregistrée.  </p>
-			    <p>Récapitulatif de votre Réservation : </p>
-			    <ul>
-			    <li>Motif : ${object.name or ''}</li>
-			    <li>Du : ${object.checkin or ''} Au : ${object.checkout or ''}</li>
-			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
-			    <li><u>Ressources Réservées :</u> 
-			    <ul>
-			    % for line in object.reservation_line:
-			    <li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>
-			    % endfor
-			    </ul>
-			    </li>
-			    </ul>
-			    
-			    % if object.folio_id:
-			    	<p>Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.<br/>
-			    	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.</p>
-			    % endif
-			    <br />
-			    <p>Cordialement,</p>
-			    <br />
-			    <p>${object.shop_id.company_id.name or ''}</p>
-			    <br />
-			    <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>
-			    
+	<h2>Message Automatique</h2>
+	
+	<p>Votre Réservation a bien été enregistrée.  </p>
+	<p>Récapitulatif de votre Réservation : </p>
+	<ul>
+	<li>Libellé : ${object.name or ''}</li>
+	<%
+	from datetime import datetime
+	import pytz
+	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+	%>
+	<li>Dates : ${my_checkin} - ${my_checkout}</li>
+	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
+	<li><u>Ressources Réservées :</u> 
+	<ul>
+	% for line in object.reservation_line:
+	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>
+	% endfor
+	</ul>
+	</li>
+	</ul>
+   
+   % if object.folio_id:
+   	<p>Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.<br/>
+   	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.</p>
+   % endif
+   <br />
+   <p>Cordialement,</p>
+   <br />
+   <p>${object.shop_id.company_id.name or ''}</p>
+   <br />
+   <img src="data:image/png;base64,${object.shop_id.company_id.logo or ''}"/>
+   <br />
+   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>
+   
 			    ]]></field>
 			<field name="body_text"><![CDATA[
 			    Message Automatique
@@ -44,8 +54,16 @@
 			    Votre Réservation a bien été enregistrée.
 			    Récapitulatif de votre Réservation :
 			    
-			    Motif : ${object.name or ''}
-			    Du : ${object.checkin or ''} Au : ${object.checkout or ''}
+			    Libellé : ${object.name or ''}
+			    <%
+			    from datetime import datetime
+			    import pytz
+			    my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+			    my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+			    my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+			    my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+			    %>
+			    Dates : ${my_checkin_str} - ${my_checkout_str}
 			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
 			    % for line in object.reservation_line:
 			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}
@@ -77,8 +95,16 @@
 			    <p>Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. </p>
 			    <p>Récapitulatif de votre Réservation : </p>
 			    <ul>
-			    <li>Motif : ${object.name or ''}</li>
-			    <li>Du : ${object.checkin or ''} Au : ${object.checkout or ''}</li>
+			    <li>Libellé : ${object.name or ''}</li>
+			    <%
+			    import pytz
+			    from datetime import datetime
+			    my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+			    my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+			    my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+			    my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+			    %>
+			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
 			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
 			    <li><u>Ressources Réservées :</u> 
 			    <ul>
@@ -95,6 +121,8 @@
 			    <br />
 			    <p>${object.shop_id.company_id.name or ''}</p>
 			    <br />
+			    <img src="data:image/png;base64,${object.shop_id.company_id.logo or ''}"/>
+			    <br />
 			    <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>
 			    
 			    ]]></field>
@@ -104,8 +132,16 @@
 			    Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. 
 			    Récapitulatif de votre Réservation : 
 			    
-			    Motif : ${object.name or ''}
-			    Du : ${object.checkin or ''} Au : ${object.checkout or ''}
+			    Libellé : ${object.name or ''}
+			   <%
+			    import pytz
+			    from datetime import datetime
+			    my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+			    my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+			    my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+			    my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+			    %>
+			    Dates : ${my_checkin_str} - ${my_checkout_str}
 			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
 			    % for line in object.reservation_line:
 			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}
