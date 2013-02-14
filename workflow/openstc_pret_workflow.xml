@@ -122,7 +122,13 @@
 			<field name="act_to" ref="act_to_uncheck" />
 			<field name="signal">reserv_modified</field>
 		</record>
-		
+
+		<record model="workflow.transition" id="trans_openstc_pret_waiting_confirm_confirm">
+			<field name="act_from" ref="act_waiting_confirm" />
+			<field name="act_to" ref="hotel_reservation.act_confirm" />
+			<field name="signal">confirm</field>
+		</record>
+				
 		<record model="workflow.transition" id="t003">
 			<field name="act_from" ref="hotel_reservation.act_confirm" />
 			<field name="act_to" ref="act_to_uncheck" />

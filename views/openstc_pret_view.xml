@@ -130,7 +130,7 @@
 					<field name="partner_shipping_id" string="Adresse de Livraison"
 						domain="[('partner_id','=',partner_id)]"
 						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" 
-						on_change="onchange_partner_shipping_id(partner_shipping_id)"/>
+						/>
 				</field>
 				<field name="adults" position="replace" />
 				<field name="childs" position="replace" />
@@ -144,26 +144,28 @@
 						on_change="on_change_checkout(checkin,checkout)"
 						attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
 				</field>
-
+				
+				<field name="state" position="after">
+					<field name="in_option" on_change="onchange_in_option(in_option,state)" />
+				</field>
+				
 				<field name="reservation_line" colspan="4" nolabel="1"
 					position="replace">
 					<field name="reservation_line" string="Lignes de Réservation" required="1" colspan="4"
-					     nolabel="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}">
+					     nolabel="1" attrs="{'readonly':[('state','not in',('remplir', 'draft','wait_confirm'))]}">
 						<tree string="Ligne de réservation" editable="top">
-							<field name="categ_id" required="1" />
+							<field name="categ_id" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
 							<field name="reserve_product" colspan="1"
-								domain="[('categ_id','=',categ_id)]" required="1" />
-							<field name="qte_reserves" />
-							<field name="prix_unitaire" />
+								domain="[('categ_id','=',categ_id)]" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
+							<field name="qte_reserves" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
+							<field name="prix_unitaire" attrs="{'readonly':[('state','&lt;&gt;','wait_confirm')]}"/>
 							<field name="dispo" readonly="1"/>
 							<field name="infos"/>
 							<field name="no_infos"/>
 							<field name="valide"/>
+							<field name="state"/>
 						</tree>
 					</field>
-				</field>
-				<field name="state" position="after">
-					<field name="in_option" on_change="onchange_in_option(in_option,state)" />
 				</field>
 				<button name="done" string="Create Folio" states="confirm"
 					position="replace">
@@ -172,8 +174,9 @@
 				</button>
 				<button name="confirm" string="Confirm" states="draft"
 					position="replace">
-					<group colspan="1" col="1">
-						<button name="confirm" string="Valider la réservation" states="draft" icon="gtk-go-forward"/>
+					<group colspan="1" col="2">
+						<button name="compute_lines_price" type="object" string="Calculer prix" states="draft" icon="gtk-execute" />
+						<button name="confirm" string="Valider la réservation" states="draft,wait_confirm" icon="gtk-go-forward"/>
 					    <button name="redraft" string="Recommencer la réservation" states="cancle" />
 						<button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/>
 						<button name="verif_dispo" type="object" string="Vérifier Disponibilités" states="remplir" icon="gtk-execute"/>

@@ -27,6 +27,9 @@ from osv import fields, osv
 import netsvc
 from tools.translate import _
 from mx.DateTime.mxDateTime import strptime
+import time
+import base64
+import re
 
 #----------------------------------------------------------
 # Fournitures
@@ -75,6 +78,9 @@ class product_product(osv.osv):
 
 product_product()
 
+AVAILABLE_RESA_STATE_VALUES = [('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation'),('recur_waiting','Récurrence Planifiée')]
+    
+
 class hotel_reservation_line(osv.osv):
     _name = "hotel_reservation.line"
     _inherit = "hotel_reservation.line"
@@ -107,10 +113,12 @@ class hotel_reservation_line(osv.osv):
                                  store={'hotel_reservation.line':(_get_line_to_valide, ['infos','no_infos'], 10),},
                                  string="Ligne Valide"),
         "name":fields.char('Libellé', size=128),
+        'state':fields.related('line_id','state', type='selection',string='Etat Résa', selection=AVAILABLE_RESA_STATE_VALUES, readonly=True),
         }
     
     _defaults = {
      'qte_reserves':lambda *a: 1,
+     'state':'remplir',
         }
 
     def write(self, cr, uid, ids, vals, context=None):
@@ -152,15 +160,12 @@ class hotel_reservation(osv.osv):
         return ids
     
     _columns = {
-                'state': fields.selection([('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation'),('recur_waiting','Récurrence Planifiée')], 'Etat',readonly=True),
+                'state': fields.selection(AVAILABLE_RESA_STATE_VALUES, 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
                                             help=("""Une réservation mise en option signifie que votre demande est prise en compte mais
                                             dont on ne peut pas garantir la livraison à la date prévue.
                                             Une réservation bloquée signifie que la réservation n'est pas prise en compte car nous ne pouvons pas 
                                             garantir la livraison aux dates indiquées""")),
-                #'in_option':fields.boolean("En Option", readonly = True, help=("""Une réservation en option signifie 
-                #votre demande est prise en compte mais qu'un ou plusieurs articles que vous voulez réserver ne 
-                #sont pas disponible à cette date.""")),
                 'name':fields.char('Nom Manifestation', size=128, required=True),
                 'partner_mail':fields.char('Email Demandeur', size=128, required=False),
                 'is_recur':fields.boolean('Issue d\'une Récurrence', readonly=True),
@@ -184,9 +189,20 @@ class hotel_reservation(osv.osv):
                         raise osv.except_osv("Erreur","""Votre réservation est bloquée car la date de début de votre manifestion
                         ne nous permet pas de vous livrer dans les temps.""")
                     
-                    #TODO: Envoi mail d'info au demandeur : Demande prise en compte et validée
+                    attach_sale_id = []
+                    #TODO: how to know if a user have not computed the price ? If he has not, we have to compute first
                     #Calcul montant de la résa
+                    form_amount = 0.0
+                    line_ids = []
+                    for line in resa.reservation_line:
+                        form_amount += line.prix_unitaire * line.qte_reserves
                     amount = self.get_amount_resa(cr, uid, ids)
+                    #in the folowing case, user have not computed the prod prices
+                    if form_amount <> amount and resa.state == 'draft':
+                        self.compute_lines_price(cr, uid, [resa.id])
+                    #ohterwise, we test on the form values and not the expected values
+                    elif resa.state == "wait_confirm":
+                        amount = form_amount
                     if amount > 0.0:
                     #Si montant > 0 euros, générer sale order puis dérouler wkf jusqu'a édition facture
                         folio_id = self.create_folio(cr, uid, ids)
@@ -204,8 +220,10 @@ class hotel_reservation(osv.osv):
                         for picking in folio.order_id.picking_ids:
                             move_ids.extend([x.id for x in picking.move_lines])
                         self.pool.get("stock.move").action_done(cr, uid, move_ids)
-                    self.envoyer_mail(cr, uid, ids, {'state':'validated'})
-                    self.write(cr, uid, ids, {'state':'confirm'}, context={'check_dispo':'1'})
+                        attach_sale_id.append(self.pool.get("sale.order")._create_report_attach(cr, uid, folio.order_id))
+                    #send mail with optional attaches on products and the sale order pdf attached
+                    self.envoyer_mail(cr, uid, ids, {'state':'validated'}, attach_ids=attach_sale_id)
+                    self.write(cr, uid, ids, {'state':'confirm'})
                     return True
                 else:
                     raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
@@ -219,8 +237,16 @@ class hotel_reservation(osv.osv):
                 return False
         return True
     
-    def waiting_confirm(self, cr, uid, ids, context=None):
-        self.envoyer_mail(cr, uid, ids, {'state':'waiting'}, context)
+    def waiting_confirm(self, cr, uid, ids):
+        form_amount = 0.0
+        line_ids = []
+        for resa in self.browse(cr, uid, ids):
+            for line in resa.reservation_line:
+                form_amount += line.prix_unitaire * line.qte_reserves
+            amount = self.get_amount_resa(cr, uid, ids)
+            if form_amount <> amount:
+                self.compute_lines_price(cr, uid, [resa.id])
+        self.envoyer_mail(cr, uid, ids, {'state':'waiting'})
         self.write(cr, uid, ids, {'state':'wait_confirm'})
         return True
     
@@ -239,7 +265,9 @@ class hotel_reservation(osv.osv):
                         raise osv.except_osv("Erreur","""Votre réservation est bloquée car la date de début de votre manifestion
                         ne nous permet pas de vous livrer dans les temps.""")
                     self.write(cr, uid, ids, {'state':'draft'}, context={'check_dispo':'1'})
-                    #TODO: Envoi mail d'info au demandeur : Demande prise en compte mais doit être validée
+                    #TODO: Si partner_shipping_id présent, calculer prix unitaires
+                    if resa.openstc_partner_id:
+                        self.compute_lines_price(cr, uid, [resa.id])
                     return True
                 else:
                     raise osv.except_osv("""Il manque des informations""","""Erreur, Vous devez soit fournir des précisions
@@ -562,9 +590,15 @@ class hotel_reservation(osv.osv):
                 amount += self.get_prod_price(cr, uid, ids, line, context) * line.qte_reserves
         return amount
     
+    def compute_lines_price(self, cr, uid, ids, context=None):
+        values = []
+        for resa in self.browse(cr, uid, ids, context):
+            values.extend([(1,line.id,{'prix_unitaire':self.get_prod_price(cr, uid, line.reserve_product.id, line, context)}) for line in resa.reservation_line])
+            self.write(cr, uid, [resa.id], {'reservation_line':values}, context=context)
+        return True
     
     #Vals: Dict containing "to" (required) and "state" in ("error","draft", "confirm") (required)
-    def envoyer_mail(self, cr, uid, ids, vals=None, context=None):
+    def envoyer_mail(self, cr, uid, ids, vals=None, attach_ids=[], context=None):
         #TOREMOVE: A déplacer vers un fichier init.xml
         #Si le modèle n'existe pas, on le crée à la volée
         email_obj = self.pool.get("email.template")
@@ -607,10 +641,13 @@ class hotel_reservation(osv.osv):
                     email_tmpl_id = email_tmpl_id[0]
                 #Envoi du mail proprement dit, email_tmpl_id définit quel mail sera envoyé
                 for resa in self.browse(cr, uid, ids):
+                    #link attaches of each product
                     attach_values = []
                     for line in resa.reservation_line:
                         if prod_attaches.has_key(line.reserve_product.id):
                             attach_values.extend([(4,attach_id) for attach_id in prod_attaches[line.reserve_product.id]])
+                    #and link optional paramter attach_ids
+                    attach_values.extend([(4,x) for x in attach_ids])
                     mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, resa.id)
                     self.pool.get("mail.message").write(cr, uid, [mail_id], {'attachment_ids':attach_values})
                     self.pool.get("mail.message").send(cr, uid, [mail_id])
@@ -710,6 +747,17 @@ class hotel_reservation(osv.osv):
         print(vals)
         return vals
     
+    #Recalcul des coûts de produit
+    def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False, context=None):
+            ret = []
+            if isinstance(ids, list):
+                ids = ids[0]
+            if partner_shipping_id:
+                resa = self.browse(cr, uid, ids, context)
+                for line in resa.reservation_line:
+                    ret.append((1,line.id,{'prix_unitaire':self.get_prod_price(cr, uid, ids, line, context)}))
+            return {'value':{'reservation_line':ret}}
+    
 hotel_reservation()
 
 
@@ -761,3 +809,39 @@ class purchase_order(osv.osv):
                 }
 purchase_order()   
     
+class sale_order(osv.osv):
+    _inherit = "sale.order"
+    _name = "sale.order"
+    
+    #TODO: create custom jasper report instead of classic pdf report
+    def _create_report_attach(self, cr, uid, record, context=None):
+        #sources insipered by _edi_generate_report_attachment of EDIMIXIN module
+        ir_actions_report = self.pool.get('ir.actions.report.xml')
+        matching_reports = ir_actions_report.search(cr, uid, [('model','=',self._name),
+                                                              ('report_type','=','pdf')])
+        ret = False
+        if matching_reports:
+            report = ir_actions_report.browse(cr, uid, matching_reports[0])
+            report_service = 'report.' + report.report_name
+            service = netsvc.LocalService(report_service)
+            (result, format) = service.create(cr, uid, [record.id], {'model': self._name}, context=context)
+            eval_context = {'time': time, 'object': record}
+            if not report.attachment or not eval(report.attachment, eval_context):
+                # no auto-saving of report as attachment, need to do it manually
+                result = base64.b64encode(result)
+                file_name = record.name_get()[0][1]
+                file_name = re.sub(r'[^a-zA-Z0-9_-]', '_', file_name)
+                file_name += ".pdf"
+                ir_attachment = self.pool.get('ir.attachment').create(cr, uid, 
+                                                                      {'name': file_name,
+                                                                       'datas': result,
+                                                                       'datas_fname': file_name,
+                                                                       'res_model': self._name,
+                                                                       'res_id': record.id},
+                                                                      context=context)
+                ret = ir_attachment
+        return ret
+    
+sale_order()
+
+
