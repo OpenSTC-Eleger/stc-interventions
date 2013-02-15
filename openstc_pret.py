@@ -172,6 +172,7 @@ class hotel_reservation(osv.osv):
                 'site_id':fields.many2one('openstc.site','Site (Lieu)'),
                 'prod_id':fields.many2one('product.product','Ressource'),
                 'openstc_partner_id':fields.many2one('res.partner','Demandeur', help="Personne demandant la réservation."),
+                'resa_checkout_id':fields.many2one('openstc.pret.checkout','Etat des Lieux associé'),
         }
     _defaults = {
                  'in_option': lambda *a :0,

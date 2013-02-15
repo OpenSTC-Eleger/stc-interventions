@@ -15,5 +15,13 @@
 			<field name="act_to" ref="act_emprunt_done" />
 			<field name="condition">True</field>
 		</record>    
+		
     </data>
+    
+    <data noupdate="1">
+       <!-- disable the mailing server action to purchase.order confirmed activity -->
+       <record id="purchase.act_confirmed" model="workflow.activity">
+           <field name="action_id" ref=""/>
+       </record>
+	</data>
 </openerp>
