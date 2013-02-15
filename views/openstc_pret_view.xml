@@ -387,7 +387,7 @@
 			<field name="type">search</field>
 			<field name="arch" type="xml">
 				<search string="Réservations">
-					<filter string="En cours de Confirmation" domain="['&amp;',('state','in',('remplir','draft')), ('in_option','&lt;&gt;','block')]" help="Réservations en cours de traitement, elles sont soit en Brouillon, soit en attente de validation."/>
+					<filter string="En cours de Confirmation" domain="[('state','in',('remplir','draft','wait_confirm'))]" help="Réservations en cours de traitement, elles sont soit en Brouillon, soit en attente de validation."/>
 					<filter string="En Attente de mise a dispo" domain="[('state','in',('confirm',))]" help="Réservations validées, le demandeur a été notifié que sa demande est confirmée, il faudra procéder A la mise A disposition des ressources."/>
 					<filter string="En cours d'utilisation" domain="[('state','in',('in_use',))]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
 					<filter string="Terminées" domain="[('state','in',('done',))]" help="Réservations cloturées ou annulées"/>

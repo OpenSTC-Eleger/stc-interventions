@@ -312,13 +312,7 @@ class hotel_reservation(osv.osv):
                     print(inv.state)
                     wf_service.trg_validate(uid, 'account.invoice', inv.id, 'invoice_open', cr)
                     inv_ids.append(inv.id)
-            """#Get invoice PDFs (ir.attachment), we use an SQL query because base_calendar overrides search method or attachments and crashes with ('res_id', 'in', [ids])
-            cr.execute("select id from ir_attachment where res_model='account.invoice' and res_id in %s", (tuple(inv_ids),))
-        #Create a copy of attachments to current reservation
-        for attach_id in cr.fetchall():
-            if isinstance(attach_id, list):
-                attach_id = attach_id[0]
-            self.pool.get("ir.attachment").copy(cr, uid, attach_id, {'model':self._name, 'res_id':ids})"""
+            
         self.write(cr, uid, ids, {'state':'done'})
         return True
     def is_drafted(self, cr, uid, ids):

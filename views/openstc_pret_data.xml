@@ -23,7 +23,7 @@
 	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
 	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
 	%>
-	<li>Dates : ${my_checkin} - ${my_checkout}</li>
+	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
 	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
 	<li><u>Ressources Réservées :</u> 
 	<ul>
