@@ -76,12 +76,11 @@
 		<record id="action_openstock_qte_dispo_calendar" model="ir.actions.act_window">
 			<field name="name">Verif Dispo</field>
 			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">openstock.qte.dispo.reserve.report</field>
+			<field name="res_model">hotel.reservation</field>
 			<field name="view_type">form</field>
-			<field name="view_mode">calendar</field>
-			<field name="view_id" ref="view_openstock_qte_dispo_calendar" />
+			<field name="view_mode">calendar,tree,form</field>
 			<field name="target">current</field>
-			<field name="context">{'product_ids':active_ids}</field>
+			<field name="domain">[('reservation_line.reserve_product','in',active_ids)]</field>
 		</record>
 
 		<record id="action_openstock_qte_dispo_graph_create" model="ir.values">

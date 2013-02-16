@@ -32,6 +32,13 @@
 			<field name="kind">function</field>
 			<field name="action">drafted_reservation()</field>
 		</record>
+		
+		<record model="workflow.activity" id="act_waiting_confirm">
+			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
+			<field name="name">waiting confirm</field>
+			<field name="kind">function</field>
+			<field name="action">waiting_confirm()</field>
+		</record>
 
 		<record model="workflow.activity" id="hotel_reservation.act_done">
 			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
@@ -69,7 +76,6 @@
 			<field name="act_from" ref="act_remplir" />
 			<field name="act_to" ref="hotel_reservation.act_draft" />
 			<field name="signal">to_draft</field>
-			<field name="condition">need_confirm()</field>
 		</record>
 		
 		<record model="workflow.transition" id="trans_openstc_pret_draft_remplir">
@@ -86,12 +92,18 @@
 		
 		
 		<record model="workflow.transition" id="t002">
-			<field name="act_from" ref="act_remplir" />
+			<field name="act_from" ref="hotel_reservation.act_draft" />
 			<field name="act_to" ref="hotel_reservation.act_confirm" />
-			<field name="signal">to_draft</field>
+			<field name="signal">confirm</field>
 			<field name="condition">not_need_confirm()</field>
 		</record>
 
+		<record model="workflow.transition" id="trans_openstc_pret_draft_waiting_confirm">
+			<field name="act_from" ref="hotel_reservation.act_draft" />
+			<field name="act_to" ref="act_waiting_confirm" />
+			<field name="signal">confirm</field>
+			<field name="condition">need_confirm()</field>
+		</record>
 		
 		<record model="workflow.transition" id="trans_openstc_pret_reservation_remplir_uncheck">
 			<field name="act_from" ref="act_remplir" />
@@ -105,6 +117,18 @@
 			<field name="signal">reserv_modified</field>
 		</record>
 
+		<record model="workflow.transition" id="trans_openstc_pret_waiting_confirm_to_uncheck">
+			<field name="act_from" ref="act_waiting_confirm" />
+			<field name="act_to" ref="act_to_uncheck" />
+			<field name="signal">reserv_modified</field>
+		</record>
+
+		<record model="workflow.transition" id="trans_openstc_pret_waiting_confirm_confirm">
+			<field name="act_from" ref="act_waiting_confirm" />
+			<field name="act_to" ref="hotel_reservation.act_confirm" />
+			<field name="signal">confirm</field>
+		</record>
+				
 		<record model="workflow.transition" id="t003">
 			<field name="act_from" ref="hotel_reservation.act_confirm" />
 			<field name="act_to" ref="act_to_uncheck" />
@@ -130,6 +154,12 @@
 			<field name="signal">cancel</field>
 		</record>
 
+		<record model="workflow.transition" id="trans_openstc_pret_waiting_confirm_cancel">
+			<field name="act_from" ref="act_waiting_confirm" />
+			<field name="act_to" ref="act_cancel" />
+			<field name="signal">cancel</field>
+		</record>
+		
 		<record model="workflow.transition" id="t02">
 			<field name="act_from" ref="hotel_reservation.act_confirm" />
 			<field name="act_to" ref="act_cancel" />
@@ -176,5 +206,19 @@
 			<field name="act_to" ref="hotel_reservation.act_done" />
 			<field name="signal">done</field>
 		</record>
+	</data>
+
+	
+				<!-- Overriding of existing workfows -->
+	
+	<data noupdate="1">
+		<record id="sale.act_wait_ship" model="workflow.activity">
+            <field name="action_id" ref=""/>
+        </record>
+	</data>
+	<data noupdate="1">
+		<record id="account.act_open" model="workflow.activity">
+            <field name="action_id" ref=""/>
+        </record>
 	</data>
 </openerp>

@@ -21,6 +21,7 @@
 #
 ##############################################################################
 
+import hotel
 import openstc
 import openstc_pret
 import openstc_pret_checkout

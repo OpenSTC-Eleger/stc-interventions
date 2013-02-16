@@ -61,6 +61,11 @@ class openstc_pret_checkout_wizard(osv.osv):
             ret.update({'checkout_lines':values})    
         return ret
     
+    def create(self, cr, uid, vals,context=None):
+        res = super(openstc_pret_checkout_wizard, self).create(cr, uid, vals, context)
+        self.pool.get("hotel.reservation").write(cr, uid, [vals['reservation']], {'resa_checkout_id':res}, context=context)
+        return res
+    
     def open_purchase(self, cr, uid, ids, context=None):
         purchase = self.read(cr, uid, ids[0], ['purchase_id'])
         if purchase['purchase_id']:

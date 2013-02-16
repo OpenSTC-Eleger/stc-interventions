@@ -130,7 +130,7 @@
 					<field name="partner_shipping_id" string="Adresse de Livraison"
 						domain="[('partner_id','=',partner_id)]"
 						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" 
-						on_change="onchange_partner_shipping_id(partner_shipping_id)"/>
+						/>
 				</field>
 				<field name="adults" position="replace" />
 				<field name="childs" position="replace" />
@@ -144,26 +144,28 @@
 						on_change="on_change_checkout(checkin,checkout)"
 						attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
 				</field>
-
+				
+				<field name="state" position="after">
+					<field name="in_option" on_change="onchange_in_option(in_option,state)" />
+				</field>
+				
 				<field name="reservation_line" colspan="4" nolabel="1"
 					position="replace">
 					<field name="reservation_line" string="Lignes de Réservation" required="1" colspan="4"
-					     nolabel="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}">
+					     nolabel="1" attrs="{'readonly':[('state','not in',('remplir', 'draft','wait_confirm'))]}">
 						<tree string="Ligne de réservation" editable="top">
-							<field name="categ_id" required="1" />
+							<field name="categ_id" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
 							<field name="reserve_product" colspan="1"
-								domain="[('categ_id','=',categ_id)]" required="1" />
-							<field name="qte_reserves" />
-							<field name="prix_unitaire" />
+								domain="[('categ_id','=',categ_id)]" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
+							<field name="qte_reserves" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
+							<field name="prix_unitaire" attrs="{'readonly':[('state','&lt;&gt;','wait_confirm')]}"/>
 							<field name="dispo" readonly="1"/>
 							<field name="infos"/>
 							<field name="no_infos"/>
 							<field name="valide"/>
+							<field name="state"/>
 						</tree>
 					</field>
-				</field>
-				<field name="state" position="after">
-					<field name="in_option" on_change="onchange_in_option(in_option,state)" />
 				</field>
 				<button name="done" string="Create Folio" states="confirm"
 					position="replace">
@@ -172,14 +174,15 @@
 				</button>
 				<button name="confirm" string="Confirm" states="draft"
 					position="replace">
-					<group colspan="1" col="1">
-						<button name="confirm" string="Confirmer" states="draft" icon="gtk-go-forward"/>
-					    <button name="redraft" string="Reprendre" states="cancle" />
+					<group colspan="1" col="2">
+						<button name="compute_lines_price" type="object" string="Calculer prix" states="draft" icon="gtk-execute" />
+						<button name="confirm" string="Valider la réservation" states="draft,wait_confirm" icon="gtk-go-forward"/>
+					    <button name="redraft" string="Recommencer la réservation" states="cancle" />
 						<button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/>
 						<button name="verif_dispo" type="object" string="Vérifier Disponibilités" states="remplir" icon="gtk-execute"/>
 						<button name="%(action_view_openstc_pret_deliver_products_wizard)d" type="action" string="Mettre à Disposition les articles" states="confirm" icon="gtk-go-forward"/>
-						<button name="back_to_remplir" string="Modifier votre réservation" icon="gtk-go-back" states="draft"/>
-						<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler" type="action" states="draft,confirm" icon="gtk-cancel"/>
+						<button name="back_to_remplir" string="Modifier la réservation" icon="gtk-go-back" states="draft"/>
+						<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Refuser la réservation" type="action" states="draft,confirm" icon="gtk-cancel"/>
 					</group>
 				</button>
 				<page string="Reservation" position="after">
@@ -384,7 +387,7 @@
 			<field name="type">search</field>
 			<field name="arch" type="xml">
 				<search string="Réservations">
-					<filter string="En cours de Confirmation" domain="['&amp;',('state','in',('remplir','draft')), ('in_option','&lt;&gt;','block')]" help="Réservations en cours de traitement, elles sont soit en Brouillon, soit en attente de validation."/>
+					<filter string="En cours de Confirmation" domain="[('state','in',('remplir','draft','wait_confirm'))]" help="Réservations en cours de traitement, elles sont soit en Brouillon, soit en attente de validation."/>
 					<filter string="En Attente de mise a dispo" domain="[('state','in',('confirm',))]" help="Réservations validées, le demandeur a été notifié que sa demande est confirmée, il faudra procéder A la mise A disposition des ressources."/>
 					<filter string="En cours d'utilisation" domain="[('state','in',('in_use',))]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
 					<filter string="Terminées" domain="[('state','in',('done',))]" help="Réservations cloturées ou annulées"/>

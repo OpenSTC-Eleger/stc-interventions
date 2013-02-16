@@ -113,7 +113,7 @@
 
 		<!-- MenuItems Gestion des Ressources -->
 		<menuitem id="menu_action_view_fournitures" action="action_openstock_view_fournitures"
-			name="Choisir Ressources à réserver" parent="menu_action_view_articles"
+			name="Catalogue des ressources" parent="menu_action_view_articles"
 			sequence="1" />
 
 		<menuitem id="menu_action_view_emprunt_ext" name="Emprunter des Ressources à l'extérieur"
