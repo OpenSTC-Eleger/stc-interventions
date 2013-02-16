@@ -966,27 +966,29 @@
    			groups="openstc_employee"
    			sequence="1"/>
 
-		<menuitem name="Interventions"
-				action="action_openstc_view_intervention"
-				id="project.menu_open_view_project_all"
-				parent="project.menu_project_management"
-				groups="openstc_qualifier"
-				sequence="2"/>
-
-		<menuitem action="openstc_action_view_task"
-				id="openstc_menu_action_view_task"
-				parent="project.menu_project_management"
-				name="Tasks"
-				groups="openstc_qualifier,openstc_agent"
-				sequence="3"/>
-
 		<!--  planning -->
    		<menuitem action="openstc_action_view_planning"
    			id="menu_planning"
 			groups="openstc_dst,openstc_manager"
 			name="Planning"
 			parent="project.menu_project_management"
-			sequence="4"/>
+			sequence="2"/>
+
+		<menuitem name="Interventions"
+				action="action_openstc_view_intervention"
+				id="project.menu_open_view_project_all"
+				parent="project.menu_project_management"
+				groups="openstc_qualifier"
+				sequence="3"/>
+
+		<menuitem action="openstc_action_view_task"
+				id="openstc_menu_action_view_task"
+				parent="project.menu_project_management"
+				name="Tasks"
+				groups="openstc_qualifier,openstc_agent"
+				sequence="4"/>
+
+
 
 
    		<!--  <menuitem action="action_openstc_task_work"
