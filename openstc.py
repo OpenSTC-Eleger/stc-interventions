@@ -26,6 +26,28 @@ from datetime import datetime
 from osv import fields, osv
 from tools.translate import _
 
+#----------------------------------------------------------
+# Equipments
+#----------------------------------------------------------
+
+class equipment(osv.osv):
+    _name = "openstc.equipment"
+    _description = "openstc.equipment"
+    _rec_name = "name"
+
+    _columns = {
+            'name': fields.char('Imatt', size=128),
+            'marque': fields.char('marque', size=128),
+            'type': fields.char('marque', size=128),
+            'usage': fields.char('marque', size=128),
+            'cv': fields.integer('CV', select=1),
+            'year': fields.integer('Year', select=1),
+            'time': fields.integer('Time', select=1),
+    }
+equipment()
+
+
+
 
 #----------------------------------------------------------
 # Services
@@ -197,6 +219,7 @@ class task(osv.osv):
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
+        'equipment_id':fields.many2one('openstc.equipment', 'Equipment'),
         'parent_id': fields.many2one('project.task', 'Parent Task'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'absent_type_id':fields.many2one('openstc.absent.type', 'Type d''abscence'),
