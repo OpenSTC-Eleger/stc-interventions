@@ -217,6 +217,7 @@ class task(osv.osv):
 #        return res
 
     _columns = {
+        'active': fields.boolean('Active'),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'equipment_id':fields.many2one('openstc.equipment', 'Equipment'),
@@ -229,7 +230,7 @@ class task(osv.osv):
                                   \n If the task is over, the states is set to \'Done\'.'),
         #'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
         'team_id': fields.many2one('openstc.team', 'Team'),
-#        'planned_hours': fields.float('Planned Hours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
+#        'planned_hours': fields.float('Planned print_on_orderHours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
 #        'effective_hours': fields.float('Effective Hours', help='Time spent'),
 #        'remaining_hours': fields.float('Remaining Hours', digits=(16,2), help="Total remaining time, can be re-estimated periodically by the assignee of the task."),
 #        'total_hours': fields.function(_hours_get, string='Total Hours', multi='hours', help="Computed as: Time Spent + Remaining Time.",
@@ -245,6 +246,8 @@ class task(osv.osv):
 #                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
 #            }),
     }
+
+    _defaults = {'active': lambda *a: True,}
 task()
 
 
