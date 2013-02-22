@@ -544,7 +544,7 @@ msgstr "Graphe d'avancement"
 #: view:openstc.ask:0
 #: selection:openstc.ask,state:0
 msgid "To be confirm"
-msgstr "A confirmer"
+msgstr "a confirmer"
 
 #. module: openstc
 #: field:openstc.ask,site2:0
@@ -705,7 +705,7 @@ msgstr "Utilisateur à qui vous voulez déléguer cette tâche"
 #: view:openstc.ask:0
 #: selection:openstc.ask,state:0
 msgid "Wait"
-msgstr "En attente"
+msgstr "en attente"
 
 #. module: project
 #: view:project.task.history.cumulative:0
@@ -1656,7 +1656,7 @@ msgstr "Basse"
 #. module: openstc
 #: selection:openstc.ask,state:0
 msgid "Closed"
-msgstr "Cloturée"
+msgstr "cloturée"
 
 #. module: openstc
 #: constraint:openstc.task.memory:0
@@ -1998,7 +1998,7 @@ msgstr "Réintegrer la tâche"
 #: view:openstc.ask:0
 #: selection:openstc.ask,state:0
 msgid "Refused"
-msgstr "Refusée"
+msgstr "refusée"
 
 #. module: project
 #: code:addons/addons/project/wizard/mail_compose_message.py:64
@@ -2119,7 +2119,7 @@ msgstr "Nb de jours"
 #: view:openstc.ask:0
 #: selection:openstc.ask,state:0
 msgid "Valid"
-msgstr "Valide"
+msgstr "validée"
 
 #. module: openstc
 #: view:openstc.employee:0

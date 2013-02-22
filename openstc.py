@@ -667,6 +667,29 @@ class ask(osv.osv):
             }
         return res
 
+    def send_email(self, cr, uid, ids, params, context=None):
+        #print("test"+params)
+        ask_obj = self.pool.get('openstc.ask')
+        ask = ask_obj.browse(cr, uid, ids[0], context)
+
+        email_obj = self.pool.get("email.template")
+        ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=',self._name)])
+
+        email_tmpl_id = email_obj.create(cr, uid, {
+                    #'name':'modèle de mail pour résa annulée',
+                    'name':'Suivi de la demande ' + ask.name,
+                    'model_id':ir_model[0],
+                    'subject':'Suivi de la demande ' + ask.name,
+                    'email_from':'pierreyves.fadet@siclic.fr',
+                    'email_to': ask.partner_email if ask.partner_email!=False else ask.people_email,
+                    'body_text':"Votre Demande est à l'état " + _(ask.state) +  "\r" +
+                        "pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
+            })
+
+        mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, ids[0])
+        #self.pool.get("mail.message").write(cr, uid, [mail_id])
+        self.pool.get("mail.message").send(cr, uid, [mail_id])
+
 
 ask()
 
