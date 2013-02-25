@@ -33,16 +33,26 @@ from tools.translate import _
 class equipment(osv.osv):
     _name = "openstc.equipment"
     _description = "openstc.equipment"
+    _inherits = {'product.product': "product_product_id"}
     _rec_name = "name"
 
     _columns = {
             'name': fields.char('Imatt', size=128),
-            'marque': fields.char('marque', size=128),
-            'type': fields.char('marque', size=128),
-            'usage': fields.char('marque', size=128),
+            'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade", required=True),
+
+            'marque': fields.char('Marque', size=128),
+            'type': fields.char('Type', size=128),
+            'usage': fields.char('Usage', size=128),
+            'on_wheels': fields.boolean('On Wheels'),
+            'small': fields.boolean('Small'),
             'cv': fields.integer('CV', select=1),
             'year': fields.integer('Year', select=1),
             'time': fields.integer('Time', select=1),
+            'km': fields.integer('Km', select=1),
+
+            #Calcul total price and liters
+            #'oil_qtity': fields.integer('oil quantity', select=1),
+            #'oil_price': fields.integer('oil price', select=1),
     }
 equipment()
 
@@ -230,6 +240,12 @@ class task(osv.osv):
                                   \n If the task is over, the states is set to \'Done\'.'),
         #'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
         'team_id': fields.many2one('openstc.team', 'Team'),
+
+        'km': fields.integer('Km', select=1),
+        'oil_qtity': fields.integer('oil quantity', select=1),
+        'oil_price': fields.integer('oil price', select=1),
+
+
 #        'planned_hours': fields.float('Planned print_on_orderHours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
 #        'effective_hours': fields.float('Effective Hours', help='Time spent'),
 #        'remaining_hours': fields.float('Remaining Hours', digits=(16,2), help="Total remaining time, can be re-estimated periodically by the assignee of the task."),
@@ -680,8 +696,8 @@ class ask(osv.osv):
                     'name':'Suivi de la demande ' + ask.name,
                     'model_id':ir_model[0],
                     'subject':'Suivi de la demande ' + ask.name,
-                    'email_from':'pierreyves.fadet@siclic.fr',
-                    'email_to': ask.partner_email if ask.partner_email!=False else ask.people_email,
+                    'email_from':'albacorefr@gmail.com',
+                    'email_to': 'albacorefr@gmail.com', #ask.partner_email if ask.partner_email!=False else ask.people_email,
                     'body_text':"Votre Demande est à l'état " + _(ask.state) +  "\r" +
                         "pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
             })
@@ -689,6 +705,8 @@ class ask(osv.osv):
         mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, ids[0])
         #self.pool.get("mail.message").write(cr, uid, [mail_id])
         self.pool.get("mail.message").send(cr, uid, [mail_id])
+
+        return true;
 
 
 ask()
