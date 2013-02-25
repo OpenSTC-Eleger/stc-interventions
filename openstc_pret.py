@@ -590,15 +590,28 @@ class hotel_reservation(osv.osv):
 
     #param record: browse_record hotel.reservation.line
     def get_prod_price(self, cr, uid, ids, record, context=None):
-        return record.reserve_product.product_tmpl_id.standard_price
+        pricelist_obj = self.pool.get("product.pricelist")
+        pricelist_id = record.line_id.partner_id.property_product_pricelist.id
+        res = pricelist_obj.price_get_multi(cr, uid, [pricelist_id], [(record.reserve_product.id,record.qte_reserves,record.line_id.partner_id.id)], context=None)
+        return res and res[record.reserve_product.id][pricelist_id] or False
+        #return record.reserve_product.product_tmpl_id.standard_price
 
     def get_amount_resa(self, cr, uid, ids, context=None):
+        pricelist_obj = self.pool.get("product.pricelist")
         for resa in self.browse(cr, uid, ids ,context):
+            pricelist = resa.partner_id.property_product_pricelist.id
             amount = 0.0
+            values = []
             for line in resa.reservation_line:
-                #TODO: for each prod, gets price from table price
-                #TOREMOVE: for each prod, gets price from pricelist
-                amount += self.get_prod_price(cr, uid, ids, line, context) * line.qte_reserves
+                #TOREMOVE: for each prod, gets price from table price
+                #amount += self.get_prod_price(cr, uid, ids, line, context) * line.qte_reserves
+                #TODO: for each prod, gets price from pricelist
+                values.append((line.reserve_product.id,line.qte_reserves, resa.partner_id.id))
+            pricelist_obj = self.pool.get("product.pricelist")
+            res = pricelist_obj.price_get_multi(cr, uid, [pricelist], values, context=None)
+            #compute amount with price_unit got
+            for line in resa.reservation_line:
+                amount += res[line.reserve_product.id][pricelist]
         return amount
 
     def compute_lines_price(self, cr, uid, ids, context=None):

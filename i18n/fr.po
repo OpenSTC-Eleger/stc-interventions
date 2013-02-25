@@ -704,6 +704,7 @@ msgstr "Utilisateur à qui vous voulez déléguer cette tâche"
 #. module: openstc
 #: view:openstc.ask:0
 #: selection:openstc.ask,state:0
+msgid "Wait"
 msgstr "En attente"
 
 
