@@ -62,7 +62,14 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
             print(ret)
         return ret
     
-    
+    def prepare_sale_order(self, cr, uid, default_location_id, partner_id, purchase_lines, origin=False):
+        return {'invoice_method':'manual',
+                      'location_id':default_location_id,
+                      'partner_id':partner_id,
+                      'order_line':purchase_lines,
+                      'origin': origin or '',
+                      'is_emprunt':True,
+                      }
     
     def do_emprunt(self,cr,uid,ids,context=None):
         
@@ -93,18 +100,12 @@ class openstc_pret_emprunt_wizard(osv.osv_memory):
         #Pour chaque mairie (fournisseur), on crée un bon de commande
         for (partner_id, purchase_lines) in dict_partner.items():
             #Dict qui Contient tous les éléments pour créer un nouveau bon de commande
-            values = {'invoice_method':'manual',
-                      'location_id':default_location_id,
-                      'partner_id':partner_id,
-                      'order_line':purchase_lines,
-                      'origin': origin,
-                      'is_emprunt':True,
-                      }
+     
+            values = self.prepare_sale_order(cr, uid, default_location_id, partner_id, purchase_lines, origin)
             #On insère les modifs de l'onchange sur partner_id pour compléter les champs obligatoires
             for (key, value) in purchase_obj.onchange_partner_id(cr, uid, False, partner_id)['value'].items():
                 values[key] = value
-            
-            print(values)      
+               
             purchase_id = purchase_obj.create(cr, uid, values)
             wf_service = netsvc.LocalService('workflow')
             wf_service.trg_validate(uid, 'purchase.order', purchase_id, 'purchase_confirm', cr)

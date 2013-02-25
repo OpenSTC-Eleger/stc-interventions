@@ -211,12 +211,14 @@
 	
 				<!-- Overriding of existing workfows -->
 	
-	<data noupdate="1">
+
+	<data>
 		<record id="sale.act_wait_ship" model="workflow.activity">
             <field name="action_id" ref=""/>
         </record>
 	</data>
-	<data noupdate="1">
+
+	<data>
 		<record id="account.act_open" model="workflow.activity">
             <field name="action_id" ref=""/>
         </record>

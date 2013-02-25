@@ -389,26 +389,23 @@ class hotel_reservation(osv.osv):
                     " + where_optionnel + " \
                     group by reserve_product; ", (tuple(prod_list), checkin, checkout))
         return cr
-
-    def check_dispo(self, cr, uid, id=0, context=None):
+    
+    def check_dispo(self, cr, uid, id=0, default_checkin=False, default_checkout=False, prod_dict={}, context=None):
         reservation = self.browse(cr, uid, id)
         if isinstance(reservation, list):
             reservation = reservation[0]
-        where_optionnel = " and hr.id <> " + str(id)
-        checkin = reservation.checkin
-        checkout = reservation.checkout
-        reserv_vals = reservation.reservation_line
-        demande_prod = {}
-        prod_list = []
-        prod_list_all = []
-        #Parcours des lignes de réservation pour
+        checkin = default_checkin or reservation.checkin
+        checkout = default_checkout or reservation.checkout
+        reserv_vals = {} if prod_dict else reservation.reservation_line
+        demande_prod = prod_dict
+        prod_list = prod_dict.keys() or []
+        prod_list_all = prod_dict.keys() or []
+        #Parcours des lignes de réservation pour 
         for line in reserv_vals:
             #Récup des produits à réserver
             prod_list.append(line.reserve_product.id)
             prod_list_all.append(line.reserve_product.id)
-            demande_prod[str(line.reserve_product.id)] = line.qte_reserves
-
-        print(reserv_vals)
+            demande_prod[line.reserve_product.id] = line.qte_reserves
 
         #Vérif dispo pour chaque produit
         ok = True
@@ -429,7 +426,7 @@ class hotel_reservation(osv.osv):
             #prod_desire = self.pool.get("product.product").browse(cr, uid, data[1])
             #print(prod_desire)
             qte_total_prod = stock_prod[data[0]]['virtual_available']
-            qte_voulue = demande_prod[str(data[0])]
+            qte_voulue = demande_prod[data[0]]
             #Si l'un des produits n'est pas dispo, on annule la réservation des articles
             #TOCHECK:la réservation reste à l'état draft
             #on vérifie si le produit est dispo en quantité suffisante : stock total - qtés déjà résevées - qtés voulues
@@ -441,7 +438,7 @@ class hotel_reservation(osv.osv):
         for prod_id in prod_list:
              ok = True
              qte_total_prod = stock_prod[prod_id]['virtual_available']
-             qte_voulue = demande_prod[str(prod_id)]
+             qte_voulue = demande_prod[prod_id]
              if qte_total_prod < qte_voulue:
                  ok = False
                  dict_error_prod[prod_id] = [qte_voulue, qte_total_prod]
@@ -487,7 +484,7 @@ class hotel_reservation(osv.osv):
         list_prod_error = {}
         ok = True
         for id in ids:
-            list_prod_error, prod_list_all = self.check_dispo(cr, uid, id, context)
+            list_prod_error, prod_list_all = self.check_dispo(cr, uid, id, context=context)
             if list_prod_error:
                 ok = False
         #S'il y a une erreur de dispo, on affiche un wizard donnant accès à l'action d'emprunt des articles ou de visualisation du planning
@@ -509,7 +506,26 @@ class hotel_reservation(osv.osv):
                 'res_id':ids[0]
                 }
 
-
+    def get_prods_available(self, cr, uid, checkin, checkout, prod_ids=[], context=None):
+        #TODO: add alternative return, which indicates qty of prod_available (useful for multi-qty reservation)
+        if not context:
+            context = {}
+        prod_dict = {}
+        if isinstance(prod_ids, list):
+            for id in prod_ids:
+                prod_dict.update({id:1})
+        elif isinstance(prod_ids, dict):
+            prod_dict = prod_ids
+        else:
+            #Print for log errors
+            print("prod_ids error : " + prod_ids)
+            raise osv.except_osv("Erreur","Une erreur est apparue, veuillez notifier l'erreur suivante A votre prestataire : \n la paramètre prod_ids de la méthode get_prods_available est d'une forme incorrecte.")
+        #Get availability of prods : (dict_error, all_prods)
+        res = self.check_dispo(cr, uid, 0, checkin, checkout, prod_dict, context)
+        #Format result to return only prods available
+        ret = [id for id in res[1] if id not in res[0].keys()]
+        return ret
+    
     #Vérifies les champs dispo de chaque ligne de résa pour dire si oui ou non la résa est OK pour la suite
     #TODO: Voir comment gérer le cas de la reprise d'une résa à revalider / incomplète où des champs dispo sont à True
     #=> Problème lorsque quelqu'un d'autre réserve un même produit

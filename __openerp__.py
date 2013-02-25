@@ -34,7 +34,8 @@
         'workflow/purchase_workflow.xml',
 
         "report/openstc_pret_qte_dispo_report_view.xml",
-        #"unit tests/unit_tests.xml",
+        "unit_tests/unit_tests.xml",
+
     ],
     "demo": [],
     "test": [],

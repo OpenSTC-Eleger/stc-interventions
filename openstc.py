@@ -737,4 +737,3 @@ class todo(osv.osv):
             'completed': fields.boolean('Completed'),
     }
 todo()
-
