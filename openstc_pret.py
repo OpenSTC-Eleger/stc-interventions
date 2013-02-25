@@ -162,10 +162,10 @@ class hotel_reservation(osv.osv):
     _columns = {
                 'state': fields.selection(AVAILABLE_RESA_STATE_VALUES, 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
-                                            help=("""Une réservation mise en option signifie que votre demande est prise en compte mais
-                                            dont on ne peut pas garantir la livraison à la date prévue.
-                                            Une réservation bloquée signifie que la réservation n'est pas prise en compte car nous ne pouvons pas
-                                            garantir la livraison aux dates indiquées""")),
+                                            help=("Une réservation mise en option signifie que votre demande est prise en compte mais \
+                                            dont on ne peut pas garantir la livraison à la date prévue.\
+                                            Une réservation bloquée signifie que la réservation n'est pas prise en compte car nous ne pouvons pas \
+                                            garantir la livraison aux dates indiquées")),
                 'name':fields.char('Nom Manifestation', size=128, required=True),
                 'partner_mail':fields.char('Email Demandeur', size=128, required=False),
                 'is_recur':fields.boolean('Issue d\'une Récurrence', readonly=True),
@@ -180,6 +180,15 @@ class hotel_reservation(osv.osv):
                  'is_recur': lambda *a: 0,
         }
     _order = "checkin, in_option"
+    
+    def _check_dates(self, cr, uid, ids, context=None):
+        for resa in self.browse(cr, uid, ids, context):
+            if resa.checkin >= resa.checkout:
+                return False
+        return True
+     
+    _constraints = [(_check_dates, "La date de Début de votre réservation est supérieure A la date de Fin, veuillez les modifier.", ['checkin','checkout'])]
+
 
     def confirmed_reservation(self,cr,uid,ids):
         #self.write(cr, uid, ids, {'state':'confirm'})
@@ -265,6 +274,8 @@ class hotel_reservation(osv.osv):
                     if resa.in_option == 'block':
                         raise osv.except_osv("Erreur","""Votre réservation est bloquée car la date de début de votre manifestion
                         ne nous permet pas de vous livrer dans les temps.""")
+                    if not resa.reservation_line:
+                        raise osv.except_osv("Erreur","Vous n'avez saisie aucune ligne de réservation. Vous ne pouvez pas poursuivre sans saisir de lignes de réservations.")
                     self.write(cr, uid, ids, {'state':'draft'}, context={'check_dispo':'1'})
                     #TODO: Si partner_shipping_id présent, calculer prix unitaires
                     if resa.openstc_partner_id:
@@ -390,8 +401,10 @@ class hotel_reservation(osv.osv):
                     group by reserve_product; ", (tuple(prod_list), checkin, checkout))
         return cr
     
-    def check_dispo(self, cr, uid, id=0, default_checkin=False, default_checkout=False, prod_dict={}, context=None):
+    def check_dispo(self, cr, uid, id=0, default_checkin=False, default_checkout=False, prod_dict=None, context=None):
         reservation = self.browse(cr, uid, id)
+        if not prod_dict:
+            prod_dict = {}
         if isinstance(reservation, list):
             reservation = reservation[0]
         checkin = default_checkin or reservation.checkin
@@ -400,13 +413,18 @@ class hotel_reservation(osv.osv):
         demande_prod = prod_dict
         prod_list = prod_dict.keys() or []
         prod_list_all = prod_dict.keys() or []
+        if id:
+            where_optionnel = "and hr.id <> " + str(id)
+        if not (demande_prod or reserv_vals):
+            raise osv.except_osv("Erreur","Vous n'avez saisie aucune ligne de réservation. Vous ne pouvez pas poursuivre sans saisir de lignes de réservations.")
+        
         #Parcours des lignes de réservation pour 
         for line in reserv_vals:
             #Récup des produits à réserver
             prod_list.append(line.reserve_product.id)
             prod_list_all.append(line.reserve_product.id)
             demande_prod[line.reserve_product.id] = line.qte_reserves
-
+        
         #Vérif dispo pour chaque produit
         ok = True
         #On vérifie que l'on a récupéré au moins un produit
@@ -621,6 +639,32 @@ class hotel_reservation(osv.osv):
             self.write(cr, uid, [resa.id], {'reservation_line':values}, context=context)
         return True
 
+    def open_checkout(self, cr, uid, ids, context=None):
+        if isinstance(ids, list):
+            ids = ids[0]
+        ret = {
+            'type':'ir.actions.act_window',
+            'res_model':'openstc.pret.checkout',
+            'view_type':'form',
+            'view_mode':'form',
+            'target':'new',
+            }
+        if not context:
+            context = {}
+        context.update({'reservation_id':ids})
+        #if a checkout already exists, we open to the existing id
+        resa = self.browse(cr, uid, ids, context)
+        if resa.resa_checkout_id:
+            ret.update({'res_id':resa.resa_checkout_id.id})
+        else:
+            #else, we create a new checkout and display it in a new window(we force the creation to be sure that the checkout is saved in db)
+            #we get default_values defined in default_get
+            values = self.pool.get("openstc.pret.checkout").default_get(cr, uid, [], context=context)
+            res_id = self.pool.get("openstc.pret.checkout").create(cr, uid, values)
+            ret.update({'res_id':res_id})
+        #and display it
+        return ret
+
     #Vals: Dict containing "to" (required) and "state" in ("error","draft", "confirm") (required)
     def envoyer_mail(self, cr, uid, ids, vals=None, attach_ids=[], context=None):
         #TOREMOVE: A déplacer vers un fichier init.xml
@@ -721,17 +765,6 @@ class hotel_reservation(osv.osv):
         #id = super(hotel_reservation, self).create(cr, uid, vals, context)
         return super(hotel_reservation, self).create(cr, uid, vals, context)
         #TOCHECK: Vérif utilité, supprimer puis tester si tout fonctionne
-        """else:
-            id = super(hotel_reservation, self).create(cr, uid, vals, context)
-
-            try:
-                self.check_dispo(cr, uid, id, context)
-            except osv.except_osv as e:
-                self.write(cr, uid, id, {'in_option':True})
-        if id:
-            print("affichage message")
-            self.log(cr, uid, id, "Réservation enregistrée")
-        return id"""
 
     def write(self, cr, uid, ids, vals, context=None):
         #OpenERP fait toujours un write des modifs faites sur le form lors d'un clic de bouton, ce qui peut
