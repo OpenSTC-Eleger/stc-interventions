@@ -33,17 +33,18 @@ from tools.translate import _
 class equipment(osv.osv):
     _name = "openstc.equipment"
     _description = "openstc.equipment"
-    _inherits = {'product.product': "product_product_id"}
+    #_inherits = {'product.product': "product_product_id"}
     _rec_name = "name"
 
     _columns = {
             'name': fields.char('Imatt', size=128),
-            'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade", required=True),
+            #'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade", required=True),
 
             'marque': fields.char('Marque', size=128),
             'type': fields.char('Type', size=128),
             'usage': fields.char('Usage', size=128),
-            'on_wheels': fields.boolean('On Wheels'),
+            #'on_wheels': fields.boolean('On Wheels'),
+            'technical': fields.boolean('Technical'),
             'small': fields.boolean('Small'),
             'cv': fields.integer('CV', select=1),
             'year': fields.integer('Year', select=1),

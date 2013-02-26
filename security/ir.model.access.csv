@@ -99,6 +99,22 @@ access_res_partner_address_dst,res_partner address dst,base.model_res_partner_ad
 access_product_pricelist_sale_user,product.pricelist.sale.user,product.model_product_pricelist,base.group_user,1,0,0,0
 access_product_pricelist_sale_openstc_dst,product.pricelist.sale. openstc_dst,product.model_product_pricelist,openstc_dst,1,1,1,1
 
+access_product_product_dst,product_product dst,model_product_product,openstc_dst,1,1,1,1
+access_product_product_qualifier,product_product qualifier,model_product_product,openstc_qualifier,1,0,0,0
+access_product_product_agent,product_product agent,model_product_product,openstc_agent,1,1,0,0
+access_product_product_employee,product_product employee,model_product_product,openstc_employee,1,0,0,0
+access_product_product_accueil,product_product accueil,model_product_product,openstc_accueil,1,0,0,0
+access_product_product_manager,product_product manager,model_product_product,openstc_manager,1,1,1,1
+
+access_openstc_todo_dst,openstc_todo dst,model_openstc_todo,openstc_dst,1,1,1,1
+
+#access_product_template_dst,product_template dst,product.model_product_template,openstc_dst,1,1,1,1
+#access_product_template_qualifier,product_template qualifier,product.model_product_template,openstc_qualifier,1,0,0,0
+#access_product_template_agent,product_template agent,product.model_product_template,openstc_agent,1,1,0,0
+#access_product_template_employee,product_template employee,product.model_product_template,openstc_employee,1,0,0,0
+#access_product_template_accueil,product_template accueil,product.model_product_template,openstc_accueil,1,0,0,0
+#access_product_template_manager,product_template manager,product.model_product_template,openstc_manager,1,1,1,1
+
 
 
 
