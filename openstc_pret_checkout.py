@@ -135,7 +135,7 @@ class openstc_pret_checkout_line_wizard(osv.osv):
                 'checkout_id':fields.many2one('openstc.pret.checkout','Etat des Lieux'),
                 'product_id':fields.many2one('product.product','Article', readonly=True),
                 'qte_reservee':fields.integer('Qté prêtée', readonly=True),
-                'etat_retour':fields.selection(AVAILABLE_ETAT_SELECTION, 'Etat après utilisation', required=True),
+                'etat_retour':fields.selection(AVAILABLE_ETAT_SELECTION, 'Etat après utilisation'),
                 'state':fields.selection(AVAILABLE_STATE_TREATMENT_SELECTION, 'Avancement', readonly=True),
                 'qte_to_purchase':fields.integer('Qté à Racheter'),
                 'infos_supp':fields.char('Infos Supplémentaires',size=128),

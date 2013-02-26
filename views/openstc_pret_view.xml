@@ -169,7 +169,7 @@
 				</field>
 				<button name="done" string="Create Folio" states="confirm"
 					position="replace">
-					<button name="%(action_view_openstc_pret_create_checkout)d" string="Retour des articles" type="action" states="in_use" />
+					<button name="open_checkout" string="Retour des articles" type="object" states="in_use" />
 					<!-- <button name="create_folio" type="object" string="Générer Folio" states="done"/> -->
 				</button>
 				<button name="confirm" string="Confirm" states="draft"
