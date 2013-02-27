@@ -491,7 +491,7 @@ class hotel_reservation(osv.osv):
             if list_for_update:
                 self.write(cr, uid, [id], {'reservation_line':list_for_update})
 
-        if not ok:
+        """if not ok:
             prod_error_str = ""
             for prod_error in self.pool.get("product.product").browse(cr, uid, dict_error_prod.keys()):
                 if prod_error_str <> "":
@@ -499,8 +499,8 @@ class hotel_reservation(osv.osv):
                 prod_error_str += str(dict_error_prod[prod_error.id][0]) + " x " + prod_error.name + "( " + str(dict_error_prod[prod_error.id][1]) + " disponibles pour ces dates)"
             if not 'update_line_dispo' in context:
                 raise osv.except_osv("Produit(s) non disponible(s)","Votre réservation n'a pas aboutie car \
-                les produits suivants ne sont disponibles pour la période " + checkin + " - " + checkout + ":\
-                " + prod_error_str)
+                les produits suivants ne sont pas disponibles pour la période " + checkin + " - " + checkout + ":\
+                " + prod_error_str)"""
         return dict_error_prod, prod_list_all
 
     #Bouton pour vérif résa, mets à jour les champs dispo de chaque ligne de résa
@@ -550,6 +550,28 @@ class hotel_reservation(osv.osv):
         #Format result to return only prods available
         ret = [id for id in res[1] if id not in res[0].keys()]
         return ret
+    
+    def get_prods_available_and_qty(self, cr, uid, checkin, checkout, prod_ids=[], context=None):
+        if not context:
+            context = {}
+        prod_dict = {}
+        if isinstance(prod_ids, list):
+            for prod in self.pool.get("product.product").browse(cr, uid, prod_ids, context):
+                prod_dict.update({prod.id:prod.virtual_available + 1.0})
+        elif isinstance(prod_ids, dict):
+            prod_dict = prod_ids
+        else:
+            #Print for log errors
+            print("prod_ids error : " + prod_ids)
+            raise osv.except_osv("Erreur","Une erreur est apparue, veuillez notifier l'erreur suivante A votre prestataire : \n la paramètre prod_ids de la méthode get_prods_available est d'une forme incorrecte.")
+        #Get availability of prods : (dict_error, all_prods)
+        res = self.check_dispo(cr, uid, 0, checkin, checkout, prod_dict, context)
+        if res[0]:
+            ret = {}
+            for key, value in res[0]:
+                ret.update({key:value[1]})
+            return ret
+        return False
     
     #Vérifies les champs dispo de chaque ligne de résa pour dire si oui ou non la résa est OK pour la suite
     #TODO: Voir comment gérer le cas de la reprise d'une résa à revalider / incomplète où des champs dispo sont à True
