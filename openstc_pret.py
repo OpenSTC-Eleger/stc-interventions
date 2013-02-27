@@ -78,8 +78,6 @@ class product_product(osv.osv):
 
 product_product()
 
-AVAILABLE_RESA_STATE_VALUES = [('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation'),('recur_waiting','Récurrence Planifiée')]
-
 
 class hotel_reservation_line(osv.osv):
     _name = "hotel_reservation.line"
@@ -101,6 +99,10 @@ class hotel_reservation_line(osv.osv):
     def _get_line_to_valide(self, cr, uid, ids, context=None):
         return ids
 
+    def _get_state_line(self, cr, uid, context=None):
+        res = self.pool.get("hotel.reservation").fields_get(cr, uid, 'state', context=context)
+        return res['state']['selection']
+
     _columns = {
         'categ_id': fields.many2one('product.category','Type d\'article'),
         "reserve_product": fields.many2one("product.product", "Articles réservés"),
@@ -113,7 +115,8 @@ class hotel_reservation_line(osv.osv):
                                  store={'hotel_reservation.line':(_get_line_to_valide, ['infos','no_infos'], 10),},
                                  string="Ligne Valide"),
         "name":fields.char('Libellé', size=128),
-        'state':fields.related('line_id','state', type='selection',string='Etat Résa', selection=AVAILABLE_RESA_STATE_VALUES, readonly=True),
+        'state':fields.related('line_id','state', type='selection',string='Etat Résa', selection=_get_state_line, readonly=True),
+        'uom_qty':fields.float('Qté de Référence pour Facturation',digit=(2,1))
         }
 
     _defaults = {
@@ -159,8 +162,11 @@ class hotel_reservation(osv.osv):
     def _get_resa_modified(self, cr, uid, ids, context=None):
         return ids
 
+    def _get_state_values(self, cr, uid, context=None):
+        return [('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation'),('recur_waiting','Récurrence Planifiée')]
+
     _columns = {
-                'state': fields.selection(AVAILABLE_RESA_STATE_VALUES, 'Etat',readonly=True),
+                'state': fields.selection(_get_state_values, 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
                                             help=("Une réservation mise en option signifie que votre demande est prise en compte mais \
                                             dont on ne peut pas garantir la livraison à la date prévue.\
@@ -388,17 +394,17 @@ class hotel_reservation(osv.osv):
         #Valeurs par défauts des champs cachés
         return res
 
-    def get_nb_prod_reserved(self, cr, prod_list, checkin, checkout, where_optionnel=""):
+    def get_nb_prod_reserved(self, cr, prod_list, checkin, checkout, states=['cancle','done','remplir'], where_optionnel=""):
         print("début get_nb_prod_reserved")
         cr.execute("select reserve_product, sum(qte_reserves) as qte_reservee \
                     from hotel_reservation as hr, \
                     hotel_reservation_line as hrl \
                     where hr.id = hrl.line_id \
                     and reserve_product in %s \
-                    and hr.state not in('cancle', 'done') \
+                    and hr.state not in%s \
                     and (hr.checkin, hr.checkout) overlaps ( timestamp %s, timestamp %s ) \
                     " + where_optionnel + " \
-                    group by reserve_product; ", (tuple(prod_list), checkin, checkout))
+                    group by reserve_product; ", (tuple(prod_list), tuple(states), checkin, checkout))
         return cr
     
     def check_dispo(self, cr, uid, id=0, default_checkin=False, default_checkout=False, prod_dict=None, context=None):
@@ -413,8 +419,9 @@ class hotel_reservation(osv.osv):
         demande_prod = prod_dict
         prod_list = prod_dict.keys() or []
         prod_list_all = prod_dict.keys() or []
+        my_where_optionnel = ""
         if id:
-            where_optionnel = "and hr.id <> " + str(id)
+            my_where_optionnel = "and hr.id <> " + str(id)
         if not (demande_prod or reserv_vals):
             raise osv.except_osv("Erreur","Vous n'avez saisie aucune ligne de réservation. Vous ne pouvez pas poursuivre sans saisir de lignes de réservations.")
         
@@ -435,7 +442,7 @@ class hotel_reservation(osv.osv):
         dict_error_prod = {}
         #NOTES:chaque produit que l'on récupère de la requête sql indique que ce produit a été loué au moins une fois
         #Ainsi, si un produit figure dans la demande en cours mais non présent dans le résultat sql, c'est qu'on n'a jamais réservé ce produit
-        results = self.get_nb_prod_reserved(cr, prod_list, checkin, checkout, where_optionnel).fetchall()
+        results = self.get_nb_prod_reserved(cr, prod_list, checkin, checkout, where_optionnel=my_where_optionnel).fetchall()
         print(results)
         ok = results and ok or False
         print(ok)
@@ -580,7 +587,7 @@ class hotel_reservation(osv.osv):
                    'name':line.reserve_product.name_template,
                    'product_uom':line.reserve_product.uom_id.id,
                    'price_unit':line.prix_unitaire,
-                   'product_uom_qty':line.qte_reserves
+                   'product_uom_qty':line.uom_qty
 
                    }))
             folio=self.pool.get('hotel.folio').create(cr,uid,{
@@ -614,6 +621,28 @@ class hotel_reservation(osv.osv):
         return res and res[record.reserve_product.id][pricelist_id] or False
         #return record.reserve_product.product_tmpl_id.standard_price
 
+    #param record: browse_record hotel.reservation.line
+    #if product uom refers to a resa time, we compute uom according to checkin, checkout
+    def get_prod_uom_qty(self, cr, uid, ids, record, length, context=None):
+        if re.search(u"[Rr]{1}[ée]{1}servation", record.reserve_product.uom_id.category_id.name):
+            #uom factor refers to journey, to have uom factor refering to hours, we have to adust ratio
+            factor = 24.0 / record.reserve_product.uom_id.factor
+            res = length / factor
+            #round to direct superior int
+            #TODO: here we can apply an adjustment to decide the max decimal value before passing to superior int
+            if res > int(res):
+                res = int(res) + 1.0
+        else:
+            res = record.qte_reserves
+        return res
+
+    def get_length_resa(self, cr, uid, id, context=None):
+        resa = self.browse(cr, uid, id, context)
+        checkin = strptime(resa.checkin, '%Y-%m-%d %H:%M:%S')
+        checkout = strptime(resa.checkout, '%Y-%m-%d %H:%M:%S')
+        length = (checkout - checkin).hours
+        return length
+
     def get_amount_resa(self, cr, uid, ids, context=None):
         pricelist_obj = self.pool.get("product.pricelist")
         for resa in self.browse(cr, uid, ids ,context):
@@ -634,8 +663,11 @@ class hotel_reservation(osv.osv):
 
     def compute_lines_price(self, cr, uid, ids, context=None):
         values = []
+        #get lentgh resa in hours
         for resa in self.browse(cr, uid, ids, context):
-            values.extend([(1,line.id,{'prix_unitaire':self.get_prod_price(cr, uid, line.reserve_product.id, line, context)}) for line in resa.reservation_line])
+            length_resa = self.get_length_resa(cr, uid, resa.id, context=None)
+            values.extend([(1,line.id,{'prix_unitaire':self.get_prod_price(cr, uid, resa.id, line, context),
+                                       'uom_qty':self.get_prod_uom_qty(cr, uid, resa.id, line, length_resa, context)}) for line in resa.reservation_line])
             self.write(cr, uid, [resa.id], {'reservation_line':values}, context=context)
         return True
 
@@ -735,7 +767,7 @@ class hotel_reservation(osv.osv):
     #Surcharge methode pour renvoyer uniquement les resas a traiter jusqu'au vendredi prochain, si on veut la vue associee aux resas a traiter par le responsable
     def search(self, cr, uid,args, offset=0, limit=None, order=None, context=None, count=False):
         #datetime.datetime.now() + datetime.timedelta(days=int(datetime.datetime.now().weekday()) / 4) * (7 - int(datetime.datetime.now().weekday())) + (4 - int(datetime.datetime.now().weekday()) * (1 - int(datetime.datetime.now().weekday()) / 4))
-        if 'resa_semaine' in context:
+        if context and 'resa_semaine' in context:
             now = datetime.now()
             delta_day = 0
             if now.weekday() >= 4:

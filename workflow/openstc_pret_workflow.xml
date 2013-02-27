@@ -17,14 +17,6 @@
 			<field name="action">redrafted_reservation()</field>
 		</record>
 		
-		<record model="workflow.activity" id="act_recur_waiting">
-			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
-			<field name="name">recur_waiting</field>
-			<field name="kind">function</field>
-			<field name="action">recur_waiting()</field>
-		</record>
-		
-
 		<record model="workflow.activity" id="hotel_reservation.act_draft">
 			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
 			<field name="flow_start" eval="False" />
@@ -84,11 +76,7 @@
 			<field name="signal">back_to_remplir</field>
 		</record>
 		
-		<record model="workflow.transition" id="trans_openstc_pret_aremplir_recur_waiting">
-			<field name="act_from" ref="act_remplir" />
-			<field name="act_to" ref="act_recur_waiting" />
-			<field name="condition">(is_recur == True)</field>
-		</record>
+		
 		
 		
 		<record model="workflow.transition" id="t002">
@@ -135,11 +123,6 @@
 			<field name="signal">reserv_modified</field>
 		</record>
 		
-		<record model="workflow.transition" id="trans_openstc_pret_recur_waiting_uncheck">
-			<field name="act_from" ref="act_recur_waiting" />
-			<field name="act_to" ref="act_to_uncheck" />
-			<field name="signal">reserv_modified</field>
-		</record>
 		
 		<record model="workflow.transition" id="t004">
 			<field name="act_from" ref="act_to_uncheck" />
@@ -166,11 +149,7 @@
 			<field name="signal">cancel</field>
 		</record>
 
-		<record model="workflow.transition" id="trans_openstc_pret_recur_waiting_cancel">
-			<field name="act_from" ref="act_recur_waiting" />
-			<field name="act_to" ref="act_cancel" />
-			<field name="signal">cancel</field>
-		</record>
+		
 		
 		<record model="workflow.transition" id="t03">
 			<field name="act_from" ref="act_cancel" />
@@ -195,11 +174,7 @@
 			<field name="signal">put_in_use</field>
 		</record>
 		
-		<record model="workflow.transition" id="trans_openstc_pret_recur_waiting_in_use">
-			<field name="act_from" ref="act_recur_waiting" />
-			<field name="act_to" ref="act_in_use" />
-			<field name="signal">put_in_use</field>
-		</record>
+		
 		
 		<record model="workflow.transition" id="trans_openstc_pret_in_use_done">
 			<field name="act_from" ref="act_in_use" />

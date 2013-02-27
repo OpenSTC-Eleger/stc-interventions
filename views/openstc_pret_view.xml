@@ -160,6 +160,7 @@
 							<field name="qte_reserves" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
 							<field name="prix_unitaire" attrs="{'readonly':[('state','&lt;&gt;','wait_confirm')]}"/>
 							<field name="dispo" readonly="1"/>
+							<field name="uom_qty"/>
 							<field name="infos"/>
 							<field name="no_infos"/>
 							<field name="valide"/>
@@ -393,7 +394,7 @@
 					<filter string="Terminées" domain="[('state','in',('done',))]" help="Réservations cloturées ou annulées"/>
 					<filter string="Litigieuses" domain="['|',('state','in',('cancle',)),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
 					<newline />
-					<filter string="Voir seulement les Salles" domain="[('reservation_line.reserve_product.is_salle','=',True)]"
+					<filter string="Voir seulement les Salles" domain="[('reservation_line.reserve_product.categ_id.name','like','Salles')]"
 					    help="n'affiche que les réservations concernant une salle"/>
 					<field name="prod_id" string="Ressource" widget="selection"
 					    filter_domain="[('reservation_line.reserve_product','=',self)]"/>
