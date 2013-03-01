@@ -33,31 +33,39 @@ from tools.translate import _
 class equipment(osv.osv):
     _name = "openstc.equipment"
     _description = "openstc.equipment"
+    _inherit = 'product.product'
     #_inherits = {'product.product': "product_product_id"}
-    _rec_name = "name"
 
     _columns = {
-            'name': fields.char('Imatt', size=128),
-            #'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade", required=True),
+            #'name': fields.char('Imatt', size=128),
+            'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade"),
 
             'marque': fields.char('Marque', size=128),
             'type': fields.char('Type', size=128),
             'usage': fields.char('Usage', size=128),
             #'on_wheels': fields.boolean('On Wheels'),
-            'technical': fields.boolean('Technical'),
-            'small': fields.boolean('Small'),
+            'vehicle': fields.boolean('Vehicle'),
+
+            'technical_vehicle': fields.boolean('Technical vehicle'),
+            'commercial_vehicle': fields.boolean('Commercial vehicle'),
+
+            'small_material': fields.boolean('Small'),
+            'fat_material': fields.boolean('Fat'),
+
             'cv': fields.integer('CV', select=1),
             'year': fields.integer('Year', select=1),
             'time': fields.integer('Time', select=1),
             'km': fields.integer('Km', select=1),
 
+
+
             #Calcul total price and liters
             #'oil_qtity': fields.integer('oil quantity', select=1),
             #'oil_price': fields.integer('oil price', select=1),
     }
+
+
 equipment()
-
-
 
 
 #----------------------------------------------------------
@@ -231,7 +239,8 @@ class task(osv.osv):
         'active': fields.boolean('Active'),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
-        'equipment_id':fields.many2one('openstc.equipment', 'Equipment'),
+        'equipment_ids':fields.many2many('openstc.equipment', 'openstc_equipment_task_rel', 'task_id', 'equipment_id', 'Equipments'),
+        #'equipment_id':fields.many2one('openstc.equipment', 'Equipment'),
         'parent_id': fields.many2one('project.task', 'Parent Task'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'absent_type_id':fields.many2one('openstc.absent.type', 'Type d''abscence'),

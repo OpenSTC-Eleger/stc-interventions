@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>
+    <data noupdate="0">
 
     	<!--  planning -->
 
@@ -1185,8 +1185,24 @@
 		 <delete model="ir.ui.menu" id="project.menu_project_config_project" />
 		 <delete model="ir.actions.act_window" id="project.open_task_type_form" />
 		 <delete model="ir.rule" id="project.task_visibility_rule" />
-
 		 <delete model="ir.ui.menu" id="project.menu_definitions" />
+
+
+
+
+
+
+
+
+		 <delete model="ir.ui.menu" id="menu_stock_inventory_control" />
+		 <delete model="ir.ui.menu" id="menu_warehouse_config" />
+		 <delete model="ir.ui.menu" id="menu_stock_configuration" />
+		 <delete model="ir.ui.menu" id="menu_stock_products_menu" />
+		 <delete model="ir.ui.menu" id="menu_product_by_category_stock_form" />
+		 <delete model="ir.ui.menu" id="menu_stock_product" />
+		 <delete model="ir.ui.menu" id="menu_stock_warehouse_mgmt" />
+		 <delete model="ir.ui.menu" id="menu_stock_root" />
+
 
 		 <!--  <delete model="res.groups" id="group_project_user" />
 		 <delete model="res.groups" id="group_project_manager" />

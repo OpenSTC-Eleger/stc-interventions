@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-<data>
+<data noupdate="0">
 
 	<!--  GROUPS -->
 
@@ -37,13 +37,13 @@
     <record id="openstc_dst" model="res.groups">
          <field name="name">OpenSTC/DST</field>
          <field name="category_id" ref="base.module_category_project_management"/>
-         <field name="implied_ids" eval="[(4, ref('openstc_qualifier'))]"/>
+         <field name="implied_ids" eval="[(4, ref('openstc_qualifier')),(4, ref('stock.group_stock_manager'))]"/>
     </record>
 
     <record id="openstc_manager" model="res.groups">
         <field name="name">OpenSTC/Manager</field>
         <field name="category_id" ref="base.module_category_project_management"/>
-        <field name="implied_ids" eval="[(4, ref('openstc_qualifier'))]"/>
+        <field name="implied_ids" eval="[(4, ref('openstc_qualifier')),(4, ref('stock.group_stock_manager'))]"/>
     </record>
 
     <!--  RULES -->
