@@ -127,6 +127,8 @@ class openstc_pret_checkout_wizard(osv.osv):
         return{'type':'ir.actions.act_window_close'}
         
 openstc_pret_checkout_wizard()
+
+
 AVAILABLE_STATE_TREATMENT_SELECTION = [('draft','Non Planifié'),('in_progress','En cours de Traitement'),('done','Remis en Etat')]
 AVAILABLE_ETAT_SELECTION = [('ras','Ne Rien Planifier'),('to_repair','A Réparer'),('to_purchase','A Racheter')]
 class openstc_pret_checkout_line_wizard(osv.osv):

@@ -351,7 +351,10 @@ class hotel_reservation(osv.osv):
         reservations = self.browse(cr, uid, ids)
         #if group <> "Responsable":
         etape_validation = False
+        re.compile("[Oo]pen")
         for resa in reservations:
+            group = resa.user_id.group_id
+            
             for line in resa.reservation_line:
                 if line.qte_reserves > line.reserve_product.seuil_confirm:
                     etape_validation = True

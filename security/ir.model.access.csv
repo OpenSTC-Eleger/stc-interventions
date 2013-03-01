@@ -115,14 +115,16 @@ access_openstc_todo_dst,openstc_todo dst,model_openstc_todo,openstc_dst,1,1,1,1
 #access_product_template_accueil,product_template accueil,product.model_product_template,openstc_accueil,1,0,0,0
 #access_product_template_manager,product_template manager,product.model_product_template,openstc_manager,1,1,1,1
 
+access_openstc_pret_checkout_dst,openstc_pret_checkout dst,model_openstc_pret_checkout,openstc_dst,1,1,1,1
+access_openstc_pret_checkout_qualifier,openstc_pret_checkout qualifier,model_openstc_pret_checkout,openstc_qualifier,1,0,0,0
+access_openstc_pret_checkout_agent,openstc_pret_checkout agent,model_openstc_pret_checkout,openstc_agent,1,1,0,0
+access_openstc_pret_checkout_employee,openstc_pret_checkout employee,model_openstc_pret_checkout,openstc_employee,1,0,0,0
+access_openstc_pret_checkout_accueil,openstc_pret_checkout accueil,model_openstc_pret_checkout,openstc_accueil,1,0,0,0
+access_openstc_pret_checkout_manager,openstc_pret_checkout manager,model_openstc_pret_checkout,openstc_manager,1,1,1,1
 
-
-
-
-
-
-
-
-
-
-
+access_openstc_pret_checkout_line_dst,openstc_pret_checkout_line dst,model_openstc_pret_checkout_line,openstc_dst,1,1,1,1
+access_openstc_pret_checkout_line_qualifier,openstc_pret_checkout_line qualifier,model_openstc_pret_checkout_line,openstc_qualifier,1,0,0,0
+access_openstc_pret_checkout_line_agent,openstc_pret_checkout_line agent,model_openstc_pret_checkout_line,openstc_agent,1,1,0,0
+access_openstc_pret_checkout_line_employee,openstc_pret_checkout_line employee,model_openstc_pret_checkout_line,openstc_employee,1,0,0,0
+access_openstc_pret_checkout_line_accueil,openstc_pret_checkout_line accueil,model_openstc_pret_checkout_line,openstc_accueil,1,0,0,0
+access_openstc_pret_checkout_line_manager,openstc_pret_checkout_line manager,model_openstc_pret_checkout_line,openstc_manager,1,1,1,1
