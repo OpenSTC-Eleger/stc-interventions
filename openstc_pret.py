@@ -731,73 +731,67 @@ class hotel_reservation(osv.osv):
         #and display it
         return ret
 
-    #Vals: Dict containing "to" (required) and "state" in ("error","draft", "confirm") (required)
+    #Vals: Dict containing "to" (deprecated) and "state" in ("error","draft", "confirm") (required)
     def envoyer_mail(self, cr, uid, ids, vals=None, attach_ids=[], context=None):
         #TOREMOVE: model.template A déplacer vers un fichier init.xml
         #TOREMOVE: Si le modèle n'existe pas, on le crée à la volée
-        #TODO: check if company wants to send email (info in partner ? user ? group ? ...)
-        email_obj = self.pool.get("email.template")
-        email_tmpl_id = 0
-        if 'state' in vals.keys():
-            if vals['state'] == "error":
-                email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','annulée')])
-                if not email_tmpl_id:
-                    ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=',self._name)])
-                    email_tmpl_id = email_obj.create(cr, uid, {
-                                                'name':'modèle de mail pour résa annulée',
-                                                'name':'Réservation Annulée',
-                                                'model_id':ir_model[0],
-                                                'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
-                                                'email_from':'bruno.plancher@gmail.com',
-                                                'email_to':'bruno.plancher@gmail.com',
-                                                'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
-    ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-    pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
-                                                'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
-    ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-    pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
-                                               })
-            elif vals['state'] == 'validated':
-                email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Valid%')])
-            elif vals['state'] == 'waiting':
-                email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Attente')])
-            if email_tmpl_id:
-                #Search for product attaches to be added to email
-                prod_ids = []
-                for resa in self.browse(cr, uid, ids):
-                    prod_ids.extend([line.reserve_product.id for line in resa.reservation_line])
-                cr.execute("select id, res_id from ir_attachment where res_id in %s and res_model=%s order by res_id", (tuple(prod_ids), 'product.product'))
-                #format sql return to concat attaches with each prod_id
-                prod_attaches = {}
-                for item in cr.fetchall():
-                    prod_attaches.setdefault(item[1],[])
-                    prod_attaches[item[1]].append(item[0])
-                if isinstance(email_tmpl_id, list):
-                    email_tmpl_id = email_tmpl_id[0]
-                #Envoi du mail proprement dit, email_tmpl_id définit quel mail sera envoyé
-                for resa in self.browse(cr, uid, ids):
-                    #link attaches of each product
-                    attach_values = []
-                    for line in resa.reservation_line:
-                        if prod_attaches.has_key(line.reserve_product.id):
-                            attach_values.extend([(4,attach_id) for attach_id in prod_attaches[line.reserve_product.id]])
-                    #and link optional paramter attach_ids
-                    attach_values.extend([(4,x) for x in attach_ids])
-                    mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, resa.id)
-                    self.pool.get("mail.message").write(cr, uid, [mail_id], {'attachment_ids':attach_values})
-                    self.pool.get("mail.message").send(cr, uid, [mail_id])
-
+        #TODO: check if company wants to send email (info opt_out in partner)
+        #We keep only resa where partner have opt_out checked
+        resa_ids_notif = []
+        resa_ids_notif = [resa.id for resa in self.browse(cr, uid, ids) if resa.partner_id.opt_out]
+        if resa_ids_notif:
+            email_obj = self.pool.get("email.template")
+            email_tmpl_id = 0
+            if 'state' in vals.keys():
+                if vals['state'] == "error":
+                    email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','annulée')])
+                    if not email_tmpl_id:
+                        ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=',self._name)])
+                        email_tmpl_id = email_obj.create(cr, uid, {
+                                                    'name':'modèle de mail pour résa annulée',
+                                                    'name':'Réservation Annulée',
+                                                    'model_id':ir_model[0],
+                                                    'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
+                                                    'email_from':'bruno.plancher@gmail.com',
+                                                    'email_to':'bruno.plancher@gmail.com',
+                                                    'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
+        ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
+        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
+                                                    'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
+        ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
+        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
+                                                   })
+                elif vals['state'] == 'validated':
+                    email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Valid%')])
+                elif vals['state'] == 'waiting':
+                    email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Attente')])
+                if email_tmpl_id:
+                    #Search for product attaches to be added to email
+                    prod_ids = []
+                    for resa in self.browse(cr, uid, ids):
+                        prod_ids.extend([line.reserve_product.id for line in resa.reservation_line])
+                    cr.execute("select id, res_id from ir_attachment where res_id in %s and res_model=%s order by res_id", (tuple(prod_ids), 'product.product'))
+                    #format sql return to concat attaches with each prod_id
+                    prod_attaches = {}
+                    for item in cr.fetchall():
+                        prod_attaches.setdefault(item[1],[])
+                        prod_attaches[item[1]].append(item[0])
+                    if isinstance(email_tmpl_id, list):
+                        email_tmpl_id = email_tmpl_id[0]
+                    #Envoi du mail proprement dit, email_tmpl_id définit quel mail sera envoyé
+                    for resa in self.browse(cr, uid, resa_ids_notif):
+                        #link attaches of each product
+                        attach_values = []
+                        for line in resa.reservation_line:
+                            if prod_attaches.has_key(line.reserve_product.id):
+                                attach_values.extend([(4,attach_id) for attach_id in prod_attaches[line.reserve_product.id]])
+                        #and link optional paramter attach_ids
+                        attach_values.extend([(4,x) for x in attach_ids])
+                        mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, resa.id)
+                        self.pool.get("mail.message").write(cr, uid, [mail_id], {'attachment_ids':attach_values})
+                        self.pool.get("mail.message").send(cr, uid, [mail_id])
+    
         return
-
-    """def fields_get(self, cr, uid, fields, context=None):
-        res = super(hotel_reservation, self).fields_get(cr, uid, fields, context)
-        #Values to put on fields
-        state = {'state':{'draft':[('required',False)]}}
-        #fields to be redefined
-        my_fields = {
-            'partner_id':state
-            }
-        return"""
 
     #Surcharge methode pour renvoyer uniquement les resas a traiter jusqu'au vendredi prochain, si on veut la vue associee aux resas a traiter par le responsable
     def search(self, cr, uid,args, offset=0, limit=None, order=None, context=None, count=False):
