@@ -210,13 +210,13 @@ class hotel_reservation(osv.osv):
                         ne nous permet pas de vous livrer dans les temps.""")
 
                     attach_sale_id = []
-                    #TODO: how to know if a user have not computed the price ? If he has not, we have to compute first
+                    #TOCHECK: as long as form is written by employee, we let him all latitude to manage prices
                     #Calcul montant de la résa
                     form_amount = 0.0
                     line_ids = []
                     for line in resa.reservation_line:
                         form_amount += line.prix_unitaire * line.qte_reserves
-                    amount = self.get_amount_resa(cr, uid, ids)
+                    """amount = self.get_amount_resa(cr, uid, ids)
                     #in the folowing case, user have not computed the prod prices
                     if form_amount <> amount and resa.state == 'draft':
                         self.compute_lines_price(cr, uid, [resa.id])
@@ -224,6 +224,8 @@ class hotel_reservation(osv.osv):
                     elif resa.state == "wait_confirm":
                         amount = form_amount
                     if amount > 0.0:
+                    """
+                    if form_amount > 0.0:
                     #Si montant > 0 euros, générer sale order puis dérouler wkf jusqu'a édition facture
                         folio_id = self.create_folio(cr, uid, ids)
                         wf_service = netsvc.LocalService('workflow')
@@ -347,17 +349,20 @@ class hotel_reservation(osv.osv):
         return not self.is_drafter
 
     def need_confirm(self, cr, uid, ids):
-        #TODO: Rajouter le test sur res.group => si responsable(s) (à définir lesquels), renvoyer False
         reservations = self.browse(cr, uid, ids)
-        #if group <> "Responsable":
         etape_validation = False
-        re.compile("[Oo]pen")
+        prog = re.compile(u'[Oo]pen(STC|[SC]TM)/[Mm]anager')
+        groups = self.pool.get("res.users").browse(cr, uid, uid, context=None).groups_id
+        #if group == "Responsable", no need confirm
+        for group in groups:
+            if prog.search(group.name):
+                return False
+        #else, check each seuil confirm products
         for resa in reservations:
-            group = resa.user_id.group_id
-            
-            for line in resa.reservation_line:
-                if line.qte_reserves > line.reserve_product.seuil_confirm:
-                    etape_validation = True
+                for line in resa.reservation_line:
+                    #Si l'un des produits dépasse le seuil max autorisé, on force la validation
+                    if line.qte_reserves > line.reserve_product.seuil_confirm:
+                        etape_validation = True
         return etape_validation
         #return True
 

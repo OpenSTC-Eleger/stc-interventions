@@ -158,7 +158,7 @@
 							<field name="reserve_product" colspan="1"
 								domain="[('categ_id','=',categ_id)]" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
 							<field name="qte_reserves" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" />
-							<field name="prix_unitaire" attrs="{'readonly':[('state','&lt;&gt;','wait_confirm')]}"/>
+							<field name="prix_unitaire"/>
 							<field name="dispo" readonly="1"/>
 							<field name="uom_qty"/>
 							<field name="infos"/>
