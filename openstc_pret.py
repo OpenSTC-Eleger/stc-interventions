@@ -142,7 +142,8 @@ class hotel_reservation(osv.osv):
     def _calc_in_option(self, cr, uid, ids, name, args, context=None):
         print("début calc_in_option")
         ret = {}
-        for resa in self.browse(cr, uid, ids):
+        #fixes : calc only for resa, avoiding inheritance bugs
+        for resa in self.pool.get("hotel.reservation").browse(cr, uid, ids, context):
             ret[resa.id] = 'no'
             date_crea = strptime(resa.date_order, '%Y-%m-%d %H:%M:%S')
             checkin = strptime(resa.checkin, '%Y-%m-%d %H:%M:%S')
@@ -159,15 +160,18 @@ class hotel_reservation(osv.osv):
                         ret[resa.id] = 'in_option'
         return ret
 
-    def _get_resa_modified(self, cr, uid, ids, context=None):
+    def get_resa_modified(self, cr, uid, ids, context=None):
         return ids
 
+    def return_state_values(self, cr, uid, context=None):
+        return [('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation')]
+
     def _get_state_values(self, cr, uid, context=None):
-        return [('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation'),('recur_waiting','Récurrence Planifiée')]
+        return self.return_state_values(cr, uid, context)
 
     _columns = {
                 'state': fields.selection(_get_state_values, 'Etat',readonly=True),
-                'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(_get_resa_modified,['checkin','reservation_line'],10)},
+                'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(get_resa_modified,['checkin','reservation_line'],10)},
                                             help=("Une réservation mise en option signifie que votre demande est prise en compte mais \
                                             dont on ne peut pas garantir la livraison à la date prévue.\
                                             Une réservation bloquée signifie que la réservation n'est pas prise en compte car nous ne pouvons pas \
@@ -568,7 +572,7 @@ class hotel_reservation(osv.osv):
         res = self.check_dispo(cr, uid, 0, checkin, checkout, prod_dict, context)
         if res[0]:
             ret = {}
-            for key, value in res[0]:
+            for key, value in res[0].items():
                 ret.update({key:value[1]})
             return ret
         return False
@@ -721,8 +725,9 @@ class hotel_reservation(osv.osv):
 
     #Vals: Dict containing "to" (required) and "state" in ("error","draft", "confirm") (required)
     def envoyer_mail(self, cr, uid, ids, vals=None, attach_ids=[], context=None):
-        #TOREMOVE: A déplacer vers un fichier init.xml
-        #Si le modèle n'existe pas, on le crée à la volée
+        #TOREMOVE: model.template A déplacer vers un fichier init.xml
+        #TOREMOVE: Si le modèle n'existe pas, on le crée à la volée
+        #TODO: check if company wants to send email (info in partner ? user ? group ? ...)
         email_obj = self.pool.get("email.template")
         email_tmpl_id = 0
         if 'state' in vals.keys():

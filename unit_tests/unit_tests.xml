@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data noupdate="1">
-	    
-	    <function model="hotel.reservation" name="compute_lines_price">
-	        <value eval="[77]"/>
-	    </function>
+
 	    
 	</data>
 </openerp>
