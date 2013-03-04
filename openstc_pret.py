@@ -336,7 +336,14 @@ class hotel_reservation(osv.osv):
                     print(inv.state)
                     wf_service.trg_validate(uid, 'account.invoice', inv.id, 'invoice_open', cr)
                     inv_ids.append(inv.id)
-
+            #send mail to notify user if opt_out checked and if there is invoice(s)
+            if inv_ids:
+                #attaches = self.pool.get("ir.attachment").search(cr, uid, [('res_model_','=','account.invoice'),('res_id','in',inv_ids)])
+                cr.execute("select id from ir_attachment where res_model = %s and res_id in %s", ('account.invoice',tuple(inv_ids)))
+                attaches = [item[0] for item in cr.fetchall()]
+                if not isinstance(attaches, list):
+                    attaches = [attaches]
+                self.envoyer_mail(cr, uid, [ids], vals={'state':'done'}, attach_ids=attaches)
         self.write(cr, uid, ids, {'state':'done'})
         return True
     def is_drafted(self, cr, uid, ids):
@@ -742,6 +749,7 @@ class hotel_reservation(osv.osv):
         if resa_ids_notif:
             email_obj = self.pool.get("email.template")
             email_tmpl_id = 0
+            prod_attaches = {}
             if 'state' in vals.keys():
                 if vals['state'] == "error":
                     email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','annulée')])
@@ -763,19 +771,21 @@ class hotel_reservation(osv.osv):
                                                    })
                 elif vals['state'] == 'validated':
                     email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Valid%')])
-                elif vals['state'] == 'waiting':
-                    email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Attente')])
-                if email_tmpl_id:
                     #Search for product attaches to be added to email
                     prod_ids = []
                     for resa in self.browse(cr, uid, ids):
                         prod_ids.extend([line.reserve_product.id for line in resa.reservation_line])
                     cr.execute("select id, res_id from ir_attachment where res_id in %s and res_model=%s order by res_id", (tuple(prod_ids), 'product.product'))
                     #format sql return to concat attaches with each prod_id
-                    prod_attaches = {}
+                    
                     for item in cr.fetchall():
                         prod_attaches.setdefault(item[1],[])
                         prod_attaches[item[1]].append(item[0])
+                elif vals['state'] == 'waiting':
+                    email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Attente')])
+                elif vals['state'] == 'done':
+                    email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Termin')])
+                if email_tmpl_id:
                     if isinstance(email_tmpl_id, list):
                         email_tmpl_id = email_tmpl_id[0]
                     #Envoi du mail proprement dit, email_tmpl_id définit quel mail sera envoyé
@@ -962,4 +972,49 @@ class sale_order(osv.osv):
 
 sale_order()
 
-
+class account_invoice(osv.osv):
+    _inherit = "account.invoice"
+    _name = "account.invoice"
+    
+    _columns = {
+        }
+    
+        #TODO: create custom jasper report instead of classic pdf report
+    def _create_report_attach(self, cr, uid, record, context=None):
+        #sources insipered by _edi_generate_report_attachment of EDIMIXIN module
+        ir_actions_report = self.pool.get('ir.actions.report.xml')
+        matching_reports = ir_actions_report.search(cr, uid, [('model','=',self._name),
+                                                              ('report_type','=','pdf')])
+        ret = False
+        if matching_reports:
+            report = ir_actions_report.browse(cr, uid, matching_reports[0])
+            report_service = 'report.' + report.report_name
+            service = netsvc.LocalService(report_service)
+            (result, format) = service.create(cr, uid, [record.id], {'model': self._name}, context=context)
+            eval_context = {'time': time, 'object': record}
+            if not report.attachment or not eval(report.attachment, eval_context):
+                # no auto-saving of report as attachment, need to do it manually
+                result = base64.b64encode(result)
+                file_name = record.name_get()[0][1]
+                file_name = re.sub(r'[^a-zA-Z0-9_-]', '_', file_name)
+                file_name += ".pdf"
+                ir_attachment = self.pool.get('ir.attachment').create(cr, uid,
+                                                                      {'name': file_name,
+                                                                       'datas': result,
+                                                                       'datas_fname': file_name,
+                                                                       'res_model': self._name,
+                                                                       'res_id': record.id},
+                                                                      context=context)
+                ret = ir_attachment
+        return ret
+    
+    #override to force creation of pdf report (base function (ir.actions.server) was unlinked and replaced by this one)
+    def action_number(self, cr, uid, ids, context=None):
+        res = super(account_invoice, self).action_number(cr, uid, ids, context)
+        for inv in self.browse(cr, uid, ids, context):
+            report_attach = self._create_report_attach(cr, uid, inv, context)
+        return res
+    
+account_invoice()
+    
+    
