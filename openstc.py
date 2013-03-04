@@ -33,18 +33,33 @@ from tools.translate import _
 class equipment(osv.osv):
     _name = "openstc.equipment"
     _description = "openstc.equipment"
-    _inherit = 'product.product'
-    #_inherits = {'product.product': "product_product_id"}
+    #_inherit = 'product.product'
+    _inherits = {'product.product': "product_product_id"}
+
+    def name_get(self, cr, uid, ids, context=None):
+        if not len(ids):
+            return []
+        reads = self.read(cr, uid, ids, ['name','type'], context=context)
+        res = []
+        for record in reads:
+            name = record['name']
+            if record['type']:
+                name =  name + ' / '+ record['type']
+            res.append((record['id'], name))
+        return res
+
+    def _name_get_fnc(self, cr, uid, ids, prop, unknow_none, context=None):
+        res = self.name_get(cr, uid, ids, context=context)
+        return dict(res)
 
     _columns = {
             #'name': fields.char('Imatt', size=128),
+            'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade"),
 
             'marque': fields.char('Marque', size=128),
             'type': fields.char('Type', size=128),
             'usage': fields.char('Usage', size=128),
-            #'on_wheels': fields.boolean('On Wheels'),
-            'vehicle': fields.boolean('Vehicle'),
 
             'technical_vehicle': fields.boolean('Technical vehicle'),
             'commercial_vehicle': fields.boolean('Commercial vehicle'),
