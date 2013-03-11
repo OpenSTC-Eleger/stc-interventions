@@ -132,6 +132,8 @@ class site(osv.osv):
             'lenght': fields.integer('Lenght'),
             'width': fields.integer('Width'),
             'surface': fields.integer('Surface'),
+            'long': fields.float('Longitude'),
+            'lat': fields.float('Latitude'),
             'asksBelongsto': fields.one2many('openstc.ask', 'site1', "asks"),
     }
 

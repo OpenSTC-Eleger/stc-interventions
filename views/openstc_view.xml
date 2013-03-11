@@ -22,6 +22,27 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+        <!--  Carto -->
+
+        <record id="openstc_task_category_form_view" model="ir.ui.view">
+            <field name="name">openstc.planning.form</field>
+            <field name="model">openstc.planning</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="planning">
+					<field name="name" />
+                </form>
+            </field>
+        </record>
+        <record id="action_openstc_view_carto_site" model="ir.actions.act_window">
+            <field name="name">Carto sites</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.planning</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+		<!--  Category -->
         <record id="openstc_task_category_search_view" model="ir.ui.view">
             <field name="name">openstc.task.category.search</field>
             <field name="model">openstc.task.category</field>
@@ -1117,10 +1138,19 @@
    			groups="openstc_dst"
    			sequence="2"/>
 
+   		<!--  Carto -->
 
+   	  <menuitem id="menu_carto"
+			groups="openstc_employee"
+			name="Cartographie"
+			parent="base.menu_main_pm"
+			sequence="4"/>
 
-
-
+   	  <menuitem action="action_openstc_view_carto_site"
+   			id="menu_action_openstc_view_carto_site"
+   			parent="menu_carto"
+   			groups="openstc_employee"
+   			sequence="1"/>
 
 
 		<!--  Dashboard -->
