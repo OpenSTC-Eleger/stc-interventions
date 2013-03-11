@@ -9,13 +9,6 @@
 			<field name="kind">function</field>
 			<field name="action">cancelled_reservation()</field>
 		</record>
-
-		<record model="workflow.activity" id="act_redraft">
-			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
-			<field name="name">redraft</field>
-			<field name="kind">function</field>
-			<field name="action">redrafted_reservation()</field>
-		</record>
 		
 		<record model="workflow.activity" id="hotel_reservation.act_draft">
 			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
@@ -148,34 +141,19 @@
 			<field name="act_to" ref="act_cancel" />
 			<field name="signal">cancel</field>
 		</record>
-
 		
-		
-		<record model="workflow.transition" id="t03">
+		<!-- <record model="workflow.transition" id="t03">
 			<field name="act_from" ref="act_cancel" />
 			<field name="act_to" ref="act_remplir" />
 			<field name="signal">redraft</field>
-		</record>
-
-		<record model="workflow.transition" id="t04">
-			<field name="act_from" ref="act_redraft" />
-			<field name="act_to" ref="hotel_reservation.act_draft" />
-			<field name="condition">is_drafted()</field>
-		</record>
-		<record model="workflow.transition" id="t05">
-			<field name="act_from" ref="act_redraft" />
-			<field name="act_to" ref="act_cancel" />
-			<field name="condition">is_not_drafted()</field>
-		</record>
+		</record> -->
 		
 		<record model="workflow.transition" id="hotel_reservation.t2">
 			<field name="act_from" ref="hotel_reservation.act_confirm" />
 			<field name="act_to" ref="act_in_use" />
 			<field name="signal">put_in_use</field>
 		</record>
-		
-		
-		
+
 		<record model="workflow.transition" id="trans_openstc_pret_in_use_done">
 			<field name="act_from" ref="act_in_use" />
 			<field name="act_to" ref="hotel_reservation.act_done" />

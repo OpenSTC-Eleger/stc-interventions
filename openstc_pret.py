@@ -336,7 +336,7 @@ class hotel_reservation(osv.osv):
                     print(inv.state)
                     wf_service.trg_validate(uid, 'account.invoice', inv.id, 'invoice_open', cr)
                     inv_ids.append(inv.id)
-            #send mail to notify user if opt_out checked and if there is invoice(s)
+            #send mail to notify user if opt_out not checked and if there is invoice(s)
             if inv_ids:
                 #attaches = self.pool.get("ir.attachment").search(cr, uid, [('res_model_','=','account.invoice'),('res_id','in',inv_ids)])
                 cr.execute("select id from ir_attachment where res_model = %s and res_id in %s", ('account.invoice',tuple(inv_ids)))
@@ -742,10 +742,10 @@ class hotel_reservation(osv.osv):
     def envoyer_mail(self, cr, uid, ids, vals=None, attach_ids=[], context=None):
         #TOREMOVE: model.template A déplacer vers un fichier init.xml
         #TOREMOVE: Si le modèle n'existe pas, on le crée à la volée
-        #TODO: check if company wants to send email (info opt_out in partner)
-        #We keep only resa where partner have opt_out checked
+        #TODO: check if company wants to send email (info not(opt_out) in partner)
+        #We keep only resa where partner have not opt_out checked
         resa_ids_notif = []
-        resa_ids_notif = [resa.id for resa in self.browse(cr, uid, ids) if resa.partner_id.opt_out]
+        resa_ids_notif = [resa.id for resa in self.browse(cr, uid, ids) if not resa.partner_id.opt_out]
         if resa_ids_notif:
             email_obj = self.pool.get("email.template")
             email_tmpl_id = 0
@@ -833,13 +833,11 @@ class hotel_reservation(osv.osv):
             part_vals = self.onchange_partner_id( cr, uid, [], vals['partner_id'])
             for (cle, data) in part_vals['value'].items():
                 vals[cle] = data
-        #id = super(hotel_reservation, self).create(cr, uid, vals, context)
         return super(hotel_reservation, self).create(cr, uid, vals, context)
         #TOCHECK: Vérif utilité, supprimer puis tester si tout fonctionne
 
     def write(self, cr, uid, ids, vals, context=None):
-        #OpenERP fait toujours un write des modifs faites sur le form lors d'un clic de bouton, ce qui peut
-        #conduire à un write(cr, uid, ids, {})
+        #if dates are modified, we uncheck all dispo to force user to re check all lines
         if context == None:
             context = {}
         res = super(hotel_reservation, self).write(cr, uid, ids, vals, context)
@@ -852,10 +850,9 @@ class hotel_reservation(osv.osv):
         return super(hotel_reservation, self).unlink(cr, uid, ids, context)
 
     def onchange_in_option(self, cr, uid, ids, in_option=False, state=False, context=None):
+        #TOREMOVE:
         #if in_option:
             #Affichage d'un wizard pour simuler une msgbox
-        print('on_change_in_option')
-        print(state)
         if in_option:
             return {'warning':{'title':'Réservation mise en option', 'message': '''Attention, Votre réservation est "hors délai"
             , nous ne pouvons pas vous assurer que nous pourrons vous livrer.'''}}
@@ -867,16 +864,14 @@ class hotel_reservation(osv.osv):
 
     def onchange_partner_id(self, cr, uid, ids, part):
         vals = super(hotel_reservation, self).onchange_partner_id(cr, uid, ids, part)
-        print(vals)
         if part:
-            print("partner_id is not NULL")
-            print(part)
             vals['value']['partner_mail'] = self.pool.get("res.partner.address").browse(cr, uid, vals['value']['partner_invoice_id']).email
-        print(vals)
         return vals
 
     #Recalcul des coûts de produit
     def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False, context=None):
+        #TOCHECK: check if it's usefull
+        #TODO: if it is, replace with compute_lines_price method
             ret = []
             if isinstance(ids, list):
                 ids = ids[0]
@@ -912,7 +907,6 @@ class purchase_order(osv.osv):
                  }
 
     def emprunt_done(self, cr, uid, ids):
-        print("Ecriture state:done")
         self.write(cr, uid, ids, {'state':'done'})
         return True
 
@@ -921,14 +915,10 @@ class purchase_order(osv.osv):
         list_picking_ids = []
         wf_service = netsvc.LocalService('workflow')
         for purchase in self.browse(cr, uid, ids):
-            print("Traitement d'un emprunt")
             for picking in purchase.picking_ids:
-                print(picking.id)
-                print(purchase.id)
                 wf_service.trg_validate(uid, 'stock.picking', picking.id, 'button_cancel', cr)
             wf_service.trg_write(uid, 'purchase.order', purchase.id, cr)
-            print(purchase.id)
-        print("Emprunt Ended")
+            
         return {
                 'res_model':'purchase.order',
                 'type:':'ir.actions.act_window',
