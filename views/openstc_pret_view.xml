@@ -43,13 +43,17 @@
 			<field name="inherit_id" ref="stock.view_normal_stock_property_form" />
 			<field name="type">form</field>
 			<field name="arch" type="xml">
-				<field name="virtual_available" position="after">
-					<field name="seuil_confirm" />
-				</field>
 				<field name="purchase_ok" position="after">
 				    <field name="bloquant"/>
 				    <field name="empruntable"/>
 				</field>
+				<page string="Information" position="after">
+				    <page string="Collectivités">
+						<field name="seuil_confirm"/>
+						<field name="service_technical_id"/>
+						<field name="type_prod"/>
+					</page>
+			</page>
 			</field>
 		</record>
 		
@@ -111,7 +115,7 @@
 						attrs="{'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" />
 					
 					<field name="partner_mail" attrs="{'invisible':[('state','=','remplir')]}" />
-					<field name="site_id"/>
+					<field name="site_id" required="1"/>
 				</field>
 				<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
 					position="replace">
@@ -129,7 +133,7 @@
 					position="replace">
 					<field name="partner_shipping_id" string="Adresse de Livraison"
 						domain="[('partner_id','=',partner_id)]"
-						attrs="{'invisible':[('state','=','remplir')],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" 
+						attrs="{'invisible':[('state','&lt;&gt;',False)],'required':[('state','&lt;&gt;','remplir')],'readonly':[('state','in',('in_use','done'))]}" 
 						/>
 				</field>
 				<field name="adults" position="replace" />

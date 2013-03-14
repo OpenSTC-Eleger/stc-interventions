@@ -8,11 +8,12 @@
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<form string="Emprunter des Ressources auprès de Collectivités extérieures">
-					<field name="emprunt_line" nolabel="1" colspan="4" required="1">
+					<field name="emprunt_line" nolabel="1" colspan="4" required="1" on_change="onchange_emprunt_line(emprunt_line, context)">
 						<tree string="Lignes d'emprunt" editable="top">
 							<field name="product_id" />
 							<field name="partner_id" domain="[('supplier','=',True)]"/>
-							<field name="qte" />
+							<field name="qte"/>
+							<field name="qty_needed"/>
 							<field name="date_expected" />
 						</tree>
 					</field>
@@ -98,6 +99,16 @@
 				<form string="Comment mettre les articles à disposition">
 				    <label colspan="4" string="Pour mettre les articles à dispositions, voulez-vous créer une intervention de livraison ou le demandeur vient les chercher sur place ?" />
 				    <newline />
+				    <field name="deliver_line" colspan="4" nolabel="1">
+				    	<tree editable="top" string="Interventions pouvant être générées">
+				    	    <field name="motif"/>
+				    	    <field name="product_id"/>
+				    	    <field name="qte_reserves"/>
+				    	    <field name="service_id"/>
+				    	    <field name="site_details"/>
+				    	    <field name="to_generate"/>
+				    	</tree>
+				    </field>
 					<button icon="gtk-go-back" colspan="1" string="Retour" special="cancel"/>
 					<button icon="gtk-ok" colspan="1" name="put_in_use_with_intervention" type="object" string="Générer une intervention"/>
 					<button icon="gtk-go-forward" colspan="1" string="Ne pas générer d'intervention" type="object" name="put_in_use_without_intervention"/>

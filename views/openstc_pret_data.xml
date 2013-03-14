@@ -5,7 +5,7 @@
 	    <record id="openstc_pret_email_template_resa_validee" model="email.template">
 	        <field name="name">Réservation Validée</field>
 	        <field name="model_id" ref="model_hotel_reservation"/>
-	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'user@siclic-test.fr'}</field>
+	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'bruno.plancher@siclic.fr'}</field>
 			<field name="email_to">${object.partner_mail or ''}</field>
 			<field name="subject">Votre Réservation: ${object.name or 'inconnu'} est validée</field>
 			<field name="body_html"><![CDATA[
@@ -86,7 +86,7 @@
 	<record id="openstc_pret_email_template_resa_en_attente" model="email.template">
 	        <field name="name">Réservation En Attente</field>
 	        <field name="model_id" ref="model_hotel_reservation"/>
-	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'user@siclic-test.fr'}</field>
+	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'bruno.plancher@siclic.fr'}</field>
 			<field name="email_to">${object.partner_mail or ''}</field>
 			<field name="subject">Votre Réservation: ${object.name or 'inconnu'} est en attente de Validation</field>
 			<field name="body_html"><![CDATA[
@@ -161,7 +161,7 @@
     <record id="openstc_pret_email_template_resa_done" model="email.template">
 	        <field name="name">Réservation Terminée</field>
 	        <field name="model_id" ref="model_hotel_reservation"/>
-	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'user@siclic-test.fr'}</field>
+	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'bruno.plancher@siclic.fr'}</field>
 			<field name="email_to">${object.partner_mail or ''}</field>
 			<field name="subject">Facture concernant votre Réservation: ${object.name or 'inconnu'}</field>
 			<field name="body_html"><![CDATA[

@@ -61,6 +61,14 @@ class product_product(osv.osv):
     _name = "product.product"
     _inherit = "product.product"
     _description = "Produit"
+    
+    #Method to override in order to add some products type and being able to filter product.product according to work context (internvetions, resa etc...)
+    def return_type_prod_values(self, cr, uid, context=None):
+        return [('ressource','Ressource Réservable'),('materiel','Matériel pour Intervention')]
+    
+    def _get_type_prod_values(self, cr, uid, context=None):
+        return self.return_type_prod_values(cr, uid, context)
+    
     _columns = {
         "qte_dispo": fields.function(_calc_qte_dispo_now, method=True, string="Disponible Aujourd'hui", type="integer"),
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
@@ -69,6 +77,8 @@ class product_product(osv.osv):
         "empruntable":fields.boolean("Se fournir à l'extérieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures"),
         "checkout_lines":fields.one2many('openstc.pret.checkout.line', 'product_id', string="Lignes Etat des Lieux"),
         'need_infos_supp':fields.boolean('Nécessite Infos Supp ?', help="Indiquer si, pour une Réservation, cette ressource nécessite des infos supplémentaires A saisir par le demandeur."),
+        'service_technical_id':fields.many2one('openstc.service', 'Service Technique associé',help='Si renseigné, indique que cette ressource nécessite une manipulation technique pour être installée sur site, cette ressource est donc susceptible de générer une intervention sur ce service.'),
+        'type_prod':fields.selection(_get_type_prod_values, 'Type de Produit'),
         }
 
     _defaults = {
@@ -105,7 +115,7 @@ class hotel_reservation_line(osv.osv):
 
     _columns = {
         'categ_id': fields.many2one('product.category','Type d\'article'),
-        "reserve_product": fields.many2one("product.product", "Articles réservés"),
+        "reserve_product": fields.many2one("product.product", "Articles réservés", domain=[('type_prod','=','ressource')]),
         "qte_reserves":fields.integer("Quantité désirée"),
         "prix_unitaire": fields.float("Prix Unitaire", digit=(3,2)),
         "dispo":fields.boolean("Disponible"),
