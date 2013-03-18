@@ -53,9 +53,10 @@ class equipment(osv.osv):
         return dict(res)
 
     _columns = {
-            #'name': fields.char('Imatt', size=128),
+            'immat': fields.char('Imatt', size=128),
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade"),
+            'service':fields.many2one('openstc.service', 'Service'),
 
             'marque': fields.char('Marque', size=128),
             'type': fields.char('Type', size=128),
@@ -122,9 +123,26 @@ class site(osv.osv):
     _name = "openstc.site"
     _description = "openstc.site"
 
+    def name_get(self, cr, uid, ids, context=None):
+        if not len(ids):
+            return []
+        reads = self.read(cr, uid, ids, ['name','type','service'], context=context)
+        res = []
+        for record in reads:
+            name = record['name']
+            if record['type']:
+                name =  name + ' / '+ record['type'][1] + ' / '+ record['service'][1]
+            res.append((record['id'], name))
+        return res
+
+    def _name_get_fnc(self, cr, uid, ids, prop, unknow_none, context=None):
+        res = self.name_get(cr, uid, ids, context=context)
+        return dict(res)
+
     _columns = {
 
             'name': fields.char('Name', size=128, required=True),
+            'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'code': fields.char('Code', size=32),
             'type': fields.many2one('openstc.site.type', 'Type', required=True),
             'service': fields.many2one('openstc.service', 'Service', required=True),
@@ -135,6 +153,7 @@ class site(osv.osv):
             'long': fields.float('Longitude'),
             'lat': fields.float('Latitude'),
             'asksBelongsto': fields.one2many('openstc.ask', 'site1', "asks"),
+            'intervention_ids': fields.one2many('project.project', 'site1', "Interventions", String="Interventions"),
     }
 
 site()
@@ -196,9 +215,26 @@ class users(osv.osv):
     _inherit = "res.users"
     _rec_name = "name"
 
+    def name_get(self, cr, uid, ids, context=None):
+        if not len(ids):
+            return []
+        reads = self.read(cr, uid, ids, ['name','firstname'], context=context)
+        res = []
+        for record in reads:
+            name = record['name']
+            if record['firstname']:
+                name =  record['firstname'] + '  '+  name
+            res.append((record['id'], name))
+        return res
+
+    def _name_get_fnc(self, cr, uid, ids, prop, unknow_none, context=None):
+        res = self.name_get(cr, uid, ids, context=context)
+        return dict(res)
+
     _columns = {
             'firstname': fields.char('firstname', size=128),
             'lastname': fields.char('lastname', size=128),
+            'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'service_ids': fields.many2many('openstc.service', 'openstc_user_services_rel', 'user_id', 'service_id', 'Services'),
             'cost': fields.integer('Coût horaire'),
             'post': fields.char('Post', size=128),
