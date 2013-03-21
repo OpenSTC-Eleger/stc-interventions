@@ -1,14 +1,6 @@
 <?xml version="1.0" ?>
 <openerp>
 	<data>
-	    
-	    <record id="action_openstc_pret_view_checkout" model="ir.actions.act_window">
-			<field name="name">Voir Etats des Lieux</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">openstc.pret.checkout</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-		</record>
 		
 		<!-- Wizard pour gérer l'état des lieux des articles à leur retour à la mairie -->					
 		<record model="ir.actions.act_window" id="action_view_openstc_pret_create_checkout">
@@ -36,7 +28,7 @@
 		</record>
 		
 		<record model="ir.ui.view" id="view_openstc_pret_create_checkout">
-			<field name="name">openstc.pret.checkout</field>
+			<field name="name">openstc.pret.checkout.form</field>
 			<field name="model">openstc.pret.checkout</field>
 			<field name="type">form</field>
 			<field name="arch" type="xml">
@@ -67,5 +59,31 @@
 				</form>
 			</field>
 		</record>
+		
+		<record model="ir.ui.view" id="view_openstc_checkout_search_view">
+			<field name="name">openstc.pret.checkout.search</field>
+			<field name="model">openstc.pret.checkout</field>
+			<field name="type">search</field>
+			<field name="arch" type="xml">
+				<search string="Filtrer les Etat des Lieux">
+					<filter string="Ayant des actions à générer" domain="[('state','=','draft'),('checkout_lines.etat_retour','in',('to_purchase','to_repair'))]"
+					    help = "Etats des Lieux dont un rachat et/ou une réparation en interne sont à générer."/>
+					<group>
+						<filter string="Faisant l'objet d'une réparation" domain="[('checkout_lines.etat_retour','=','to_repair')]"/>
+						<filter string="Faisant l'objet d'un rachat" domain="[('checkout_lines.etat_retour','=','to_purchase')]"/>
+					</group>
+				</search>
+			</field>
+		</record>
+
+			    
+	    <record id="action_openstc_pret_view_checkout" model="ir.actions.act_window">
+			<field name="name">Voir Etats des Lieux</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">openstc.pret.checkout</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+				
 	</data>
 </openerp>

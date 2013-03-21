@@ -129,7 +129,7 @@
 										<field name="qte_reserves" />
 										<field name="qte_dispo"/>
 										<field name="dispo" readonly="1"/>
-										<field name="prix_unitaire"/>
+										<field name="amount"/>
 										<!-- <field name="uom_qty"/>  -->
 										<field name="infos"/>
 										<field name="action" readonly="1"/>
@@ -144,7 +144,7 @@
 								<group colspan="1" col="4">
 									<button name="compute_lines_price" type="object" string="Calculer prix" states="remplir,draft" icon="gtk-execute" />
 									<button name="open_checkout" string="Terminer Réservation" type="object" states="confirm" help="Termine la Réservation, libérant les ressources. Un Etat des lieux sera généré pour pointer l'état des ressources après utilisation."/>
-								    <button name="confirm" string="Valider la réservation" states="remplir,draft,wait_confirm" icon="gtk-go-forward" help="La réservation sera visible sur le planning. Si vous avez planifié des interventions, elles vont être générées."/>
+								    <button name="confirm" string="Valider la réservation" states="remplir,draft,wait_confirm" icon="gtk-go-forward" help="Valide les informations saisies et réserve les ressources sélectionnées aux dates indiquées. La réservation sera visible sur le planning et le demandeur sera notifié par mail (si adresse mail renseignée)."/>
 									<button name="put_in_use_with_intervention" type="object" states="confirm" string="Générer Interventions restantes" icon="gtk-execute" help="Générer les interventions planifiées sur ce formulaire"/>
 								    <button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler la réservation" type="action" states="draft,confirm" icon="gtk-cancel"/>
  									<!-- <button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/> -->
@@ -153,10 +153,11 @@
 									<!-- <button name="verif_dispo" type="object" string="Vérifier Disponibilités" invisible="1" states="remplir" icon="gtk-execute"/> -->
 									<!-- <button name="%(action_view_openstc_pret_deliver_products_wizard)d" type="action" string="Mettre à Disposition les articles" states="confirm" icon="gtk-go-forward"/> -->
 									<!-- <button name="back_to_remplir" string="Modifier la réservation" icon="gtk-go-back" states="draft"/> -->
+									<button name="dummy" string="Actualiser la Page" icon="gtk-refresh" colspan="2"/>
 								</group>		        
 				       		</page>
 				       		<page string="Folios Associés">
-	 				      		<field name="folio_id"/>
+	 				      		<field name="folio_id" nolabel="1"/>
 	 				   		</page>
 			       		</notebook>
 			       	</form>
