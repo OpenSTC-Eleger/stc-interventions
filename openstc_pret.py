@@ -29,6 +29,7 @@ from tools.translate import _
 from mx.DateTime.mxDateTime import strptime
 import time
 import base64
+import unicodedata
 import re
 import pytz
 
@@ -237,6 +238,26 @@ class hotel_reservation(osv.osv):
     _inherit = "hotel.reservation"
     _description = "Réservations"
 
+    def remove_accents(self, str):
+        return ''.join(x for x in unicodedata.normalize('NFKD',str) if unicodedata.category(x)[0] == 'L')
+    
+    def _custom_sequence(self, cr, uid, context):
+        seq = self.pool.get("ir.sequence").next_by_code(cr, uid, 'engage.number',context)
+        user = self.pool.get("res.users").browse(cr, uid, uid)
+        prog = re.compile('[Oo]pen[a-zA-Z]{3}/[Mm]anager')
+        service = None
+        if 'service_id' in context:
+            service = context['service_id']
+        for group in user.groups_id:
+            if prog.search(group.name):
+                if isinstance(user.service_ids, list) and not service:
+                    service = user.service_ids[0]
+                else:
+                    service = self.pool.get("openstc.service").browse(cr, uid, service)
+                seq = seq.replace('-xxx-','-' + self.remove_accents(service.name[:3]).upper() + '-')
+                
+        return seq
+
     def _calc_in_option(self, cr, uid, ids, name, args, context=None):
         print("début calc_in_option")
         ret = {}
@@ -286,6 +307,7 @@ class hotel_reservation(osv.osv):
                  'in_option': lambda *a :0,
                  'state': lambda *a: 'remplir',
                  'is_recur': lambda *a: 0,
+                 'name': lambda self,cr,uid,ctx=None:self._custom_sequence(cr, uid, ctx),
         }
     _order = "checkin, in_option"
     

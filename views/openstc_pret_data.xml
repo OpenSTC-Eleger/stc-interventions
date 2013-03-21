@@ -2,6 +2,17 @@
 <openerp>
 	<data>
 	    
+	    <record id="sequence_resa_number_type" model="ir.sequence.type">
+            <field name="name">Numéro de Réservation</field>
+            <field name="code">resa.number</field>
+        </record>
+        <record id="sequence_asset_number" model="ir.sequence">
+            <field name="name">Numéro d'engagement</field>
+            <field name="code">engage.number</field>
+            <field name="prefix">%(year)s-xxx-</field>
+            <field name="padding" eval="4"/>
+        </record>
+	    
 	    <record id="openstc_pret_email_template_resa_validee" model="email.template">
 	        <field name="name">Réservation Validée</field>
 	        <field name="model_id" ref="model_hotel_reservation"/>
