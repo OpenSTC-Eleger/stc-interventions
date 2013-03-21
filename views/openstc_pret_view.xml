@@ -97,12 +97,12 @@
 						        <group col="4" colspan="4" string="Infos Générales">
 							        <field name="reservation_no" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 							        <field name="date_order" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
-							        <field name="name" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 						        </group>
 						        <group col="2" colspan="2" string="Infos de la Réservation">
+						            <field name="name" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 							        <field name="site_id" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
-						            <field name="checkin" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
-						            <field name="checkout" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
+					                <field name="checkin" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
+					            	<field name="checkout" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>    
 						        </group>
 						        <group col="2" colspan="2" string="Coordonnées Demandeur">
 						            <field name="openstc_partner_id" required="1" on_change="onchange_openstc_partner_id(openstc_partner_id)"
@@ -111,12 +111,20 @@
 						                attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 						            <field name="partner_shipping_id" on_change="onchange_partner_shipping_id(partner_shipping_id)"
 						                attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
-						            <field name="partner_mail" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
+						            <field name="partner_order_id" invisible="1"
+						                attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
+						            <field name="partner_invoice_id" invisible="1"
+						                attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
+						            <group colspan="2" col="4">
+						            	<field name="partner_mail" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
+									</group>
+   						            <field name="pricelist_id" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 						        </group>
 						        
-						        <field name="reservation_line" string="Lignes de Réservation" required="1" colspan="4" nolabel="1">
+						        <field name="reservation_line" string="Lignes de Réservation" required="1" colspan="4" nolabel="1"
+						            attrs="{'readonly':[('state','not in',('remplir','waiting_confirm'))]}">
 									<tree string="Ligne de réservation" editable="top" colors="green:dispo==True;red:dispo==False">
-										<field name="categ_id" />
+										<field name="categ_id"/>
 										<field name="reserve_product" colspan="1" domain="[('categ_id','=',categ_id)]" required="1"/>
 										<field name="qte_reserves" />
 										<field name="qte_dispo"/>
@@ -124,20 +132,27 @@
 										<field name="prix_unitaire"/>
 										<!-- <field name="uom_qty"/>  -->
 										<field name="infos"/>
+										<field name="action" readonly="1"/>
+										<button name="unplan_inter" type="object" icon="gtk-cancel" attrs="{'invisible':[('action','&lt;&gt;','inter')]}" help="Ne plus plannifier d'intervention pour cette ressource"/>
+										<button name="plan_inter" type="object" icon="gtk-go-forward" attrs="{'invisible':[('action','&lt;&gt;','nothing')]}" help="Plannifier une intervention pour cette ressource"/>
+										<button name="open_inter" type="object" icon="gtk-edit" attrs="{'invisible':[('action','&lt;&gt;','inter_ok')]}" help="Ouvrir l'intervention générée"/>
+										<button name="dummy" icon="gtk-apply" help="Une intervention sera générée pour cette ressource." attrs="{'invisible':[('action','&lt;&gt;','inter')]}"/>  
 									</tree>
 								</field>
 								<field name="state"/>
 								<newline />
 								<group colspan="1" col="4">
 									<button name="compute_lines_price" type="object" string="Calculer prix" states="remplir,draft" icon="gtk-execute" />
-									<button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/>
-									<button name="confirm" string="Valider la réservation" states="draft,wait_confirm" icon="gtk-go-forward"/>
-								    <button name="open_checkout" string="Retour des articles" type="object" states="in_use" />
+									<button name="open_checkout" string="Terminer Réservation" type="object" states="confirm" help="Termine la Réservation, libérant les ressources. Un Etat des lieux sera généré pour pointer l'état des ressources après utilisation."/>
+								    <button name="confirm" string="Valider la réservation" states="remplir,draft,wait_confirm" icon="gtk-go-forward" help="La réservation sera visible sur le planning. Si vous avez planifié des interventions, elles vont être générées."/>
+									<button name="put_in_use_with_intervention" type="object" states="confirm" string="Générer Interventions restantes" icon="gtk-execute" help="Générer les interventions planifiées sur ce formulaire"/>
+								    <button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler la réservation" type="action" states="draft,confirm" icon="gtk-cancel"/>
+ 									<!-- <button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/> -->
+								    <!-- <button name="put_in_use" string="Planifier" states="confirm" icon="gtk-go-forward" help="La réservation sera visible sur le planning. Si vous avez planifié des interventions, elles vont être générées."/> -->
 								    <!-- <button name="redraft" string="Recommencer la réservation" states="cancle" /> -->
 									<!-- <button name="verif_dispo" type="object" string="Vérifier Disponibilités" invisible="1" states="remplir" icon="gtk-execute"/> -->
 									<!-- <button name="%(action_view_openstc_pret_deliver_products_wizard)d" type="action" string="Mettre à Disposition les articles" states="confirm" icon="gtk-go-forward"/> -->
-									<button name="back_to_remplir" string="Modifier la réservation" icon="gtk-go-back" states="draft"/>
-									<button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Refuser la réservation" type="action" states="draft,confirm" icon="gtk-cancel"/>
+									<!-- <button name="back_to_remplir" string="Modifier la réservation" icon="gtk-go-back" states="draft"/> -->
 								</group>		        
 				       		</page>
 				       		<page string="Folios Associés">
@@ -448,10 +463,10 @@
 			<field name="arch" type="xml">
 				<search string="Réservations">
 					<filter string="En cours de Confirmation" domain="[('state','in',('remplir','draft','wait_confirm'))]" help="Réservations en cours de traitement, elles sont soit en Brouillon, soit en attente de validation."/>
-					<filter string="En Attente de mise a dispo" domain="[('state','in',('confirm',))]" help="Réservations validées, le demandeur a été notifié que sa demande est confirmée, il faudra procéder A la mise A disposition des ressources."/>
-					<filter string="En cours d'utilisation" domain="[('state','in',('in_use',))]" help="Le demandeur est en train d'utiliser les articles empruntés"/>
-					<filter string="Terminées" domain="[('state','in',('done',))]" help="Réservations cloturées ou annulées"/>
-					<filter string="Litigieuses" domain="['|',('state','in',('cancle',)),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
+					<filter string="Confirmées mais pas Planifiées" domain="[('state','in',('confirm',))]" help="Réservations validées, le demandeur a été notifié que sa demande est confirmée. Il faut ensuite la planifier."/>
+<!-- 					<filter string="Planifiées" domain="[('state','in',('in_use',))]" help="Réservations planifiées sur le planning."/> -->
+					<filter string="Terminées" domain="[('state','in',('done',))]" help="Réservations cloturées"/>
+					<filter string="Abandonnées" domain="['|',('state','in',('cancle',)),('in_option','=','block')]" help="Réservations annulées ou bloquées pour cause de non disponibilité des articles"/>
 					<newline />
 					<filter string="Voir seulement les Salles" domain="[('reservation_line.reserve_product.categ_id.name','like','Salles')]"
 					    help="n'affiche que les réservations concernant une salle"/>

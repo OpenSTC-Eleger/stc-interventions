@@ -7,6 +7,7 @@
 			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
 			<field name="name">cancel</field>
 			<field name="kind">function</field>
+			<field name="flow_stop">True</field>
 			<field name="action">cancelled_reservation()</field>
 		</record>
 		
@@ -41,68 +42,70 @@
 			<field name="action">ARemplir_reservation()</field>
 		</record>
 
-		<record model="workflow.activity" id="act_in_use">
-			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
-			<field name="name">in_use</field>
-			<field name="kind">function</field>
-			<field name="action">in_used_reservation()</field>
-		</record>
+<!-- 		<record model="workflow.activity" id="act_in_use"> -->
+<!-- 			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" /> -->
+<!-- 			<field name="name">in_use</field> -->
+<!-- 			<field name="kind">function</field> -->
+<!-- 			<field name="action">in_used_reservation()</field> -->
+<!-- 		</record> -->
 
-		<record model="workflow.activity" id="act_to_uncheck">
-			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" />
-			<field name="name">to_uncheck</field>
-			<field name="kind">function</field>
-			<field name="action">to_uncheck_reservation_lines()</field>
-		</record>
+<!-- 		<record model="workflow.activity" id="act_to_uncheck"> -->
+<!-- 			<field name="wkf_id" ref="hotel_reservation.wkf_reservation" /> -->
+<!-- 			<field name="name">to_uncheck</field> -->
+<!-- 			<field name="kind">function</field> -->
+<!-- 			<field name="action">to_uncheck_reservation_lines()</field> -->
+<!-- 		</record> -->
 		
 		<!-- Transitions -->
 		
-		<record model="workflow.transition" id="t00">
-			<field name="act_from" ref="act_remplir" />
-			<field name="act_to" ref="hotel_reservation.act_draft" />
-			<field name="signal">to_draft</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="t00"> -->
+<!-- 			<field name="act_from" ref="act_remplir" /> -->
+<!-- 			<field name="act_to" ref="hotel_reservation.act_draft" /> -->
+<!-- 			<field name="signal">to_draft</field> -->
+<!-- 		</record> -->
 		
-		<record model="workflow.transition" id="trans_openstc_pret_draft_remplir">
-			<field name="act_from" ref="hotel_reservation.act_draft" />
-			<field name="act_to" ref="act_remplir" />
-			<field name="signal">back_to_remplir</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="trans_openstc_pret_draft_remplir"> -->
+<!-- 			<field name="act_from" ref="hotel_reservation.act_draft" /> -->
+<!-- 			<field name="act_to" ref="act_remplir" /> -->
+<!-- 			<field name="signal">back_to_remplir</field> -->
+<!-- 		</record> -->
 		
 		
 		
 		
 		<record model="workflow.transition" id="t002">
-			<field name="act_from" ref="hotel_reservation.act_draft" />
+<!-- 			<field name="act_from" ref="hotel_reservation.act_draft" /> -->
+			<field name="act_from" ref="act_remplir" />
 			<field name="act_to" ref="hotel_reservation.act_confirm" />
 			<field name="signal">confirm</field>
 			<field name="condition">not_need_confirm()</field>
 		</record>
 
 		<record model="workflow.transition" id="trans_openstc_pret_draft_waiting_confirm">
-			<field name="act_from" ref="hotel_reservation.act_draft" />
+<!-- 			<field name="act_from" ref="hotel_reservation.act_draft" /> -->
+			<field name="act_from" ref="act_remplir" />
 			<field name="act_to" ref="act_waiting_confirm" />
 			<field name="signal">confirm</field>
 			<field name="condition">need_confirm()</field>
 		</record>
 		
-		<record model="workflow.transition" id="trans_openstc_pret_reservation_remplir_uncheck">
-			<field name="act_from" ref="act_remplir" />
-			<field name="act_to" ref="act_to_uncheck" />
-			<field name="signal">reserv_modified</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="trans_openstc_pret_reservation_remplir_uncheck"> -->
+<!-- 			<field name="act_from" ref="act_remplir" /> -->
+<!-- 			<field name="act_to" ref="act_to_uncheck" /> -->
+<!-- 			<field name="signal">reserv_modified</field> -->
+<!-- 		</record> -->
 
-		<record model="workflow.transition" id="t001">
-			<field name="act_from" ref="hotel_reservation.act_draft" />
-			<field name="act_to" ref="act_to_uncheck" />
-			<field name="signal">reserv_modified</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="t001"> -->
+<!-- 			<field name="act_from" ref="hotel_reservation.act_draft" /> -->
+<!-- 			<field name="act_to" ref="act_to_uncheck" /> -->
+<!-- 			<field name="signal">reserv_modified</field> -->
+<!-- 		</record> -->
 
-		<record model="workflow.transition" id="trans_openstc_pret_waiting_confirm_to_uncheck">
-			<field name="act_from" ref="act_waiting_confirm" />
-			<field name="act_to" ref="act_to_uncheck" />
-			<field name="signal">reserv_modified</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="trans_openstc_pret_waiting_confirm_to_uncheck"> -->
+<!-- 			<field name="act_from" ref="act_waiting_confirm" /> -->
+<!-- 			<field name="act_to" ref="act_to_uncheck" /> -->
+<!-- 			<field name="signal">reserv_modified</field> -->
+<!-- 		</record> -->
 
 		<record model="workflow.transition" id="trans_openstc_pret_waiting_confirm_confirm">
 			<field name="act_from" ref="act_waiting_confirm" />
@@ -110,25 +113,25 @@
 			<field name="signal">confirm</field>
 		</record>
 				
-		<record model="workflow.transition" id="t003">
-			<field name="act_from" ref="hotel_reservation.act_confirm" />
-			<field name="act_to" ref="act_to_uncheck" />
-			<field name="signal">reserv_modified</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="t003"> -->
+<!-- 			<field name="act_from" ref="hotel_reservation.act_confirm" /> -->
+<!-- 			<field name="act_to" ref="act_to_uncheck" /> -->
+<!-- 			<field name="signal">reserv_modified</field> -->
+<!-- 		</record> -->
 		
 		
-		<record model="workflow.transition" id="t004">
-			<field name="act_from" ref="act_to_uncheck" />
-			<field name="act_to" ref="act_remplir" />
-			<field name="condition">True</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="t004"> -->
+<!-- 			<field name="act_from" ref="act_to_uncheck" /> -->
+<!-- 			<field name="act_to" ref="act_remplir" /> -->
+<!-- 			<field name="condition">True</field> -->
+<!-- 		</record> -->
 		
 
-		<record model="workflow.transition" id="t01">
-			<field name="act_from" ref="hotel_reservation.act_draft" />
-			<field name="act_to" ref="act_cancel" />
-			<field name="signal">cancel</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="t01"> -->
+<!-- 			<field name="act_from" ref="hotel_reservation.act_draft" /> -->
+<!-- 			<field name="act_to" ref="act_cancel" /> -->
+<!-- 			<field name="signal">cancel</field> -->
+<!-- 		</record> -->
 
 		<record model="workflow.transition" id="trans_openstc_pret_waiting_confirm_cancel">
 			<field name="act_from" ref="act_waiting_confirm" />
@@ -148,21 +151,33 @@
 			<field name="signal">redraft</field>
 		</record> -->
 		
-		<record model="workflow.transition" id="hotel_reservation.t2">
-			<field name="act_from" ref="hotel_reservation.act_confirm" />
-			<field name="act_to" ref="act_in_use" />
-			<field name="signal">put_in_use</field>
-		</record>
+<!-- 		<record model="workflow.transition" id="hotel_reservation.t2"> -->
+<!-- 			<field name="act_from" ref="hotel_reservation.act_confirm" /> -->
+<!-- 			<field name="act_to" ref="act_in_use" /> -->
+<!-- 			<field name="signal">put_in_use</field> -->
+<!-- 		</record> -->
 
+<!-- 		<record model="workflow.transition" id="trans_openstc_pret_in_use_done"> -->
+<!-- 			<field name="act_from" ref="act_in_use" /> -->
+<!-- 			<field name="act_to" ref="hotel_reservation.act_done" /> -->
+<!-- 			<field name="signal">done</field> -->
+<!-- 		</record> -->
+		
 		<record model="workflow.transition" id="trans_openstc_pret_in_use_done">
-			<field name="act_from" ref="act_in_use" />
+			<field name="act_from" ref="hotel_reservation.act_confirm" />
 			<field name="act_to" ref="hotel_reservation.act_done" />
 			<field name="signal">done</field>
 		</record>
+		
+<!-- 		<record model="workflow.transition" id="ttrans_openstc_pret_in_use_cancel"> -->
+<!-- 			<field name="act_from" ref="act_in_use" /> -->
+<!-- 			<field name="act_to" ref="act_cancel" /> -->
+<!-- 			<field name="signal">cancel</field> -->
+<!-- 		</record> -->
 	</data>
 
 	
-				<!-- Overriding of existing workfows -->
+				<!-- Override of existing workfows to disable auto mailing-->
 	
 
 	<data>

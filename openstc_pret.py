@@ -30,6 +30,7 @@ from mx.DateTime.mxDateTime import strptime
 import time
 import base64
 import re
+import pytz
 
 #----------------------------------------------------------
 # Fournitures
@@ -92,6 +93,8 @@ product_product()
 class hotel_reservation_line(osv.osv):
     _name = "hotel_reservation.line"
     _inherit = "hotel_reservation.line"
+
+    _AVAILABLE_ACTION_VALUES = [('nothing','Pas d\'intervention'),('inter','Intervention à générer'),('inter_ok','Intervention générée')]
 
     def name_get(self, cr, uid, ids, context=None):
         ret = []
@@ -166,10 +169,12 @@ class hotel_reservation_line(osv.osv):
             ret[line.id] = line.qte_dispo >= line.qte_reserves
         return ret
 
+    
+
     _columns = {
-        'categ_id': fields.many2one('product.category','Type d\'article', state={'readonly':[('state','<>','remplir')]}),
-        "reserve_product": fields.many2one("product.product", "Article réservé", domain=[('type_prod','=','ressource')], state={'readonly':[('state','&lt;&gt;','remplir')]}),
-        "qte_reserves":fields.integer("Qté désirée", state={'readonly':[('state','&lt;&gt;','remplir')]}),
+        'categ_id': fields.many2one('product.category','Type d\'article'),
+        "reserve_product": fields.many2one("product.product", "Article réservé", domain=[('type_prod','=','ressource')]),
+        "qte_reserves":fields.integer("Qté désirée"),
         "prix_unitaire": fields.float("Prix Unitaire", digit=(3,2)),
         #"dispo":fields.boolean("Disponible"),
         'dispo':fields.function(_calc_qte_dispo, string="Disponible", method=True, multi="dispo", type='boolean', store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
@@ -183,12 +188,15 @@ class hotel_reservation_line(osv.osv):
         'state':fields.related('line_id','state', type='selection',string='Etat Résa', selection=_get_state_line, readonly=True),
         'uom_qty':fields.float('Qté de Référence pour Facturation',digit=(2,1)),
         'qte_dispo':fields.function(_calc_qte_dispo, method=True, string='Qté Dispo', multi="dispo", type='float', store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
-                                                                                       'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids, ['reserve_product'], 11]})
+                                                                                       'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids, ['reserve_product'], 11]}),
+        'action':fields.selection(_AVAILABLE_ACTION_VALUES, 'Action'),
+        'inter_ask_id':fields.many2one('openstc.ask','Demande d\'intervention associée'),
         }
 
     _defaults = {
      'qte_reserves':lambda *a: 1,
      'state':'remplir',
+     'action':'nothing',
         }
 
     def write(self, cr, uid, ids, vals, context=None):
@@ -197,6 +205,29 @@ class hotel_reservation_line(osv.osv):
             resa_ids = self.read_group(cr, uid, [('id','in',ids),('line_id','<>',False)], ['line_id'], ['line_id'],context=context)
             self.pool.get("hotel.reservation").trigger_reserv_modified(cr, uid, [x['line_id'][0] for x in resa_ids], context)
         return res
+
+    
+    def plan_inter(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'action':'inter'})
+        return {'type':'ir.actions.act_window.close'}
+
+    def unplan_inter(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'action':'nothing'})
+        return {'type':'ir.actions.act_window.close'}
+
+    def open_inter(self, cr, uid, ids, context=None):
+        if isinstance(ids, list):
+            ids = ids[0]
+        line = self.browse(cr, uid, ids, context)
+        if not line.inter_ask_id:
+            raise osv.except_osv("Erreur",u"L'intervention associée n'existe pas ou a été supprimée, impossible de la retrouver.")
+        return {
+            'type':'ir.actions.act_window',
+            'target':'new',
+            'res_model':'openstc.ask',
+            'res_id':line.inter_ask_id.id,
+            'view_mode':'form',
+        }
 
 hotel_reservation_line()
 
@@ -231,7 +262,7 @@ class hotel_reservation(osv.osv):
         return ids
 
     def return_state_values(self, cr, uid, context=None):
-        return [('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','En cours d\'utilisation'),('done','Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation')]
+        return [('draft', 'Saisie des infos personnelles'),('confirm','Réservation confirmée'),('cancle','Annulée'),('in_use','Réservation planifiée'),('done','Réservation Terminée'), ('remplir','Saisie de la réservation'),('wait_confirm','En Attente de Confirmation')]
 
     def _get_state_values(self, cr, uid, context=None):
         return self.return_state_values(cr, uid, context)
@@ -380,6 +411,7 @@ class hotel_reservation(osv.osv):
         self.write(cr, uid, ids, {'state':'remplir'})
         return True
     def in_used_reservation(self, cr, uid, ids):
+        self.put_in_use_with_intervention(cr, uid, ids)
         self.write(cr, uid, ids, {'state':'in_use'})
         return True
     def done_reservation(self, cr, uid, ids):
@@ -824,6 +856,52 @@ class hotel_reservation(osv.osv):
         #and display it
         return ret
 
+    def put_in_use_with_intervention(self, cr, uid, ids, context=None):
+        if not context:
+            context={}
+        for resa in self.browse(cr, uid, ids, context):
+            #Générer intervention de livraison et interventions optionnelles
+            checkin = datetime.strptime(resa.checkin, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc)
+            checkout = datetime.strptime(resa.checkout, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc)
+            checkin_str = checkin.astimezone(pytz.timezone('Europe/Paris')).strftime('%x à %H:%M')
+            checkout_str = checkout.astimezone(pytz.timezone('Europe/Paris')).strftime('%x à %H:%M')
+            user = self.pool.get("res.users").browse(cr, uid, uid, context=context)
+            partner = user.company_id.partner_id        
+            inter_ask = []
+            lines_grouped = {}
+            for line in resa.reservation_line:
+                if line.action == 'inter':
+                    #group resa line by service_id
+                    if not line.reserve_product.service_technical_id:
+                        raise osv.except_osv("Erreur",u"Vous devez spécifier un service pour cet article : %s" %(line.reserve_product.name_template))
+                    lines_grouped.setdefault(line.reserve_product.service_technical_id.id, [])
+                    lines_grouped[line.reserve_product.service_technical_id.id].append(line)
+            for service_id, lines in lines_grouped.items():
+                #generate inter for each service, and compute strings according to lines matches this service_id
+                name = ''
+                name += ','.join(['%s %s ' % (str(line.qte_reserves) ,line.reserve_product.name_template) for line in lines])
+                site_details = '\n'.join(['%s: %s ' % (line.reserve_product.name_template, line.infos) for line in lines if line.infos])
+                values = {'name':u'[Evénementiel] Mise en place de %s sur le site %s' % (name, resa.site_id and resa.site_id.name or 'inconnu'), 
+                          'site_details':site_details,
+                          'description':u'Mise en place de %s sur le site %s dans le cadre de l\'événement "%s" prévue du %s au %s' %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str),
+                          'partner_id':partner.id, 
+                          'partner_address':partner.address[0].id,
+                          'partner_type':partner.type_id and partner.type_id.id or False,
+                          'partner_type_code':partner.type_id and partner.type_id.code or False,
+                          'site1':resa.site_id.id,
+                          'service_id':service_id,
+                          'state':'wait',
+                          }
+                ret = self.pool.get("openstc.ask").create(cr, uid, values, context=context)
+                if ret:
+                    line_ids = [x.id for x in lines]
+                    self.pool.get("hotel_reservation.line").write(cr, uid, line_ids, {'action':'inter_ok','inter_ask_id':ret})
+                else:
+                    print("Error when creating intervention with values : ")
+                    print(values)
+            line_with_no_ids = []    
+        return {'type':'ir.actions.act_window_close'}
+
     #Vals: Dict containing "to" (deprecated) and "state" in ("error","draft", "confirm") (required)
     def envoyer_mail(self, cr, uid, ids, vals=None, attach_ids=[], context=None):
         #TOREMOVE: model.template A déplacer vers un fichier init.xml
@@ -915,10 +993,14 @@ class hotel_reservation(osv.osv):
         print(vals)
         if not 'state' in vals or vals['state'] == 'remplir':
             vals['shop_id'] = self.pool.get("sale.shop").search(cr, uid, [], limit=1)[0]
-            vals['partner_id'] = self.pool.get("res.partner").search(cr, uid, [], limit=1)[0]
+            """vals['partner_id'] = self.pool.get("res.partner").search(cr, uid, [], limit=1)[0]
             part_vals = self.onchange_partner_id( cr, uid, [], vals['partner_id'])
             for (cle, data) in part_vals['value'].items():
-                vals[cle] = data
+                vals[cle] = data"""
+        if 'checkin' in vals:
+            vals['checkin'] = vals['checkin'][:-5] + '00:00'
+        if 'checkout' in vals:
+            vals['checkout'] = vals['checkout'][:-5] + '00:00'
         return super(hotel_reservation, self).create(cr, uid, vals, context)
         #TOCHECK: Vérif utilité, supprimer puis tester si tout fonctionne
 
@@ -926,9 +1008,13 @@ class hotel_reservation(osv.osv):
         #if dates are modified, we uncheck all dispo to force user to re check all lines
         if context == None:
             context = {}
+        if 'checkin' in vals:
+            vals['checkin'] = vals['checkin'][:-5] + '00:00'
+        if 'checkout' in vals:
+            vals['checkout'] = vals['checkout'][:-5] + '00:00'
         res = super(hotel_reservation, self).write(cr, uid, ids, vals, context)
-        if 'checkin' in vals or 'checkout' in vals:
-            self.trigger_reserv_modified(cr, uid, ids, context)
+        #if 'checkin' in vals or 'checkout' in vals:
+        #    self.trigger_reserv_modified(cr, uid, ids, context)
         return res
 
     def unlink(self, cr, uid, ids, context):
@@ -960,7 +1046,7 @@ class hotel_reservation(osv.osv):
         return vals"""
 
     #Recalcul des coûts de produit
-    def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False, context=None):
+    """def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False, context=None):
         #TOCHECK: check if it's usefull
         #TODO: if it is, replace with compute_lines_price method
             ret = []
@@ -970,7 +1056,7 @@ class hotel_reservation(osv.osv):
                 resa = self.browse(cr, uid, ids, context)
                 for line in resa.reservation_line:
                     ret.append((1,line.id,{'prix_unitaire':self.get_prod_price(cr, uid, ids, line, context)}))
-            return {'value':{'reservation_line':ret}}
+            return {'value':{'reservation_line':ret}}"""
         
     def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False):
         if partner_shipping_id:
