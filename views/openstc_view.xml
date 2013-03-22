@@ -730,7 +730,7 @@
         </record>
 
         <record id="action_openstc_view_ask" model="ir.actions.act_window">
-            <field name="name">Intervention asks</field>
+            <field name="name">Demandes d'interventions</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">openstc.ask</field>
             <field name="view_type">form</field>
@@ -921,7 +921,7 @@
 		<delete model="ir.actions.act_window" search="[('name', '=', 'Tasks')]"  />
 
         <record id="openstc_action_view_task" model="ir.actions.act_window">
-            <field name="name">Tasks</field>
+            <field name="name">Tâches</field>
              <field name="type">ir.actions.act_window</field>
             <field name="res_model">project.task</field>
             <field name="view_type">form</field>
@@ -1014,14 +1014,14 @@
 
 		<menuitem id="project.menu_project_management"
 			groups="openstc_employee"
-			name="Interventions Management"
+			name="Gestion des interventions"
 			parent="base.menu_main_pm"
 			sequence="1"/>
 
 		<menuitem action="action_openstc_view_ask"
    			id="menu_action_openstc_view_ask"
    			parent="project.menu_project_management"
-   			name="Intervention asks"
+   			name="Demandes d'interventions"
    			groups="openstc_employee"
    			sequence="1"/>
 
