@@ -95,7 +95,7 @@ class service(osv.osv):
 
     _columns = {
             'name': fields.char('Name', size=128, required=True),
-            'favcolor':  fields.char('Name', size=128, required=True),
+            'favcolor':  fields.char('Name', size=128),
             'code': fields.char('Code', size=32, required=True),
             'service_id':fields.many2one('openstc.service', 'Service Parent'),
             'category_ids':fields.many2many('openstc.task.category', 'openstc_task_category_services_rel', 'service_id', 'task_category_id', 'Categories'),
