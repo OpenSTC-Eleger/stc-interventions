@@ -29,6 +29,7 @@ from tools.translate import _
 from mx.DateTime.mxDateTime import strptime
 import time
 import base64
+import unicodedata
 import re
 import pytz
 
@@ -169,13 +170,19 @@ class hotel_reservation_line(osv.osv):
             ret[line.id] = line.qte_dispo >= line.qte_reserves
         return ret
 
-    
+    def _get_amount(self, cr, uid, ids, name, args, context=None):
+        ret = {}.fromkeys(ids, 0.0)
+        for line in self.browse(cr, uid, ids, context):
+            amount = line.prix_unitaire * line.uom_qty
+            ret[line.id] = amount
+            #TOCHECK: is there any taxe when collectivity invoice people ?
+        return ret
 
     _columns = {
         'categ_id': fields.many2one('product.category','Type d\'article'),
         "reserve_product": fields.many2one("product.product", "Article réservé", domain=[('type_prod','=','ressource')]),
-        "qte_reserves":fields.integer("Qté désirée"),
-        "prix_unitaire": fields.float("Prix Unitaire", digit=(3,2)),
+        "qte_reserves":fields.float("Qté désirée", digits=(3,2)),
+        "prix_unitaire": fields.float("Prix Unitaire", digit=(4,2)),
         #"dispo":fields.boolean("Disponible"),
         'dispo':fields.function(_calc_qte_dispo, string="Disponible", method=True, multi="dispo", type='boolean', store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
                                                                                                                          'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids,['reserve_product','qte_dispo','qte_reserves'],11]}),
@@ -187,6 +194,7 @@ class hotel_reservation_line(osv.osv):
         "name":fields.char('Libellé', size=128),
         'state':fields.related('line_id','state', type='selection',string='Etat Résa', selection=_get_state_line, readonly=True),
         'uom_qty':fields.float('Qté de Référence pour Facturation',digit=(2,1)),
+        'amount':fields.function(_get_amount, string="Prix (si onéreux)", type="float", method=True),
         'qte_dispo':fields.function(_calc_qte_dispo, method=True, string='Qté Dispo', multi="dispo", type='float', store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
                                                                                        'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids, ['reserve_product'], 11]}),
         'action':fields.selection(_AVAILABLE_ACTION_VALUES, 'Action'),
@@ -237,6 +245,26 @@ class hotel_reservation(osv.osv):
     _inherit = "hotel.reservation"
     _description = "Réservations"
 
+    def remove_accents(self, str):
+        return ''.join(x for x in unicodedata.normalize('NFKD',str) if unicodedata.category(x)[0] == 'L')
+    
+    def _custom_sequence(self, cr, uid, context):
+        seq = self.pool.get("ir.sequence").next_by_code(cr, uid, 'resa.number',context)
+        user = self.pool.get("res.users").browse(cr, uid, uid)
+        prog = re.compile('[Oo]pen[a-zA-Z]{3}/[Mm]anager')
+        service = None
+        if 'service_id' in context:
+            service = context['service_id']
+        for group in user.groups_id:
+            if prog.search(group.name):
+                if isinstance(user.service_ids, list) and not service:
+                    service = user.service_ids[0]
+                else:
+                    service = self.pool.get("openstc.service").browse(cr, uid, service)
+                seq = seq.replace('-xxx-','-' + self.remove_accents(service.name[:3]).upper() + '-')
+                
+        return seq
+
     def _calc_in_option(self, cr, uid, ids, name, args, context=None):
         print("début calc_in_option")
         ret = {}
@@ -286,6 +314,7 @@ class hotel_reservation(osv.osv):
                  'in_option': lambda *a :0,
                  'state': lambda *a: 'remplir',
                  'is_recur': lambda *a: 0,
+                 'reservation_no': lambda self,cr,uid,ctx=None:self._custom_sequence(cr, uid, ctx),
         }
     _order = "checkin, in_option"
     

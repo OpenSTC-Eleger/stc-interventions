@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-	<data>
+	<data noupdate="1">
+	    
+	    <record id="sequence_resa_number_type" model="ir.sequence.type">
+            <field name="name">Type de Numéro de Réservation</field>
+            <field name="code">resa.number</field>
+        </record>
+        <record id="sequence_resa_number" model="ir.sequence">
+            <field name="name">Numéro de Réservation</field>
+            <field name="code">resa.number</field>
+            <field name="prefix">R-%(year)s-%(month)s-</field>
+            <field name="padding" eval="3"/>
+        </record>
 	    
 	    <record id="openstc_pret_email_template_resa_validee" model="email.template">
 	        <field name="name">Réservation Validée</field>
