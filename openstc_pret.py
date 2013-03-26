@@ -912,7 +912,7 @@ class hotel_reservation(osv.osv):
                 if line.action == 'inter':
                     #group resa line by service_id
                     if not line.reserve_product.service_technical_id:
-                        raise osv.except_osv(_("Erreur"),_("Vous devez spécifier un service pour cet article : %s" %(line.reserve_product.name_template)))
+                        raise osv.except_osv("Erreur",_("Vous devez spécifier un service pour cet article : %s") %(line.reserve_product.name_template))
                     lines_grouped.setdefault(line.reserve_product.service_technical_id.id, [])
                     lines_grouped[line.reserve_product.service_technical_id.id].append(line)
             for service_id, lines in lines_grouped.items():
@@ -920,9 +920,9 @@ class hotel_reservation(osv.osv):
                 name = ''
                 name += ','.join(['%s %s ' % (str(line.qte_reserves) ,line.reserve_product.name_template) for line in lines])
                 site_details = '\n'.join(['%s: %s ' % (line.reserve_product.name_template, line.infos) for line in lines if line.infos])
-                values = {'name':_('[Evénementiel] Mise en place de %s sur le site %s' % (name, resa.site_id and resa.site_id.name or 'inconnu')), 
+                values = {'name':_('[Evénementiel] Mise en place de %s sur le site %s') % (name, resa.site_id and resa.site_id.name or 'inconnu'), 
                           'site_details':site_details,
-                          'description':_('Mise en place de %s sur le site %s dans le cadre de l\'événement "%s" prévue du %s au %s' %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str)),
+                          'description':_('Mise en place de %s sur le site %s dans le cadre de l\'événement "%s" prévue du %s au %s') %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str),
                           'partner_id':partner.id, 
                           'partner_address':partner.address[0].id,
                           'partner_type':partner.type_id and partner.type_id.id or False,
