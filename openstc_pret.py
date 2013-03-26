@@ -138,6 +138,11 @@ class hotel_reservation_line(osv.osv):
             return self.search(cr, uid, [('reserve_product','in',(prod_ids)),('line_id.state','in',('remplir,draft,waiting_confirm'))])
         return ids"""
     
+    def _get_resa_via_prods(self, cr, uid, ids, context=None):
+        prod_ids = [x.product_id.id for x in self.pool.get("stock.inventory.line").browse(cr, uid, ids, context=context) if x.product_id]
+        line_ids = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id.state','=','remplir'),('reserve_product','in',prod_ids)])
+        return line_ids
+    
     def _calc_qte_dispo(self, cr, uid, ids, name, args, context=None):
         prod_id_to_line = {}
         if not context:
@@ -184,8 +189,9 @@ class hotel_reservation_line(osv.osv):
         "qte_reserves":fields.float("Qté désirée", digits=(3,2)),
         "prix_unitaire": fields.float("Prix Unitaire", digit=(4,2)),
         #"dispo":fields.boolean("Disponible"),
-        'dispo':fields.function(_calc_qte_dispo, string="Disponible", method=True, multi="dispo", type='boolean', store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
-                                                                                                                         'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids,['reserve_product','qte_dispo','qte_reserves'],11]}),
+        'dispo':fields.function(_calc_qte_dispo, string="Disponible", method=True, multi="dispo", type='boolean'),
+#        store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
+#        'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids,['reserve_product','qte_dispo','qte_reserves'],11]}
         "infos":fields.char("Informations supplémentaires",size=256),
         #"no_infos":fields.boolean("Ne sais pas"),
         #"valide":fields.function(_calc_line_is_valid, method=True, type="boolean",
@@ -195,10 +201,14 @@ class hotel_reservation_line(osv.osv):
         'state':fields.related('line_id','state', type='selection',string='Etat Résa', selection=_get_state_line, readonly=True),
         'uom_qty':fields.float('Qté de Référence pour Facturation',digit=(2,1)),
         'amount':fields.function(_get_amount, string="Prix (si onéreux)", type="float", method=True),
-        'qte_dispo':fields.function(_calc_qte_dispo, method=True, string='Qté Dispo', multi="dispo", type='float', store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
-                                                                                       'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids, ['reserve_product'], 11]}),
+        'qte_dispo':fields.function(_calc_qte_dispo, method=True, string='Qté Dispo', multi="dispo", type='float'),
         'action':fields.selection(_AVAILABLE_ACTION_VALUES, 'Action'),
         'inter_ask_id':fields.many2one('openstc.ask','Demande d\'intervention associée'),
+
+#        store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
+#        'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids, ['reserve_product'], 11],
+#        'stock.inventory.line':[_get_resa_via_prods,['product_id','product_qty','inventory_id','location_id'],12]}
+
         }
 
     _defaults = {
@@ -910,9 +920,9 @@ class hotel_reservation(osv.osv):
                 name = ''
                 name += ','.join(['%s %s ' % (str(line.qte_reserves) ,line.reserve_product.name_template) for line in lines])
                 site_details = '\n'.join(['%s: %s ' % (line.reserve_product.name_template, line.infos) for line in lines if line.infos])
-                values = {'name':u'[Evénementiel] Mise en place de %s sur le site %s' % (name, resa.site_id and resa.site_id.name or 'inconnu'), 
+                values = {'name':_('[Evénementiel] Mise en place de %s sur le site %s' % (name, resa.site_id and resa.site_id.name or 'inconnu')), 
                           'site_details':site_details,
-                          'description':u'Mise en place de %s sur le site %s dans le cadre de l\'événement "%s" prévue du %s au %s' %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str),
+                          'description':_('Mise en place de %s sur le site %s dans le cadre de l\'événement "%s" prévue du %s au %s' %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str)),
                           'partner_id':partner.id, 
                           'partner_address':partner.address[0].id,
                           'partner_type':partner.type_id and partner.type_id.id or False,
@@ -949,18 +959,18 @@ class hotel_reservation(osv.osv):
                     if not email_tmpl_id:
                         ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=',self._name)])
                         email_tmpl_id = email_obj.create(cr, uid, {
-                                                    'name':'modèle de mail pour résa annulée',
+                                                    'name':_('modèle de mail pour résa annulée'),
                                                     'name':'Réservation Annulée',
                                                     'model_id':ir_model[0],
-                                                    'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
-                                                    'email_from':'bruno.plancher@gmail.com',
-                                                    'email_to':'bruno.plancher@gmail.com',
-                                                    'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
+                                                    'subject':_('Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée'),
+                                                    'email_from':_('bruno.plancher@gmail.com'),
+                                                    'email_to':_('bruno.plancher@gmail.com'),
+                                                    'body_text':_("Votre Réservation normalement prévue du ${object.checkin} au \
         ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
-                                                    'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
+        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"),
+                                                    'body_html':_("Votre Réservation normalement prévue du ${object.checkin} au \
         ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
+        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx")
                                                    })
                 elif vals['state'] == 'validated':
                     email_tmpl_id = email_obj.search(cr, uid, [('model','=',self._name),('name','ilike','Réserv%Valid%')])

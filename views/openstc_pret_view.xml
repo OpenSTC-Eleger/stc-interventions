@@ -124,8 +124,8 @@
 						        <field name="reservation_line" string="Lignes de Réservation" required="1" colspan="4" nolabel="1"
 						            attrs="{'readonly':[('state','not in',('remplir','waiting_confirm'))]}">
 									<tree string="Ligne de réservation" editable="top" colors="green:dispo==True;red:dispo==False">
-										<field name="categ_id"/>
-										<field name="reserve_product" colspan="1" domain="[('categ_id','=',categ_id)]" required="1"/>
+<!-- 										<field name="categ_id"/> -->
+										<field name="reserve_product" colspan="1" required="1"/>
 										<field name="qte_reserves" />
 										<field name="qte_dispo"/>
 										<field name="dispo" readonly="1"/>
@@ -156,7 +156,7 @@
 									<button name="dummy" string="Actualiser la Page" icon="gtk-refresh" colspan="2"/>
 								</group>		        
 				       		</page>
-				       		<page string="Folios Associés">
+				       		<page string="Factures associées (si onéreux)">
 	 				      		<field name="folio_id" nolabel="1"/>
 	 				   		</page>
 			       		</notebook>

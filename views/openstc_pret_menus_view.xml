@@ -18,6 +18,7 @@
 			<field name="res_model">hotel.reservation</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
+			<field name="domain" eval="False"/>
 		</record>
 
 		<!-- <record id="action_openstock_view_reservation_confirmed" model="ir.actions.act_window">
