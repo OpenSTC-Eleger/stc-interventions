@@ -912,7 +912,7 @@ class hotel_reservation(osv.osv):
                 if line.action == 'inter':
                     #group resa line by service_id
                     if not line.reserve_product.service_technical_id:
-                        raise osv.except_osv("Erreur",u"Vous devez spécifier un service pour cet article : %s" %(line.reserve_product.name_template))
+                        raise osv.except_osv("Erreur",_("Vous devez spécifier un service pour cet article : %s" %(line.reserve_product.name_template)))
                     lines_grouped.setdefault(line.reserve_product.service_technical_id.id, [])
                     lines_grouped[line.reserve_product.service_technical_id.id].append(line)
             for service_id, lines in lines_grouped.items():
