@@ -128,15 +128,6 @@ class hotel_reservation_line(osv.osv):
                 line_recompute_ids = self.pool.get("hotel_reservation.line").search(cr, uid, [('reserve_product','in',[x.reserve_product.id for x in resa.reservation_line]),('line_id.state','in',('remplir','draft','wait_confirm'))])
                 return line_recompute_ids
         return line_ids
-        """def _get_resa_line_id(self, cr, uid, ids, context=None):
-        prod_ids = []
-        for line in self.browse(cr, uid, ids, context):
-            #if a record of a validated resa is unlinked, we have to adapt availability of all prod line at 'remplir'
-            if not line.line_id and line.state in ('confirm','in_use'):
-                prod_ids.append(line.reserve_product.id)
-        if prod_ids:
-            return self.search(cr, uid, [('reserve_product','in',(prod_ids)),('line_id.state','in',('remplir,draft,waiting_confirm'))])
-        return ids"""
     
     def _get_resa_via_prods(self, cr, uid, ids, context=None):
         prod_ids = [x.product_id.id for x in self.pool.get("stock.inventory.line").browse(cr, uid, ids, context=context) if x.product_id]
@@ -238,7 +229,7 @@ class hotel_reservation_line(osv.osv):
             ids = ids[0]
         line = self.browse(cr, uid, ids, context)
         if not line.inter_ask_id:
-            raise osv.except_osv("Erreur",u"L'intervention associée n'existe pas ou a été supprimée, impossible de la retrouver.")
+            raise osv.except_osv(_("Error"),_("Intervention associated no longer exist or have been deleted, can not open it"))
         return {
             'type':'ir.actions.act_window',
             'target':'new',
@@ -276,7 +267,7 @@ class hotel_reservation(osv.osv):
         return seq
 
     def _calc_in_option(self, cr, uid, ids, name, args, context=None):
-        print("début calc_in_option")
+        print("start calc_in_option method")
         ret = {}
         #fixes : calc only for resa, avoiding inheritance bugs
         for resa in self.pool.get("hotel.reservation").browse(cr, uid, ids, context):
@@ -334,7 +325,7 @@ class hotel_reservation(osv.osv):
                 return False
         return True
      
-    _constraints = [(_check_dates, "La date de Début de votre réservation est supérieure A la date de Fin, veuillez les modifier.", ['checkin','checkout'])]
+    _constraints = [(_check_dates, _("Your checkin is greater than your checkout, please modify them"), ['checkin','checkout'])]
 
 
     def confirmed_reservation(self,cr,uid,ids):
@@ -343,8 +334,7 @@ class hotel_reservation(osv.osv):
             if self.is_all_dispo(cr, uid, ids[0]):
                 #if self.is_all_valid(cr, uid, ids[0]):
                 if resa.in_option == 'block':
-                    raise osv.except_osv("Erreur","""Votre réservation est bloquée car la date de début de votre manifestion
-                    ne nous permet pas de vous livrer dans les temps.""")
+                    raise osv.except_osv(_("Error"),_("""Your resa is blocked because your expected date is too early so that we can not supply your products at time"""))
 
                 attach_sale_id = []
                 #TOCHECK: as long as form is written by employee, we let him all latitude to manage prices
@@ -353,15 +343,6 @@ class hotel_reservation(osv.osv):
                 line_ids = []
                 for line in resa.reservation_line:
                     form_amount += line.prix_unitaire * line.qte_reserves
-                """amount = self.get_amount_resa(cr, uid, ids)
-                #in the folowing case, user have not computed the prod prices
-                if form_amount <> amount and resa.state == 'draft':
-                    self.compute_lines_price(cr, uid, [resa.id])
-                #ohterwise, we test on the form values and not the expected values
-                elif resa.state == "wait_confirm":
-                    amount = form_amount
-                if amount > 0.0:
-                """
                 if form_amount > 0.0:
                 #Si montant > 0 euros, générer sale order puis dérouler wkf jusqu'a édition facture
                     folio_id = self.create_folio(cr, uid, ids)
@@ -390,9 +371,7 @@ class hotel_reservation(osv.osv):
                 #    Si vous avez rempli les infos supplémentaires et coché la case "ne sais pas", veuillez la décocher. """)
                 #    return False
             else:
-                raise osv.except_osv("""Vous devez vérifier les disponibilités""","""Erreur de validation du formulaire: un ou plusieurs
-                 de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée.
-                 Vous devez valider les disponibilités de vos articles via le bouton "vérifier disponibilités".""")
+                raise osv.except_osv(_("""Not available"""),_("""Not all of your products are available on those quantities for this period"""))
                 return False
         return True
 
@@ -421,10 +400,9 @@ class hotel_reservation(osv.osv):
             if self.is_all_dispo(cr, uid, ids[0]):
                 #if self.is_all_valid(cr, uid, ids[0]):
                 if resa.in_option == 'block':
-                    raise osv.except_osv("Erreur","""Votre réservation est bloquée car la date de début de votre manifestion
-                    ne nous permet pas de vous livrer dans les temps.""")
+                    raise osv.except_osv(_("Error"),_("""Your resa is blocked because your expected date is too early so that we can not supply your products at time"""))
                 if not resa.reservation_line:
-                    raise osv.except_osv("Erreur","Vous n'avez saisie aucune ligne de réservation. Vous ne pouvez pas poursuivre sans saisir de lignes de réservations.")
+                    raise osv.except_osv("Error","You have to write at least one reservation line")
                 self.write(cr, uid, ids, {'state':'draft'})
                 #TODO: Si partner_shipping_id présent, calculer prix unitaires
                 if resa.openstc_partner_id:
@@ -436,9 +414,7 @@ class hotel_reservation(osv.osv):
                 #    Si vous avez rempli les infos supplémentaires et coché la case "ne sais pas", veuillez la décocher. """)
                 #    return False
             else:
-                raise osv.except_osv("""Vous devez vérifier les disponibilités""","""Erreur de validation du formulaire: un ou plusieurs
-                 de vos articles ne sont pas disponibles, ou leur disponibilité n'a pas encore été vérifiée.
-                 Vous devez valider les disponibilités de vos articles via le bouton "vérifier disponibilités".""")
+                raise osv.except_osv(_("""Not available"""),_("""Not all of your products are available on those quantities for this period"""))
                 return False
         return True
 
@@ -516,7 +492,6 @@ class hotel_reservation(osv.osv):
 
     def ARemplir_reservation(self, cr, uid, ids):
         #TOCHECK: Voir quand il faut mettre la résa à l'état "in_option" : Clique sur Suivant malgré non dispo ?
-        print("Mise à l'état remplir")
         self.write(cr, uid, ids, {'state':'remplir'})
         return True
 
@@ -552,7 +527,7 @@ class hotel_reservation(osv.osv):
         return res
 
     def get_nb_prod_reserved(self, cr, prod_list, checkin, checkout, states=['cancle','done','remplir'], where_optionnel=""):
-        print("début get_nb_prod_reserved")
+        print("start get_nb_prod_reserved method")
         cr.execute("select reserve_product, sum(qte_reserves) as qte_reservee \
                     from hotel_reservation as hr, \
                     hotel_reservation_line as hrl \
@@ -586,7 +561,7 @@ class hotel_reservation(osv.osv):
         if id:
             my_where_optionnel = "and hr.id <> " + str(id)
         if not (demande_prod or reserv_vals):
-            raise osv.except_osv("Erreur","Vous n'avez saisie aucune ligne de réservation. Vous ne pouvez pas poursuivre sans saisir de lignes de réservations.")
+            raise osv.except_osv(_("Error"),_("You have to write at least one reservation line"))
         
         #Parcours des lignes de réservation pour 
         for line in reserv_vals:
@@ -628,39 +603,7 @@ class hotel_reservation(osv.osv):
                  ok = False
                  dict_error_prod[prod_id] = [qte_voulue, qte_total_prod]
         print(ok)
-        """#Si on a cliqué sur "vérifier dispo", on fait seulement un update des lignes de résa sur le champs dispo
-        if 'update_line_dispo' in context:
-            line_prod_ids_dispo = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id', '=',id),('reserve_product','in',prod_list_all)])
-            #print (line_prod_ids_dispo)
-            line_prod_ids_non_dispo = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id', '=',id),('reserve_product','in',dict_error_prod.keys())])
-            #print(line_prod_ids_non_dispo)
-
-            list_for_update = []
-            #Par défaut tous les produits sont dispo
-            for line_id in line_prod_ids_dispo:
-                list_for_update.append((1, line_id,{'dispo':True},))
-            #print(list_for_update)
-            if list_for_update:
-                self.write(cr, uid, [id], {'reservation_line':list_for_update})
-
-            list_for_update = []
-            #Et on mets à jour les lignes dont le produit n'est pas dispo
-            for line_id in line_prod_ids_non_dispo:
-                list_for_update.append((1, line_id,{'dispo':False}),)
-            #print(list_for_update)
-            if list_for_update:
-                self.write(cr, uid, [id], {'reservation_line':list_for_update})"""
-
-        """if not ok:
-            prod_error_str = ""
-            for prod_error in self.pool.get("product.product").browse(cr, uid, dict_error_prod.keys()):
-                if prod_error_str <> "":
-                    prod_error_str +=", "
-                prod_error_str += str(dict_error_prod[prod_error.id][0]) + " x " + prod_error.name + "( " + str(dict_error_prod[prod_error.id][1]) + " disponibles pour ces dates)"
-            if not 'update_line_dispo' in context:
-                raise osv.except_osv("Produit(s) non disponible(s)","Votre réservation n'a pas aboutie car \
-                les produits suivants ne sont pas disponibles pour la période " + checkin + " - " + checkout + ":\
-                " + prod_error_str)"""
+     
         return dict_error_prod, prod_list_all
 
     #Bouton pour vérif résa, mets à jour les champs dispo de chaque ligne de résa
@@ -704,7 +647,7 @@ class hotel_reservation(osv.osv):
         else:
             #Print for log errors
             print("prod_ids error : " + prod_ids)
-            raise osv.except_osv("Erreur","Une erreur est apparue, veuillez notifier l'erreur suivante A votre prestataire : \n la paramètre prod_ids de la méthode get_prods_available est d'une forme incorrecte.")
+            raise osv.except_osv(_("Error"),_("An error has occured, please notify following error to your supplier : \n prod_ids paramater of get_prods_available method  has an incorrect form"))
         #Get availability of prods : (dict_error, all_prods)
         res = self.check_dispo(cr, uid, 0, checkin, checkout, prod_dict, context)
         #Format result to return only prods available
@@ -726,28 +669,6 @@ class hotel_reservation(osv.osv):
         for prod_id, qty_reserved in results:
             prod_dispo[prod_id] -= qty_reserved
         return prod_dispo
-    
-        """def get_prods_available_and_qty(self, cr, uid, checkin, checkout, prod_ids=[], context=None):
-        if not context:
-            context = {}
-        prod_dict = {}
-        if isinstance(prod_ids, list):
-            for prod in self.pool.get("product.product").browse(cr, uid, prod_ids, context):
-                prod_dict.update({prod.id:prod.virtual_available + 1.0})
-        elif isinstance(prod_ids, dict):
-            prod_dict = prod_ids
-        else:
-            #Print for log errors
-            print("prod_ids error : " + prod_ids)
-            raise osv.except_osv("Erreur","Une erreur est apparue, veuillez notifier l'erreur suivante A votre prestataire : \n la paramètre prod_ids de la méthode get_prods_available est d'une forme incorrecte.")
-        #Get availability of prods : (dict_error, all_prods)
-        res = self.check_dispo(cr, uid, 0, checkin, checkout, prod_dict, context)
-        if res[0]:
-            ret = {}
-            for key, value in res[0].items():
-                ret.update({key:value[1]})
-            return ret
-        return False"""
     
     #Vérifies les champs dispo de chaque ligne de résa pour dire si oui ou non la résa est OK pour la suite
     #TODO: Voir comment gérer le cas de la reprise d'une résa à revalider / incomplète où des champs dispo sont à True
@@ -912,7 +833,7 @@ class hotel_reservation(osv.osv):
                 if line.action == 'inter':
                     #group resa line by service_id
                     if not line.reserve_product.service_technical_id:
-                        raise osv.except_osv("Erreur",_(u"Vous devez spécifier un service pour cet article : %s") %(line.reserve_product.name_template))
+                        raise osv.except_osv(_("Error"),_("you must specified a service for this product : %s") %(line.reserve_product.name_template))
                     lines_grouped.setdefault(line.reserve_product.service_technical_id.id, [])
                     lines_grouped[line.reserve_product.service_technical_id.id].append(line)
             for service_id, lines in lines_grouped.items():
@@ -920,9 +841,9 @@ class hotel_reservation(osv.osv):
                 name = ''
                 name += ','.join(['%s %s ' % (str(line.qte_reserves) ,line.reserve_product.name_template) for line in lines])
                 site_details = '\n'.join(['%s: %s ' % (line.reserve_product.name_template, line.infos) for line in lines if line.infos])
-                values = {'name':_('[Evénementiel] Mise en place de %s sur le site %s') % (name, resa.site_id and resa.site_id.name or 'inconnu'), 
+                values = {'name':_('[Evenemential] supply of %s ont the site %s') % (name, resa.site_id and resa.site_id.name or 'inconnu'), 
                           'site_details':site_details,
-                          'description':_('Mise en place de %s sur le site %s dans le cadre de l\'événement "%s" prévue du %s au %s') %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str),
+                          'description':_('supply of %s on the site %s for the event "%s" planned from %s to %s') %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str),
                           'partner_id':partner.id, 
                           'partner_address':partner.address[0].id,
                           'partner_type':partner.type_id and partner.type_id.id or False,
@@ -1078,24 +999,6 @@ class hotel_reservation(osv.osv):
     def onchange_openstc_partner_id(self, cr, uid, ids, openstc_partner_id=False):
         return {'value':{'partner_id':openstc_partner_id}}
 
-    """def onchange_partner_id(self, cr, uid, ids, part):
-        vals = super(hotel_reservation, self).onchange_partner_id(cr, uid, ids, part)
-        if part:
-            vals['value']['partner_mail'] = self.pool.get("res.partner.address").browse(cr, uid, vals['value']['partner_invoice_id']).email
-        return vals"""
-
-    #Recalcul des coûts de produit
-    """def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False, context=None):
-        #TOCHECK: check if it's usefull
-        #TODO: if it is, replace with compute_lines_price method
-            ret = []
-            if isinstance(ids, list):
-                ids = ids[0]
-            if partner_shipping_id:
-                resa = self.browse(cr, uid, ids, context)
-                for line in resa.reservation_line:
-                    ret.append((1,line.id,{'prix_unitaire':self.get_prod_price(cr, uid, ids, line, context)}))
-            return {'value':{'reservation_line':ret}}"""
         
     def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False):
         if partner_shipping_id:

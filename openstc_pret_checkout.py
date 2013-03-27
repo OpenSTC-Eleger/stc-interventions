@@ -25,6 +25,7 @@ from datetime import datetime,timedelta
 
 from osv import fields, osv
 import netsvc
+from tools.translate import _
 
 class openstc_pret_checkout_wizard(osv.osv):
     AVAILABLE_STATE_VALUES = [('draft','Brouillon'),('done','Cloturé')]
@@ -115,7 +116,7 @@ class openstc_pret_checkout_wizard(osv.osv):
                 purchase_id = self.pool.get("purchase.order").create(cr, uid, values)
                 self.write(cr, uid, checkout.id, {'purchase_id':purchase_id})    
             else:
-                self.log(cr, uid, checkout.id, ("Aucune facture n'a été créée, car aucun rachat n'est programmé dans l'état des lieux"))
+                self.log(cr, uid, checkout.id, _("No purchase nor invoice have been created, because there is nothing to purchase."))
         self.write(cr, uid, ids, {'state':'done'})
         return{'type':'ir.actions.act_window_close'}
     
@@ -158,7 +159,7 @@ class openstc_pret_checkout_line_wizard(osv.osv):
         return True
     
     _constraints = [
-                    (_check_qte_to_purchase, "La Qté à Racheter doit-être inférieure à la quantité réservée et n'être renseignée que si l'article doit être racheté", ['qte_reservee','etat_retour','qte_to_purchase'])
+                    (_check_qte_to_purchase, _("Qty to purchase must be equal or lower than qty reserved, and must be written only if a purchase is to plan"), ['qte_reservee','etat_retour','qte_to_purchase'])
                     ]
     
 openstc_pret_checkout_line_wizard()

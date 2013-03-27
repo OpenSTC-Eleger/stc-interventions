@@ -24,6 +24,7 @@ import netsvc
 from mx import DateTime
 import datetime
 from tools import config
+from tools.translate import _
 
 class hotel_folio(osv.osv):
     
