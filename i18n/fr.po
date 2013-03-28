@@ -6,13 +6,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-27 16:14+0000\n"
-"PO-Revision-Date: 2013-03-27 16:14+0000\n"
+"POT-Creation-Date: 2013-03-28 08:19+0000\n"
+"PO-Revision-Date: 2013-03-28 08:19+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
+"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: \n"
 
 #. module: openstc
@@ -76,6 +76,12 @@ msgstr "Réservations de la semaine à traiter"
 #: view:hotel.folio:0
 msgid "Recréer Approvisionnement"
 msgstr "Recréer Approvisionnement"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:844
+#, python-format
+msgid "[Evenemential] supply of %s ont the site %s"
+msgstr "[Evénementiel] Mise en place de %s sur le site %s"
 
 #. module: openstc
 #: field:project.task,absent_type_id:0
@@ -175,12 +181,6 @@ msgstr "Equipment"
 #: view:report.project.task.user:0
 msgid "State"
 msgstr "Etat"
-
-#. module: openstc
-#: code:addons/openstc/openstc_pret.py:844
-#, python-format
-msgid "[Evenemential] supply of %s ont the site %s"
-msgstr "[Evénementiel] Mise en place de %s sur le site %s"
 
 #. module: openstc
 #: field:openstc.pret.emprunt.wizard,origin:0
@@ -550,11 +550,6 @@ msgid "firstname"
 msgstr "firstname"
 
 #. module: openstc
-#: constraint:openstc.pret.checkout.line:0
-msgid "La Qté à Racheter doit-être inférieure à la quantité réservée et n'être renseignée que si l'article doit être racheté"
-msgstr "La Qté à Racheter doit-être inférieure à la quantité réservée et n'être renseignée que si l'article doit être racheté"
-
-#. module: openstc
 #: view:hotel.reservation:0
 msgid "Ligne de réservation"
 msgstr "Ligne de réservation"
@@ -583,12 +578,6 @@ msgstr "Modèle d'Email"
 #: field:hotel.reservation,name:0
 msgid "Nom Manifestation"
 msgstr "Nom Manifestation"
-
-#. module: openstc
-#: code:addons/openstc/openstc_pret.py:846
-#, python-format
-msgid "supply of %s on the site %s for the event \"%s\" planned from %s to %s"
-msgstr "Mise en place de %s sur le site %s dans le cadre de l'événement \"%s\" prévue du %s au %s"
 
 #. module: openstc
 #: view:product.product:0
@@ -657,6 +646,12 @@ msgid "For valid the task"
 msgstr "Valider la demande"
 
 #. module: openstc
+#: code:addons/openstc/openstc_pret.py:836
+#, python-format
+msgid "you must specified a service for this product : %s"
+msgstr "you must specified a service for this product : %s"
+
+#. module: openstc
 #: view:openstc.pret.checkout:0
 msgid "Voir facture associée"
 msgstr "Voir facture associée"
@@ -700,6 +695,7 @@ msgstr "Prêts / Locations"
 
 #. module: openstc
 #: code:addons/openstc/openstc_pret.py:328
+#: constraint:hotel.reservation:0
 #, python-format
 msgid "Your checkin is greater than your checkout, please modify them"
 msgstr "Votre date de début dépasse votre date de Fin, veuillez les modifier"
@@ -1104,6 +1100,12 @@ msgid "Mauvais"
 msgstr "Mauvais"
 
 #. module: openstc
+#: code:addons/openstc/openstc_pret.py:846
+#, python-format
+msgid "supply of %s on the site %s for the event \"%s\" planned from %s to %s"
+msgstr "Mise en place de %s sur le site %s dans le cadre de l'événement \"%s\" prévue du %s au %s"
+
+#. module: openstc
 #: model:ir.model,name:openstc.model_openstc_pret_deliver_products_line_wizard
 msgid "openstc.pret.deliver.products.line.wizard"
 msgstr "openstc.pret.deliver.products.line.wizard"
@@ -1305,96 +1307,7 @@ msgstr "Valider la réservation"
 msgid "Link task to ask"
 msgstr "Lien vers la demande"
 
-#. module: openstc
-#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_done
-msgid "\n"
-"	<h2>Message Automatique</h2>\n"
-"	\n"
-"	<p> ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''} </p>\n"
-"	\n"
-"	<p>Votre Réservation de ressources est terminée\n"
-"	% if object.folio_id:\n"
-"	, ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
-"	% endif\n"
-"	</p>\n"
-"	<p>Récapitulatif de votre Réservation : </p>\n"
-"	<ul>\n"
-"	<li>Libellé : ${object.name or ''}</li>\n"
-"	<%\n"
-"	from datetime import datetime\n"
-"	import pytz\n"
-"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"	%>\n"
-"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
-"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
-"	<li><u>Ressources Réservées :</u> \n"
-"	<ul>\n"
-"	% for line in object.reservation_line:\n"
-"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
-"	% endfor\n"
-"	</ul>\n"
-"	</li>\n"
-"	</ul>\n"
-"	\n"
-"	Nous vous remercions d'avoir utilisé nos services de réservations en ligne.\n"
-"	\n"
-"   <br />\n"
-"   <p>Cordialement,</p>\n"
-"   <br />\n"
-"   <p>${object.shop_id.company_id.name or ''}</p>\n"
-"   <br />\n"
-"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
-"   <br />\n"
-"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
-"   \n"
-"			    "
-msgstr "\n"
-"	<h2>Message Automatique</h2>\n"
-"	\n"
-"	<p> ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''} </p>\n"
-"	\n"
-"	<p>Votre Réservation de ressources est terminée\n"
-"	% if object.folio_id:\n"
-"	, ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
-"	% endif\n"
-"	</p>\n"
-"	<p>Récapitulatif de votre Réservation : </p>\n"
-"	<ul>\n"
-"	<li>Libellé : ${object.name or ''}</li>\n"
-"	<%\n"
-"	from datetime import datetime\n"
-"	import pytz\n"
-"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"	%>\n"
-"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
-"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
-"	<li><u>Ressources Réservées :</u> \n"
-"	<ul>\n"
-"	% for line in object.reservation_line:\n"
-"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
-"	% endfor\n"
-"	</ul>\n"
-"	</li>\n"
-"	</ul>\n"
-"	\n"
-"	Nous vous remercions d'avoir utilisé nos services de réservations en ligne.\n"
-"	\n"
-"   <br />\n"
-"   <p>Cordialement,</p>\n"
-"   <br />\n"
-"   <p>${object.shop_id.company_id.name or ''}</p>\n"
-"   <br />\n"
-"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
-"   <br />\n"
-"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
-"   \n"
-"			    "
+
 
 #. module: openstc
 #: field:openstc.ask,people_name:0
@@ -1546,72 +1459,7 @@ msgstr "openstc.pret.deliver.products.wizard"
 msgid "Services"
 msgstr "Services"
 
-#. module: openstc
-#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_done
-msgid "\n"
-"			    Message Automatique\n"
-"			    \n"
-"			    ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
-"			    \n"
-"			    Votre Réservation de ressources est terminée.\n"
-"			    % if object.folio_id:\n"
-"				Ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
-"				% endif\n"
-"			    Récapitulatif de votre Réservation :\n"
-"			    \n"
-"			    Libellé : ${object.name or ''}\n"
-"			    <%\n"
-"			    from datetime import datetime\n"
-"			    import pytz\n"
-"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    %>\n"
-"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
-"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
-"			    % for line in object.reservation_line:\n"
-"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
-"			    % endfor\n"
-"			    \n"
-"			    Cordialement,\n"
-"			    \n"
-"			    ${object.shop_id.company_id.name or ''}\n"
-"			    \n"
-"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
-"		    "
-msgstr "\n"
-"			    Message Automatique\n"
-"			    \n"
-"			    ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
-"			    \n"
-"			    Votre Réservation de ressources est terminée.\n"
-"			    % if object.folio_id:\n"
-"				Ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
-"				% endif\n"
-"			    Récapitulatif de votre Réservation :\n"
-"			    \n"
-"			    Libellé : ${object.name or ''}\n"
-"			    <%\n"
-"			    from datetime import datetime\n"
-"			    import pytz\n"
-"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    %>\n"
-"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
-"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
-"			    % for line in object.reservation_line:\n"
-"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
-"			    % endfor\n"
-"			    \n"
-"			    Cordialement,\n"
-"			    \n"
-"			    ${object.shop_id.company_id.name or ''}\n"
-"			    \n"
-"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
-"		    "
+
 
 #. module: openstc
 #: view:hotel.reservation:0
@@ -1749,88 +1597,7 @@ msgstr "Réservation de la semaine a traiter"
 msgid "openstc.ask"
 msgstr "demande d'intervention"
 
-#. module: openstc
-#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_validee
-msgid "\n"
-"	<h2>Message Automatique</h2>\n"
-"	\n"
-"	<p>Votre Réservation a bien été enregistrée.  </p>\n"
-"	<p>Récapitulatif de votre Réservation : </p>\n"
-"	<ul>\n"
-"	<li>Libellé : ${object.name or ''}</li>\n"
-"	<%\n"
-"	from datetime import datetime\n"
-"	import pytz\n"
-"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"	%>\n"
-"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
-"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
-"	<li><u>Ressources Réservées :</u> \n"
-"	<ul>\n"
-"	% for line in object.reservation_line:\n"
-"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
-"	% endfor\n"
-"	</ul>\n"
-"	</li>\n"
-"	</ul>\n"
-"   \n"
-"   % if object.folio_id:\n"
-"   	<p>Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.<br/>\n"
-"   	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.</p>\n"
-"   % endif\n"
-"   <br />\n"
-"   <p>Cordialement,</p>\n"
-"   <br />\n"
-"   <p>${object.shop_id.company_id.name or ''}</p>\n"
-"   <br />\n"
-"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
-"   <br />\n"
-"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
-"   \n"
-"			    "
-msgstr "\n"
-"	<h2>Message Automatique</h2>\n"
-"	\n"
-"	<p>Votre Réservation a bien été enregistrée.  </p>\n"
-"	<p>Récapitulatif de votre Réservation : </p>\n"
-"	<ul>\n"
-"	<li>Libellé : ${object.name or ''}</li>\n"
-"	<%\n"
-"	from datetime import datetime\n"
-"	import pytz\n"
-"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"	%>\n"
-"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
-"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
-"	<li><u>Ressources Réservées :</u> \n"
-"	<ul>\n"
-"	% for line in object.reservation_line:\n"
-"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
-"	% endfor\n"
-"	</ul>\n"
-"	</li>\n"
-"	</ul>\n"
-"   \n"
-"   % if object.folio_id:\n"
-"   	<p>Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.<br/>\n"
-"   	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.</p>\n"
-"   % endif\n"
-"   <br />\n"
-"   <p>Cordialement,</p>\n"
-"   <br />\n"
-"   <p>${object.shop_id.company_id.name or ''}</p>\n"
-"   <br />\n"
-"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
-"   <br />\n"
-"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
-"   \n"
-"			    "
+
 
 #. module: openstc
 #: view:openstc.refused.ask.wizard:0
@@ -1894,79 +1661,7 @@ msgstr "Réservations en cours de traitement, elles sont soit en Brouillon, soit
 msgid "oil quantity"
 msgstr "oil quantity"
 
-#. module: openstc
-#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_validee
-msgid "\n"
-"			    Message Automatique\n"
-"			    \n"
-"			    Votre Réservation a bien été enregistrée.\n"
-"			    Récapitulatif de votre Réservation :\n"
-"			    \n"
-"			    Libellé : ${object.name or ''}\n"
-"			    <%\n"
-"			    from datetime import datetime\n"
-"			    import pytz\n"
-"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    %>\n"
-"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
-"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
-"			    % for line in object.reservation_line:\n"
-"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
-"			    % endfor\n"
-"			    \n"
-"			    \n"
-"			    % if object.folio_id:\n"
-"			    	Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.\n"
-"			    	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.\n"
-"			    % endif\n"
-"			    \n"
-"			    Cordialement,\n"
-"			    \n"
-"			    ${object.shop_id.company_id.name or ''}\n"
-"			    \n"
-"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
-"		    "
-msgstr "\n"
-"			    Message Automatique\n"
-"			    \n"
-"			    Votre Réservation a bien été enregistrée.\n"
-"			    Récapitulatif de votre Réservation :\n"
-"			    \n"
-"			    Libellé : ${object.name or ''}\n"
-"			    <%\n"
-"			    from datetime import datetime\n"
-"			    import pytz\n"
-"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    %>\n"
-"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
-"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
-"			    % for line in object.reservation_line:\n"
-"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
-"			    % endfor\n"
-"			    \n"
-"			    \n"
-"			    % if object.folio_id:\n"
-"			    	Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.\n"
-"			    	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.\n"
-"			    % endif\n"
-"			    \n"
-"			    Cordialement,\n"
-"			    \n"
-"			    ${object.shop_id.company_id.name or ''}\n"
-"			    \n"
-"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
-"		    "
 
-#. module: openstc
-#: constraint:hotel.reservation:0
-msgid "La date de Début de votre réservation est supérieure A la date de Fin, veuillez les modifier."
-msgstr "La date de Début de votre réservation est supérieure A la date de Fin, veuillez les modifier."
 
 #. module: openstc
 #: model:ir.actions.act_window,help:openstc.openstc_task_category_action
@@ -1979,10 +1674,9 @@ msgid "Numéro"
 msgstr "Numéro"
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret_checkout.py:161
-#, python-format
-msgid "Qty to purchase must be equal or lower than qty reserved, and must be written only if a purchase is to plan"
-msgstr "La quantité d'article à racheter ne peut pas dépasser la quantité réservée intialiement, et ne doit-être renseignée que si un rachat est planifié pour cet article"
+#: view:openstc.pret.deliver.products.wizard:0
+msgid "Comment mettre les articles à disposition"
+msgstr "Comment mettre les articles à disposition"
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_task_category
@@ -2101,9 +1795,9 @@ msgid "Une ou plusieurs dates ne sont disponibles pour les ressources sélection
 msgstr "Une ou plusieurs dates ne sont disponibles pour les ressources sélectionnées.          Vous pouvez visualiser le planning pour adapter vos dates de réservation.          Vous avez aussi les droits pour déclencher une demande d'emprunt des articles manquants          auprès de collectivités extérieurs, si vous voulez le faire ,cliquez sur 'Commencer l'Emprunt'."
 
 #. module: openstc
-#: view:openstc.site:0
-msgid "Properties"
-msgstr "Proprietées"
+#: view:purchase.order:0
+msgid "Renvoyer articles à la collecticité"
+msgstr "Renvoyer articles à la collecticité"
 
 #. module: openstc
 #: field:res.users,arrival_date:0
@@ -2171,6 +1865,13 @@ msgstr "Etat des Lieux"
 #: view:openstc.team:0
 msgid "General"
 msgstr "Géneral"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:826
+#: code:addons/openstc/openstc_pret.py:827
+#, python-format
+msgid "%x at %H:%M"
+msgstr "%x à %H:%M"
 
 #. module: openstc
 #: selection:product.product,etat:0
@@ -2251,9 +1952,11 @@ msgid "Invoice Corrected"
 msgstr "Invoice Corrected"
 
 #. module: openstc
-#: view:openstc.pret.deliver.products.wizard:0
-msgid "Comment mettre les articles à disposition"
-msgstr "Comment mettre les articles à disposition"
+#: code:addons/openstc/openstc_pret_checkout.py:162
+#: constraint:openstc.pret.checkout.line:0
+#, python-format
+msgid "Qty to purchase must be equal or lower than qty reserved, and must be written only if a purchase is to plan"
+msgstr "La quantité d'article à racheter ne peut pas dépasser la quantité réservée intialiement, et ne doit-être renseignée que si un rachat est planifié pour cet article"
 
 #. module: openstc
 #: field:openstc.pret.checkout.line,qte_to_purchase:0
@@ -2507,66 +2210,6 @@ msgstr "OpenSTC/Chef d'équipe"
 msgid "Cancelled"
 msgstr "Cancelled"
 
-#. module: openstc
-#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_en_attente
-msgid "\n"
-"			    Message Automatique\n"
-"			    \n"
-"			    Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. \n"
-"			    Récapitulatif de votre Réservation : \n"
-"			    \n"
-"			    Libellé : ${object.name or ''}\n"
-"			   <%\n"
-"			    import pytz\n"
-"			    from datetime import datetime\n"
-"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    %>\n"
-"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
-"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
-"			    % for line in object.reservation_line:\n"
-"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
-"			    % endfor\n"
-"			    \n"
-"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
-"			    \n"
-"			    Cordialement,\n"
-"			    \n"
-"			    ${object.shop_id.company_id.name or ''}\n"
-"			    \n"
-"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
-"		    "
-msgstr "\n"
-"			    Message Automatique\n"
-"			    \n"
-"			    Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. \n"
-"			    Récapitulatif de votre Réservation : \n"
-"			    \n"
-"			    Libellé : ${object.name or ''}\n"
-"			   <%\n"
-"			    import pytz\n"
-"			    from datetime import datetime\n"
-"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    %>\n"
-"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
-"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
-"			    % for line in object.reservation_line:\n"
-"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
-"			    % endfor\n"
-"			    \n"
-"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
-"			    \n"
-"			    Cordialement,\n"
-"			    \n"
-"			    ${object.shop_id.company_id.name or ''}\n"
-"			    \n"
-"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
-"		    "
 
 #. module: openstc
 #: field:openstc.pret.deliver.products.line.wizard,motif:0
@@ -2825,6 +2468,7 @@ msgstr "Matériel"
 #: code:addons/openstc/openstc_pret.py:403
 #: code:addons/openstc/openstc_pret.py:564
 #: code:addons/openstc/openstc_pret.py:650
+#: code:addons/openstc/openstc_pret.py:836
 #, python-format
 msgid "Error"
 msgstr "Erreur"
@@ -2849,87 +2493,12 @@ msgstr "Message du mail notifiant l'annulation"
 msgid "Date de fin de Réservation"
 msgstr "Date de fin de Réservation"
 
-#. module: openstc
-#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_en_attente
-msgid "\n"
-"			    <h2>Message Automatique</h2>\n"
-"			    \n"
-"			    <p>Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. </p>\n"
-"			    <p>Récapitulatif de votre Réservation : </p>\n"
-"			    <ul>\n"
-"			    <li>Libellé : ${object.name or ''}</li>\n"
-"			    <%\n"
-"			    import pytz\n"
-"			    from datetime import datetime\n"
-"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    %>\n"
-"			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
-"			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
-"			    <li><u>Ressources Réservées :</u> \n"
-"			    <ul>\n"
-"			    % for line in object.reservation_line:\n"
-"			    <li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
-"			    % endfor\n"
-"			    </ul>\n"
-"			    </li>\n"
-"			    </ul>\n"
-"			    <br />\n"
-"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
-"			    <br />\n"
-"			    <p>Cordialement,</p>\n"
-"			    <br />\n"
-"			    <p>${object.shop_id.company_id.name or ''}</p>\n"
-"			    <br />\n"
-"			    <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
-"			    <br />\n"
-"			    <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
-"			    \n"
-"			    "
-msgstr "\n"
-"			    <h2>Message Automatique</h2>\n"
-"			    \n"
-"			    <p>Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. </p>\n"
-"			    <p>Récapitulatif de votre Réservation : </p>\n"
-"			    <ul>\n"
-"			    <li>Libellé : ${object.name or ''}</li>\n"
-"			    <%\n"
-"			    import pytz\n"
-"			    from datetime import datetime\n"
-"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
-"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
-"			    %>\n"
-"			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
-"			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
-"			    <li><u>Ressources Réservées :</u> \n"
-"			    <ul>\n"
-"			    % for line in object.reservation_line:\n"
-"			    <li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
-"			    % endfor\n"
-"			    </ul>\n"
-"			    </li>\n"
-"			    </ul>\n"
-"			    <br />\n"
-"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
-"			    <br />\n"
-"			    <p>Cordialement,</p>\n"
-"			    <br />\n"
-"			    <p>${object.shop_id.company_id.name or ''}</p>\n"
-"			    <br />\n"
-"			    <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
-"			    <br />\n"
-"			    <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
-"			    \n"
-"			    "
+
 
 #. module: openstc
-#: view:purchase.order:0
-msgid "Renvoyer articles à la collecticité"
-msgstr "Renvoyer articles à la collecticité"
+#: view:openstc.site:0
+msgid "Properties"
+msgstr "Proprietées"
 
 #. module: openstc
 #: view:openstc.pret.checkout:0
@@ -2959,7 +2528,7 @@ msgid "Etats des lieux"
 msgstr "Etats des lieux"
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret_checkout.py:118
+#: code:addons/openstc/openstc_pret_checkout.py:119
 #, python-format
 msgid "No purchase nor invoice have been created, because there is nothing to purchase."
 msgstr "Aucun achat n'a été lancé car rien n'est à racheter"

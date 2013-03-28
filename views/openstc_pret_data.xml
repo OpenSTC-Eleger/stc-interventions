@@ -12,7 +12,8 @@
             <field name="prefix">R-%(year)s-%(month)s-</field>
             <field name="padding" eval="3"/>
         </record>
-	    
+	</data>
+	<data>
 	    <record id="openstc_pret_email_template_resa_validee" model="email.template">
 	        <field name="name">Réservation Validée</field>
 	        <field name="model_id" ref="model_hotel_reservation"/>
@@ -31,8 +32,10 @@
 	import pytz
 	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
 	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
-	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+	my_checkin_str = my_checkin_str.decode('utf-8')
+	my_checkout_str = my_checkout_str.decode('utf-8')
 	%>
 	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
 	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
@@ -67,13 +70,15 @@
 			    
 			    Libellé : ${object.name or ''}
 			    <%
-			    from datetime import datetime
-			    import pytz
-			    my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-			    my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-			    my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
-			    my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
-			    %>
+				from datetime import datetime
+				import pytz
+				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkin_str = my_checkin_str.decode('utf-8')
+				my_checkout_str = my_checkout_str.decode('utf-8')
+			   %>
 			    Dates : ${my_checkin_str} - ${my_checkout_str}
 			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
 			    % for line in object.reservation_line:
@@ -109,11 +114,13 @@
 			    <li>Libellé : ${object.name or ''}</li>
 			    <%
 			    import pytz
-			    from datetime import datetime
-			    my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-			    my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-			    my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
-			    my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+				from datetime import datetime
+				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkin_str = my_checkin_str.decode('utf-8')
+				my_checkout_str = my_checkout_str.decode('utf-8')
 			    %>
 			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
 			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
@@ -145,12 +152,14 @@
 			    
 			    Libellé : ${object.name or ''}
 			   <%
-			    import pytz
-			    from datetime import datetime
-			    my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-			    my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-			    my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
-			    my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+				import pytz
+				from datetime import datetime
+				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkin_str = my_checkin_str.decode('utf-8')
+				my_checkout_str = my_checkout_str.decode('utf-8')
 			    %>
 			    Dates : ${my_checkin_str} - ${my_checkout_str}
 			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
@@ -193,8 +202,10 @@
 	import pytz
 	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
 	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
-	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkin_str = my_checkin_str.decode('utf-8')
+	my_checkout_str = my_checkout_str.decode('utf-8')
 	%>
 	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
 	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
@@ -232,13 +243,15 @@
 			    
 			    Libellé : ${object.name or ''}
 			    <%
-			    from datetime import datetime
-			    import pytz
-			    my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-			    my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-			    my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
-			    my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x à %Hh%M")
-			    %>
+				from datetime import datetime
+				import pytz
+				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkin_str = my_checkin_str.decode('utf-8')
+				my_checkout_str = my_checkout_str.decode('utf-8')
+				%>
 			    Dates : ${my_checkin_str} - ${my_checkout_str}
 			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
 			    % for line in object.reservation_line:

@@ -1,14 +1,13 @@
 # Translation of OpenERP Server.
 # This file contains the translation of the following modules:
-#	* project
 #	* openstc
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-25 09:30+0000\n"
-"PO-Revision-Date: 2012-10-25 09:30+0000\n"
+"POT-Creation-Date: 2013-03-27 16:14+0000\n"
+"PO-Revision-Date: 2013-03-27 16:14+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -21,146 +20,100 @@ msgstr ""
 msgid "For confirm the ask by DST"
 msgstr "Confirmer la demande par le DST"
 
-#. module: project
-#: view:report.project.task.user:0
-msgid "Previous Month"
-msgstr "Mois précédent"
+#. module: openstc
+#: field:openstc.equipment,immat:0
+msgid "Imatt"
+msgstr "Imatt"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.act_my_project
-msgid "My projects"
-msgstr "Mes interventions"
-
-#. module: project
-#: field:project.project,progress_rate:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,progress:0
-msgid "Progress"
-msgstr "Avancement"
+#. module: openstc
+#: view:openstc.partner.type:0
+#: view:openstc.partner.type.type:0
+msgid "Demandeur type"
+msgstr "Demandeur type"
 
 #. module: openstc
 #: field:res.users,birth_date:0
 msgid "Date de naissance"
 msgstr "Date de naissance"
 
-#. module: project
-#: model:process.node,name:project.process_node_taskbydelegate0
-msgid "Task by delegate"
-msgstr "Tâche par délégation"
+#. module: openstc
+#: selection:project.project,state:0
+msgid "Scheduled"
+msgstr "Scheduled"
 
-#. module: project
-#: view:project.project:0
-msgid "Parent"
-msgstr "Parent"
+#. module: openstc
+#: field:openstc.pret.emprunt.line.wizard,date_expected:0
+msgid "Date de livraison"
+msgstr "Date de livraison"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.dblc_proj
-msgid "Project's tasks"
-msgstr "Tâches de l'intervention"
+#. module: openstc
+#: field:openstc.equipment,cv:0
+msgid "CV"
+msgstr "CV"
 
-#. module: project
-#: field:project.task.type,name:0
-msgid "Stage Name"
-msgstr "Nom de l'étape"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.openstc_task_category_action
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_task_category
+msgid "Catégories"
+msgstr "Catégories"
 
-#. module: project
-#: model:process.transition.action,name:project.process_transition_action_openpendingtask0
-msgid "Set pending"
-msgstr "Mettre en attente"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Réservations validées, le demandeur a été notifié que sa demande est confirmée. Il faut ensuite la planifier."
+msgstr "Réservations validées, le demandeur a été notifié que sa demande est confirmée. Il faut ensuite la planifier."
 
-#. module: project
-#: view:project.project:0
-msgid "New Project Based on Template"
-msgstr "Nouvelle intervention basée sur un modèle"
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_pret_warning_dispo_wizard
+msgid "openstc.pret.warning.dispo.wizard"
+msgstr "openstc.pret.warning.dispo.wizard"
 
-#. module: project
-#: view:report.project.task.user:0
-#: field:report.project.task.user,day:0
-#: field:task.by.days,day:0
-msgid "Day"
-msgstr "Jour"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_pret_resa_semaine_view
+msgid "Réservations de la semaine à traiter"
+msgstr "Réservations de la semaine à traiter"
 
-#. module: project
-#: model:ir.ui.menu,name:project.menu_project_management
-msgid "Interventions Management"
-msgstr "Gestion des interventions"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Recréer Approvisionnement"
+msgstr "Recréer Approvisionnement"
 
-#. module: project
-#: code:addons/addons/project/wizard/mail_compose_message.py:43
-#: code:addons/project/wizard/mail_compose_message.py:43
-#, python-format
-msgid "Please specify the Project Manager or email address of Project Manager."
-msgstr "Spécifier le responsable ou son email."
+#. module: openstc
+#: field:project.task,absent_type_id:0
+msgid "Type dabscence"
+msgstr "Type dabscence"
 
-#. module: project
-#: view:project.vs.hours:0
-msgid "Project vs remaining hours"
-msgstr "Intervention/temps restant"
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Faisant l'objet d'un rachat"
+msgstr "Faisant l'objet d'un rachat"
 
-#. module: project
-#: view:project.task:0
-#: view:res.partner:0
-msgid "Start Task"
-msgstr "Démarrer la tâche"
-
-#. module: project
-#: view:project.project:0
-msgid "Automatic variables for headers and footer. Use exactly the same notation."
-msgstr "Variables automatiques pour les entêtes et pieds. Avec exactement la même notation."
-
-#. module: project
-#: view:project.project:0
-#: field:project.project,warn_header:0
-msgid "Mail Header"
-msgstr "En-tête du courriel"
-
-#. module: project
-#: code:addons/addons/project/project.py:356
-#: code:addons/addons/project/project.py:787
-#: code:addons/addons/project/project.py:1146
-#: code:addons/project/project.py:356
-#: code:addons/project/project.py:787
-#: code:addons/project/project.py:1146
+#. module: openstc
+#: code:addons/openstc/wizard/ask_refused.py:46
+#: code:addons/openstc/wizard/ask_refused.py:72
+#: code:addons/openstc/wizard/create_task.py:167
 #, python-format
 msgid "Warning !"
-msgstr "Avertissement"
+msgstr "Warning !"
 
-#. module: project
-#: model:process.node,name:project.process_node_donetask0
-msgid "Done task"
-msgstr "Tâche terminée"
-
-#. module: project
-#: help:project.task,sequence:0
-msgid "Gives the sequence order when displaying a list of tasks."
-msgstr "Donne la séquence (l'ordre) d'affichage d'une liste de tâches"
-
+#. module: openstc
+#: selection:hotel_reservation.line,action:0
+msgid "Pas d'intervention"
+msgstr "Pas d'intervention"
 
 #. module: openstc
 #: field:openstc.site,width:0
 msgid "Width"
 msgstr "largeur"
 
-#. module: project
-#: help:project.project,warn_customer:0
-msgid "If you check this, the user will have a popup when closing a task that propose a message to send by email to the customer."
-msgstr "Si vous cochez cette option, l'utilisateur qui clôture une tâche se verra proposer l'envoi d'une notification par courriel au client (partenaire) associé."
-
-#. module: project
-#: model:project.task.type,name:project.project_tt_testing
-msgid "Testing"
-msgstr "En test"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstock_view_fournitures
+msgid "Ressources"
+msgstr "Ressources"
 
 #. module: openstc
 #: field:openstc.site,surface:0
 msgid "Surface"
 msgstr "Surface"
-
-#. module: project
-#: model:ir.model,name:project.model_account_analytic_account
-#: field:project.project,analytic_account_id:0
-msgid "Analytic Account"
-msgstr "Compte analytique"
 
 #. module: openstc
 #: field:openstc.ask,name:0
@@ -172,35 +125,22 @@ msgstr "Libellé "
 msgid "Select an intervention to"
 msgstr "Sélectionner une intervention"
 
-#. modules: project, openstc
+#. module: openstc
+#: model:ir.model,name:openstc.model_res_partner
+#: field:openstc.ask,partner_id:0
 #: view:report.project.task.user:0
-#: model:ir.model,name:project.model_res_partner
-#: view:project.project:0
-#: field:project.task,partner_id:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,partner_id:0
 msgid "Partner"
 msgstr "Partenaire"
 
-#. module: project
-#: constraint:account.analytic.account:0
-msgid "Error! You can not create recursive analytic accounts."
-msgstr "Erreur ! Vous ne pouvez pas créer de comptes analytiques récursifs."
-
-#. modules: project, openstc
+#. module: openstc
 #: field:openstc.task.memory,planned_hours:0
-#: field:project.task,planned_hours:0
-#: field:project.task.delegate,planned_hours:0
-#: field:project.vs.hours,planned_hours:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,hours_planned:0
 msgid "Planned Hours"
 msgstr "Heures prévisionnelles"
 
-#. module: project
-#: view:project.project:0
-msgid "Date Stop: %(date)s"
-msgstr "Date de fin : %(date)s"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "n'affiche que les réservations concernant une salle"
+msgstr "n'affiche que les réservations concernant une salle"
 
 #. module: openstc
 #: help:openstc.create.task.wizard,task_ids:0
@@ -208,259 +148,262 @@ msgid "Tasks for this ask"
 msgstr "Tâches de l'intervention"
 
 #. module: openstc
-#: field:openstc.ask,site_details:0
-msgid "Précision sur le site"
-msgstr "Précision sur le site"
+#: selection:openstc.pret.checkout.line,state:0
+msgid "Non Planifié"
+msgstr "Non Planifié"
 
-#. modules: project, openstc
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_employees5
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_employees
+msgid "Employés municipaux"
+msgstr "Employés municipaux"
+
+#. module: openstc
+#: selection:hotel_reservation.line,action:0
+msgid "Intervention à générer"
+msgstr "Intervention à générer"
+
+#. module: openstc
+#: view:openstc.equipment:0
+msgid "Equipment"
+msgstr "Equipment"
+
+#. module: openstc
 #: field:openstc.ask,state:0
+#: field:project.project,state:0
 #: view:project.task:0
 #: view:report.project.task.user:0
-#: view:project.task:0
-#: field:project.task,state:0
-#: field:project.task.history,state:0
-#: field:project.task.history.cumulative,state:0
-#: field:project.vs.hours,state:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,state:0
-#: field:task.by.days,state:0
 msgid "State"
 msgstr "Etat"
 
-#. module: project
-#: view:report.project.task.user:0
-msgid "In progress tasks"
-msgstr "Tâches en cours"
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:844
+#, python-format
+msgid "[Evenemential] supply of %s ont the site %s"
+msgstr "[Evénementiel] Mise en place de %s sur le site %s"
 
-#. module: project
-#: help:project.project,progress_rate:0
-msgid "Percent of tasks closed according to the total of tasks todo."
-msgstr "Pourcentage des tâches fermés en accord avec le total des tâches à faire."
+#. module: openstc
+#: field:openstc.pret.emprunt.wizard,origin:0
+msgid "Document d'origine"
+msgstr "Document d'origine"
 
-#. module: project
-#: view:board.board:0
-#: model:ir.actions.act_window,name:project.action_view_delegate_task_tree
-#: view:project.task:0
-msgid "My Delegated Tasks"
-msgstr "Mes tâches déléguées"
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:887
+#: code:addons/openstc/openstc_pret.py:888
+#, python-format
+msgid "bruno.plancher@gmail.com"
+msgstr "bruno.plancher@gmail.com"
 
-#. module: project
-#: view:project.task.delegate:0
-msgid "Validation Task Title"
-msgstr "Titre de la tâche de validation"
-
-#. module: project
-#: view:project.task:0
-msgid "Reevaluate"
-msgstr "Réévaluer"
-
-#. modules: project, openstc
-#: view:project.task:0
-#: view:project.project:0
+#. module: openstc
 #: view:project.task:0
 msgid "Miscelleanous"
 msgstr "Divers"
 
 #. module: openstc
-#: model:res.groups,name:openstc.openstc_agent
-msgid "openstc/Agent"
-msgstr "openstc/Agent"
-
-#. module: openstc
-#: model:ir.actions.act_window,name:openstc.action_openstc_view_ask
-#: model:ir.actions.act_window,name:openstc.action_openstc_view_ask_tree
-#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_ask
 #: view:openstc.ask:0
 msgid "Intervention asks"
 msgstr "Demandes d'interventions"
 
-#. module: project
-#: field:project.project,planned_hours:0
-#: field:project.task.history,planned_hours:0
-#: field:project.task.history.cumulative,planned_hours:0
-msgid "Planned Time"
-msgstr "Temps planifié"
+#. module: openstc
+#: code:addons/openstc/openstc.py:679
+#, python-format
+msgid "Suppression Impossible !"
+msgstr "Suppression Impossible !"
 
+#. module: openstc
+#: selection:openstc.pret.checkout,state:0
+msgid "Cloturé"
+msgstr "Cloturé"
 
-#. module: project
-#: field:project.vs.hours,user_id:0
-#: field:report.project.task.user,user_id:0
-msgid "Assigned To"
-msgstr "Assigné à"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_view_openstc_pret_create_envoi_mail_annulation_wizard
+msgid "Envoi du mail d'annulation de la réservation"
+msgstr "Envoi du mail d'annulation de la réservation"
 
-#. module: project
-#: view:project.task:0
-msgid "Dates"
-msgstr "Dates"
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Etats des Lieux dont un rachat et/ou une réparation en interne sont à générer."
+msgstr "Etats des Lieux dont un rachat et/ou une réparation en interne sont à générer."
 
-#. module: project
-#: view:project.project:0
-msgid "User: %(user_id)s"
-msgstr "Utilisateur: %(user_id)s"
+#. module: openstc
+#: field:openstc.service,category_ids:0
+#: view:openstc.task.category:0
+#: view:res.partner:0
+msgid "Categories"
+msgstr "Catégories"
+
+#. module: openstc
+#: help:openstc.task.memory,name:0
+#: help:openstc.task.memory,wizard_id:0
+msgid "Help note"
+msgstr "Note d'aide"
+
+#. module: openstc
+#: field:openstc.task.category,parent_id:0
+msgid "Parent Category"
+msgstr "Parent Category"
+
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Ne pas générerles actions saisies"
+msgstr "Ne pas générerles actions saisies"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Terminées"
+msgstr "Terminées"
 
 #. module: openstc
 #: view:openstc.ask:0
 msgid "Valid ask"
 msgstr "Valider la demande"
 
-#. module: project
-#: model:process.transition,name:project.process_transition_delegate0
-#: view:project.task:0
-msgid "Delegate"
-msgstr "Déléguer"
-
-#. module: project
-#: model:ir.actions.act_window,name:project.open_view_template_project
-#: view:project.project:0
-msgid "Templates of Projects"
-msgstr "Modèles de l'intervention"
+#. module: openstc
+#: field:openstc.ask,partner_address:0
+msgid "Contact"
+msgstr "Contact"
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_ir_ui_menu
-msgid "ir.ui.menu"
-msgstr "ir.ui.menu"
+#: field:openstc.equipment,technical_vehicle:0
+msgid "Technical vehicle"
+msgstr "Technical vehicle"
 
-#. module: project
-#: model:ir.actions.todo.category,name:project.category_project_config
-#: view:res.company:0
-msgid "Project Management"
-msgstr "Gestion de nterventions"
+#. module: openstc
+#: field:openstc.pret.checkout,user_id:0
+msgid "Saisie par"
+msgstr "Saisie par"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_project_task_delegate
-#: view:project.task.delegate:0
-msgid "Project Task Delegate"
-msgstr "Déléguer une tâche"
+#. module: openstc
+#: view:product.product:0
+msgid "Résumé des détériorations (Etat des Lieux)"
+msgstr "Résumé des détériorations (Etat des Lieux)"
 
 #. module: openstc
 #: field:openstc.ask,confirm_by_dst:0
 msgid "Confirm by DST"
 msgstr "Confirmé par le DST"
 
-#. module: project
-#: view:project.task:0
-msgid "Mark as Blocked"
-msgstr "Marquer comme bloquée"
+#. module: openstc
+#: selection:openstc.pret.checkout.line,etat_retour:0
+msgid "A Racheter"
+msgstr "A Racheter"
 
 #. module: openstc
-#: field:openstc.task.memory,category_id:0
-#: field:project.task,category_id:0
-msgid "Category"
-msgstr "Catégorie"
+#: view:hotel.folio:0
+msgid "Cancel Folio"
+msgstr "Cancel Folio"
+
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Lignes d'Etat des lieux"
+msgstr "Lignes d'Etat des lieux"
+
+#. module: openstc
+#: field:openstc.partner.type,claimers:0
+msgid "Claimers"
+msgstr "Claimers"
+
+#. module: openstc
+#: field:hotel_reservation.line,infos:0
+msgid "Informations supplémentaires"
+msgstr "Informations supplémentaires"
 
 #. module: openstc
 #: view:openstc.create.task.wizard:0
+#: field:openstc.task.category,tasksAssigned:0
 msgid "tasks"
 msgstr "Tâches"
 
-#. module: project
-#: view:project.task:0
-msgid "For changing to delegate state"
-msgstr "Pour passer à l'état délégué"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Réservations cloturées"
+msgstr "Réservations cloturées"
 
-#. module: project
-#: view:project.project:0
-msgid "Member"
-msgstr "Membre"
+#. module: openstc
+#: help:purchase.order,is_emprunt:0
+msgid "Indique qu'il s'agit d'une demande d'emprunt aurpès d'une mairie extèrieure et non d'un bon de commande"
+msgstr "Indique qu'il s'agit d'une demande d'emprunt aurpès d'une mairie extèrieure et non d'un bon de commande"
 
-#. module: project
-#: view:project.project:0
-msgid "Task: %(name)s"
-msgstr "Tâche: %(name)s"
+#. module: openstc
+#: field:openstock.qte.dispo.reserve.report,product:0
+msgid "article réservé"
+msgstr "article réservé"
 
-#. module: project
-#: help:project.project,members:0
-msgid "Project's members are users who can have an access to the tasks related to this project."
-msgstr "Les membres d'une intervention sont des utilisateurs qui peuvent avoir accès aux tâches de cette intervention."
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Procurement Corrected"
+msgstr "Procurement Corrected"
 
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "August"
-msgstr "Août"
+#. module: openstc
+#: selection:hotel.reservation,in_option:0
+msgid "Réservation En Option"
+msgstr "Réservation En Option"
 
-#. module: project
-#: view:project.project:0
-#: field:project.project,complete_name:0
-#: view:project.project:0 field:project.project,complete_name:0
-msgid "Project Name"
-msgstr "Nom du Projet"
+#. module: openstc
+#: model:res.groups,name:openstc.openstc_agent
+msgid "OpenSTC/Agent"
+msgstr "OpenSTC/Agent"
 
-#. module: project
-#: view:project.project:0
-#: field:project.project,complete_name:0
-msgid "Project Name"
-msgstr "Nom de l'intervention"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Guest Name"
+msgstr "Guest Name"
 
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "June"
-msgstr "Juin"
+#. module: openstc
+#: field:product.product,bloquant:0
+msgid "\"Non disponibilité\" bloquante"
+msgstr "\"Non disponibilité\" bloquante"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_create_initial_projects_installer
-msgid "Create your Firsts Projects"
-msgstr "Créer votre premiere interventions"
+#. module: openstc
+#: field:openstc.pret.checkout,name:0
+#: field:openstc.pret.checkout,reservation:0
+msgid "Réservation Associée"
+msgstr "Réservation Associée"
 
 #. module: openstc
 #: field:res.users,cost:0
 msgid "Coût horaire"
 msgstr "Coût horaire"
 
-#. module: project
-#: help:project.project,total_hours:0
-msgid "Sum of total hours of all tasks related to this project and its child projects."
-msgstr "Somme des heures de toutes les tâches de cette intervention et de ses sous-inteventions"
-
-#. module: project
-#: help:project.project,active:0
-msgid "If the active field is set to False, it will allow you to hide the project without removing it."
-msgstr "Si le champ actif n'est pas coché, l'intervention sera caché mais ne sera pas supprimé."
-
-
-
-#. module: project
-#: model:process.transition,note:project.process_transition_opendonetask0
-msgid "When task is completed, it will come into the done state."
-msgstr "Quand une tâche sera finie, elle passera à l'état terminé"
-
-#. module: project
-#: view:project.task:0
-#: view:project.task.history.cumulative:0
-msgid "In Progress Tasks"
-msgstr "Tâches en cours"
-
-#. module: project
-#: help:res.company,project_time_mode_id:0
-msgid "This will set the unit of measure used in projects and tasks.\n"
-"If you use the timesheet linked to projects (project_timesheet module), don't forget to setup the right unit of measure in your employees."
-msgstr "Ceci fixe l'unité de mesure utilisée dans les interventions et tâches.\n"
-"Si vous utilisez les feuilles de temps couplés aux interventions (project_timesheet module), n'oubliez pas de fixer la bonne unité de mesure de vos employés."
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_create_task_view
+#: model:ir.actions.act_window,name:openstc.action_openstc_refused_ask_view
+msgid "Associate tasks to wizard"
+msgstr "Associate tasks to wizard"
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_openstc_ask
-msgid "openstc.ask"
-msgstr "demande d'intervention"
+#: view:purchase.order:0
+msgid "Cancel Purchase Order"
+msgstr "Annuler cde fourn."
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_team
+#: view:openstc.team:0
+msgid "Teams"
+msgstr "Teams"
+
+#. module: openstc
+#: field:openstc.equipment,time:0
+msgid "Time"
+msgstr "Time"
 
 #. module: openstc
 #: view:openstc.create.task.wizard:0
 msgid "Création de l'intervention et de ses tâches"
 msgstr "Création de l'intervention et de ses tâches"
 
-#. modules: project, openstc
-#: model:ir.model,name:openstc.model_project_vs_hours
-#: model:ir.model,name:project.model_project_vs_hours
-msgid " Project vs  hours"
-msgstr " Intervention vs heures"
+#. module: openstc
+#: field:openstc.ask,partner_phone:0
+msgid "Téléphone"
+msgstr "Téléphone"
 
 #. module: openstc
 #: field:openstc.task.category,quantity:0
 msgid "Quantity"
 msgstr "Quantité"
 
-#. modules: project, openstc
+#. module: openstc
 #: field:openstc.task.memory,user_id:0
-#: field:project.task,user_id:0
-#: view:report.project.task.user:0
 msgid "Assigned to"
 msgstr "Assigné à"
 
@@ -475,70 +418,115 @@ msgstr "If the task is created the state is 'Wait'.\n"
 " If review is needed the task is in 'Pending' state.                          \n"
 " If the task is over, the states is set to 'Done'."
 
-#. modules: project, openstc
+#. module: openstc
+#: field:openstock.qte.dispo.report,jour_dispo:0
+msgid "Journée"
+msgstr "Journée"
+
+#. module: openstc
+#: selection:hotel.reservation,in_option:0
+msgid "Réservation bloquée"
+msgstr "Réservation bloquée"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:337
+#: code:addons/openstc/openstc_pret.py:403
+#, python-format
+msgid "Your resa is blocked because your expected date is too early so that we can not supply your products at time"
+msgstr "Your resa is blocked because your expected date is too early so that we can not supply your products at time"
+
+#. module: openstc
 #: field:openstc.ask,intervention_ids:0
-#: model:ir.ui.menu,name:project.menu_open_view_project_all
+#: field:openstc.site,intervention_ids:0
 msgid "Interventions"
 msgstr "Interventions"
 
-#. module: project
-#: code:addons/addons/project/project.py:923
-#: code:addons/project/project.py:923
-#, python-format
-msgid "Delegated User should be specified"
-msgstr "Le sous-traitant doit être spécifié"
-
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "September"
-msgstr "Septembre"
-
-#. module: project
-#: view:project.task:0
-#: selection:project.task,state:0
-#: selection:project.task.history,state:0
-#: view:project.task.history.cumulative:0
-#: selection:project.task.history.cumulative,state:0
-#: selection:report.project.task.user,state:0
-#: selection:task.by.days,state:0
-msgid "In Progress"
-msgstr "En cours"
-
-#. module: project
-#: view:project.task:0
-msgid "Reactivate"
-msgstr "Ré-activer"
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Faisant l'objet d'une réparation"
+msgstr "Faisant l'objet d'une réparation"
 
 #. module: openstc
-#: model:res.groups,name:openstc.openstc_manager
-msgid "openstc/Manager"
-msgstr "openstc/Manager"
+#: field:hotel_reservation.line,amount:0
+msgid "Prix (si onéreux)"
+msgstr "Prix (si onéreux)"
+
+#. module: openstc
+#: field:res.users,position:0
+msgid "Grade"
+msgstr "Grade"
+
+#. module: openstc
+#: field:purchase.order,is_emprunt:0
+msgid "Demande d'emprunt"
+msgstr "Demande d'emprunt"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_absent_type
+msgid "openstc.absent.type"
+msgstr "openstc.absent.type"
+
+#. module: openstc
+#: field:openstock.qte.dispo.reserve.report,checkin:0
+#: field:openstock.qte.dispo.reserve.report,checkout:0
+msgid "Début réservation"
+msgstr "Début réservation"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstock_view_reservation_new
+#: model:ir.ui.menu,name:openstc.menu_action_openstock_view_reservation_new
+msgid "Créer une nouvelle réservation"
+msgstr "Créer une nouvelle réservation"
 
 #. module: openstc
 #: field:openstc.task.memory,wizard_id:0
 msgid "Wizard"
 msgstr "Assistant"
 
-#. module: project
-#: field:project.project,resource_calendar_id:0
-msgid "Working Time"
-msgstr "Temps de Travail"
+#. module: openstc
+#: field:project.task,parent_id:0
+msgid "Parent Task"
+msgstr "Parent Task"
 
 #. module: openstc
-#: model:ir.actions.act_window,name:openstc.openstc_valid_ask
-msgid "openstc.ask.valid"
-msgstr "openstc.ask.valid"
+#: field:openstc.pret.checkout.line,state:0
+msgid "Avancement"
+msgstr "Avancement"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_project_task_reevaluate
-msgid "Re-evaluate Task"
-msgstr "Réévaluer la tâche"
+#. module: openstc
+#: view:openstc.ask:0
+msgid "Details"
+msgstr "Details"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_view_task_history_burndown
-#: model:ir.ui.menu,name:project.menu_action_view_task_history_burndown
-msgid "Burndown Chart"
-msgstr "Graphe d'avancement"
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_carto_request
+msgid "nouvelle intervention"
+msgstr "nouvelle intervention"
+
+#. module: openstc
+#: field:product.product,checkout_lines:0
+msgid "Lignes Etat des Lieux"
+msgstr "Lignes Etat des Lieux"
+
+#. module: openstc
+#: view:openstc.pret.warning.dispo.wizard:0
+msgid "Commencer l'emprunt"
+msgstr "Commencer l'emprunt"
+
+#. module: openstc
+#: selection:product.product,etat:0
+msgid "Neuf"
+msgstr "Neuf"
+
+#. module: openstc
+#: model:email.template,subject:openstc.openstc_pret_email_template_resa_validee
+msgid "Votre Réservation: ${object.name or 'inconnu'} est validée"
+msgstr "Votre Réservation: ${object.name or 'inconnu'} est validée"
+
+#. module: openstc
+#: field:openstc.pret.emprunt.line.wizard,product_id:0
+msgid "Ressource à Emprunter"
+msgstr "Ressource à Emprunter"
 
 #. module: openstc
 #: view:openstc.ask:0
@@ -547,159 +535,179 @@ msgid "To be confirm"
 msgstr "A confirmer"
 
 #. module: openstc
+#: model:ir.model,name:openstc.model_hotel_reservation
+msgid "Reservation"
+msgstr "Reservation"
+
+#. module: openstc
 #: field:openstc.ask,site2:0
-#: field:project.project,site2:0
 msgid "Site secondaire"
 msgstr "Site secondaire"
-
-#. module: project
-#: sql_constraint:res.company:0
-msgid "The company name must be unique !"
-msgstr "Le nom de la société doit être unique !"
 
 #. module: openstc
 #: field:res.users,firstname:0
 msgid "firstname"
 msgstr "firstname"
 
-#. module: project
-#: model:process.node,note:project.process_node_opentask0
-msgid "Encode your working hours."
-msgstr "Encoder vos heures de travail"
-
-#. module: project
-#: view:project.project:0
-msgid "Status: %(state)s"
-msgstr "État: %(state)s"
-
-#. module: project
-#: view:project.task.history.cumulative:0
-msgid "Month-2"
-msgstr "Mois -2"
-
-#. module: project
-#: view:project.task.history.cumulative:0
-#: view:report.project.task.user:0
-msgid "Month-1"
-msgstr "Mois -1"
-
-#. module: project
-#: field:project.task,total_hours:0
-#: field:project.vs.hours,total_hours:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,total_hours:0
-msgid "Total Hours"
-msgstr "Total des heures"
-
-#. module: project
-#: help:project.project,warn_footer:0
-msgid "Footer added at the beginning of the email for the warning message sent to the customer when a task is closed."
-msgstr "Le pied de page est ajouté à la fin du courriel du message d'avertissement envoyé au client lorsque la tâche est fermée"
-
-#. module: project
-#: model:ir.actions.act_window,help:project.open_view_project_all
-msgid "A project contains a set of tasks or issues that will be performed by your resources assigned to it. A project can be hierarchically structured, as a child of a Parent Project. This allows you to design large project structures with different phases spread over the project duration cycle. Each user can set his default project in his own preferences to automatically filter the tasks or issues he usually works on. If you choose to invoice the time spent on a project task, you can find project tasks to be invoiced in the billing section."
-msgstr "Une intervention contient des tâches ou des incidents qui seront effectués ou traités par vos ressources auxquels ils sont assignés. Une intervention peut avoir une structure hiérarchique, comme être le fils d'une intervention parent. Ceci vous permet de concevoir des structures de l'intervention avec différentes phases qui s'étalent pendant toute la durée d'un cycle. Chaque utilisateur peut s'attribuer une intervention par défaut dans ces préférences pour automatiquement filtrer les tâches et les incidents sur lesquels il travaille. Si vous choisissez de facturer le temps passé sur une tâche d'une intervention, vous pouvez retrouver les tâches de cette intervention à facturer dans la section facturation."
-
-#. module: project
-#: field:project.task,create_date:0
-msgid "Create Date"
-msgstr "Date de création"
-
-#. module: project
-#: view:project.task:0
-#: view:res.partner:0
-msgid "For changing to open state"
-msgstr "Pour revenir à l'état ouvert"
-
-#. module: project
-#: help:project.task.delegate,new_task_description:0
-msgid "Reinclude the description of the task in the task of the user"
-msgstr "Inclure de nouveau la description de la tâche dans la tâche de l'utilisateur"
-
-#. module: project
-#: view:report.project.task.user:0
-msgid "My tasks"
-msgstr "Mes Tâches"
+#. module: openstc
+#: constraint:openstc.pret.checkout.line:0
+msgid "La Qté à Racheter doit-être inférieure à la quantité réservée et n'être renseignée que si l'article doit être racheté"
+msgstr "La Qté à Racheter doit-être inférieure à la quantité réservée et n'être renseignée que si l'article doit être racheté"
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_openstc_intervention_assignement
-msgid "openstc.intervention.assignement"
-msgstr "openstc.intervention.assignement"
+#: view:hotel.reservation:0
+msgid "Ligne de réservation"
+msgstr "Ligne de réservation"
 
-#. module: project
-#: model:process.transition,name:project.process_transition_opendonetask0
-msgid "Open Done Task"
-msgstr "Rouvrir les tâches terminées"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Article Réservé"
+msgstr "Article Réservé"
 
-#. module: project
-#: field:project.task.delegate,planned_hours_me:0
-msgid "Hours to Validate"
-msgstr "Temps pour validation"
+#. module: openstc
+#: field:openstc.ask,partner_type:0
+msgid "Partner Type"
+msgstr "Partner Type"
 
-#. module: project
-#: help:project.task,remaining_hours:0
-msgid "Total remaining time, can be re-estimated periodically by the assignee of the task."
-msgstr "Le total du temps restant peut être réévalué périodiquement par le prescripteur de la tâche."
+#. module: openstc
+#: field:openstc.task.category,parent_left:0
+msgid "Left Parent"
+msgstr "Left Parent"
+
+#. module: openstc
+#: field:openstc.pret.envoie.mail.annulation.wizard,email_template:0
+msgid "Modèle d'Email"
+msgstr "Modèle d'Email"
+
+#. module: openstc
+#: field:hotel.reservation,name:0
+msgid "Nom Manifestation"
+msgstr "Nom Manifestation"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:846
+#, python-format
+msgid "supply of %s on the site %s for the event \"%s\" planned from %s to %s"
+msgstr "Mise en place de %s sur le site %s dans le cadre de l'événement \"%s\" prévue du %s au %s"
+
+#. module: openstc
+#: view:product.product:0
+msgid "Collectivités"
+msgstr "Collectivités"
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Calculer"
+msgstr "Calculer"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_partner_type
+msgid "openstc.partner.type"
+msgstr "openstc.partner.type"
+
+#. module: openstc
+#: constraint:product.product:0
+msgid "Error: Invalid ean code"
+msgstr "Erreur : Code EAN invalide"
+
+#. module: openstc
+#: view:openstc.pret.emprunt.wizard:0
+msgid "Emprunter des Ressources auprès de Collectivités extérieures"
+msgstr "Emprunter des Ressources auprès de Collectivités extérieures"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_todo
+msgid "todo stc"
+msgstr "todo stc"
+
+#. module: openstc
+#: field:hotel_reservation.line,dispo:0
+msgid "Disponible"
+msgstr "Disponible"
+
+#. module: openstc
+#: field:openstc.ask,partner_service_id:0
+#: field:res.partner,service_id:0
+msgid "Service du demandeur"
+msgstr "Service du demandeur"
+
+#. module: openstc
+#: sql_constraint:hotel.folio:0
+msgid "Check in Date Should be lesser than the Check Out Date!"
+msgstr "Votre date de Début doit-être antérieure à votre date de fin"
+
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Générer les actions saisies"
+msgstr "Générer les actions saisies"
+
+#. module: openstc
+#: view:purchase.order:0
+msgid "Annuler emprunt"
+msgstr "Annuler emprunt"
+
+#. module: openstc
+#: field:openstc.equipment,usage:0
+msgid "Usage"
+msgstr "Usage"
 
 #. module: openstc
 #: view:openstc.ask:0
 msgid "For valid the task"
 msgstr "Valider la demande"
 
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "March"
-msgstr "Mars"
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Voir facture associée"
+msgstr "Voir facture associée"
 
 #. module: openstc
 #: view:res.users:0
 msgid "Email Preferences"
 msgstr "Préférences de messagerie électronique"
 
-#. module: project
-#: view:project.task:0
-#: view:project.task.history.cumulative:0
-msgid "My Tasks"
-msgstr "Mes tâches"
-
-#. modules: project, openstc
-#: constraint:project.task:0
+#. module: openstc
 #: constraint:project.task:0
 msgid "Error ! You cannot create recursive tasks."
 msgstr "Erreur ! Vous ne pouvez pas créer de tâches récursives"
 
-#. module: project
-#: view:report.project.task.user:0
-msgid "Pending tasks"
-msgstr "Tâches en attente"
-
-#. module: project
-#: view:project.task.reevaluate:0
-msgid "_Evaluate"
-msgstr "_Evaluer"
-
-#. module: project
-#: view:report.project.task.user:0
-#: field:report.project.task.user,opening_days:0
-msgid "Days to Open"
-msgstr "Jours pour ouvrir"
+#. module: openstc
+#: field:openstc.pret.emprunt.line.wizard,qte:0
+msgid "Quantité empruntée"
+msgstr "Quantité empruntée"
 
 #. module: openstc
-#: field:res.users,arrival_date:0
-msgid "Date d'arrivée"
-msgstr "Date d'arrivée"
+#: model:res.groups,name:openstc.openstc_manager
+msgid "OpenSTC/Manager"
+msgstr "OpenSTC/Manager"
 
-#. module: project
-#: selection:report.project.task.user,priority:0
-msgid "Very urgent"
-msgstr "Très urgent"
+#. module: openstc
+#: sql_constraint:openstc.task.category:0
+msgid "Category must be unique!"
+msgstr "Category must be unique!"
 
-#. module: project
-#: help:project.task.delegate,project_id:0
-#: help:project.task.delegate,user_id:0
-msgid "User you want to delegate this task to"
-msgstr "Utilisateur à qui vous voulez déléguer cette tâche"
+#. module: openstc
+#: field:openstc.ask,create_uid:0
+#: field:openstc.ask,write_uid:0
+#: field:project.project,create_uid:0
+msgid "Created by"
+msgstr "Created by"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstock_pret_location_view_product
+msgid "Prêts / Locations"
+msgstr "Prêts / Locations"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:328
+#, python-format
+msgid "Your checkin is greater than your checkout, please modify them"
+msgstr "Votre date de début dépasse votre date de Fin, veuillez les modifier"
+
+#. module: openstc
+#: field:hotel.reservation,resa_checkout_id:0
+msgid "Etat des Lieux associé"
+msgstr "Etat des Lieux associé"
 
 #. module: openstc
 #: view:openstc.ask:0
@@ -707,355 +715,365 @@ msgstr "Utilisateur à qui vous voulez déléguer cette tâche"
 msgid "Wait"
 msgstr "En attente"
 
+#. module: openstc
+#: field:product.product,qte_dispo:0
+msgid "Disponible Aujourd'hui"
+msgstr "Disponible Aujourd'hui"
 
-#. module: project
-#: view:project.task.history.cumulative:0
-msgid "Tasks's Cumulative Flow"
-msgstr "Flux cumulé des tâches"
-
-#. module: project
-#: view:project.project:0
-msgid "Set as Template"
-msgstr "Mettre en modèle"
-
-#. modules: project, openstc
+#. module: openstc
 #: model:ir.model,name:openstc.model_project_task
-#: model:ir.model,name:project.model_project_task
-#: field:project.task.history,task_id:0
-#: field:project.task.history.cumulative,task_id:0
-#: field:project.task.work,task_id:0
-#: view:report.project.task.user:0
 msgid "Task"
 msgstr "Tâche"
 
-#. modules: project, openstc
-#: model:ir.model,name:openstc.model_project_task_work
-#: model:ir.model,name:project.model_project_task_work
-msgid "Project Task Work"
-msgstr "Avancement sur une tâche de l'intervention"
+#. module: openstc
+#: view:project.project:0
+msgid "Administration"
+msgstr "Administration"
 
 #. module: openstc
-#: field:res.users,address_home:0
-msgid "Address"
-msgstr "Adresse"
+#: view:product.product:0
+msgid "Suppliers"
+msgstr "Fournisseurs"
 
-#. module: project
-#: field:project.task,name:0
-#: field:report.project.task.user,name:0
-msgid "Task Summary"
-msgstr "Résumé de la tâche"
+#. module: openstc
+#: selection:openstc.pret.deliver.products.line.wizard,motif:0
+msgid "Installation Technique"
+msgstr "Installation Technique"
 
-#. module: project
-#: field:project.task,active:0
-msgid "Not a Template Task"
-msgstr "Pas une tâche modèle"
+#. module: openstc
+#: field:openstc.site,long:0
+msgid "Longitude"
+msgstr "Longitude"
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_task_memory
 msgid "Task management"
 msgstr "Gestion des tâches"
 
-#. module: project
-#: view:board.board:0
-#: model:ir.actions.act_window,name:project.my_open_tasks_action
-msgid "My Open Tasks"
-msgstr "Mes tâches ouvertes"
+#. module: openstc
+#: selection:product.product,etat:0
+msgid "Moyen"
+msgstr "Moyen"
 
-#. module: project
-#: view:project.task.delegate:0
-msgid "Validation Task"
-msgstr "Tâche Validée"
+#. module: openstc
+#: selection:project.project,state:0
+msgid "Closing"
+msgstr "Closing"
 
-#. module: project
-#: model:process.transition,note:project.process_transition_delegate0
-msgid "Delegates tasks to the other user"
-msgstr "Délègue des tâches à d'autres personnes"
+#. module: openstc
+#: model:email.template,subject:openstc.openstc_pret_email_template_resa_done
+msgid "Facture concernant votre Réservation: ${object.name or 'inconnu'}"
+msgstr "Facture concernant votre Réservation: ${object.name or 'inconnu'}"
 
-#. module: project
-#: help:project.task,effective_hours:0
-msgid "Computed using the sum of the task work done."
-msgstr "Représente le temps cumulé passé sur cette tâche"
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_team
+msgid "team stc"
+msgstr "team stc"
 
-#. module: project
-#: code:addons/addons/project/project.py:802
-#: code:addons/project/project.py:802
-#, python-format
-msgid "Send Email after close task"
-msgstr "Envoyer un courriel après avoir fermé la tâche"
+#. module: openstc
+#: model:res.groups,name:openstc.openstc_qualifier
+msgid "OpenSTC/Qualifier"
+msgstr "OpenSTC/Qualifier"
 
-#. module: project
-#: view:project.task:0
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Quantité Réservée"
+msgstr "Quantité Réservée"
+
+#. module: openstc
+#: view:openstc.pret.deliver.products.wizard:0
+msgid "Ne pas générer d'intervention"
+msgstr "Ne pas générer d'intervention"
+
+#. module: openstc
+#: field:openstc.team,name:0
+msgid "name"
+msgstr "name"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstock_qte_dispo_reserve_report
+msgid "Réservation des produits"
+msgstr "Réservation des produits"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_hotel_folio
+msgid "hotel folio new"
+msgstr "hotel folio new"
+
+#. module: openstc
+#: field:openstc.equipment,marque:0
+msgid "Marque"
+msgstr "Marque"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.openstc_action_view_planning
+#: model:ir.model,name:openstc.model_openstc_planning
+#: model:ir.ui.menu,name:openstc.menu_planning
+#: field:openstc.planning,name:0
 msgid "Planning"
 msgstr "Planning"
 
-#. modules: project, openstc
+#. module: openstc
 #: field:openstc.ask,date_deadline:0
 #: field:openstc.create.task.wizard,inter_date_deadline:0
 #: field:project.project,date_deadline:0
-#: view:project.task:0
-#: field:project.task,date_deadline:0
-#: field:report.project.task.user,date_deadline:0
 msgid "Deadline"
 msgstr "Date butoir"
 
-#. module: project
-#: view:project.task.delegate:0
-#: view:project.task.reevaluate:0
-msgid "_Cancel"
-msgstr "_Annuler"
-
-#. module: project
-#: view:project.task.history.cumulative:0
-msgid "Ready"
-msgstr "Prêt"
-
-#. module: project
-#: view:project.task:0
-msgid "Change Color"
-msgstr "Modifier la couleur"
-
-#. module: project
-#: view:project.task:0
-msgid "New Tasks"
-msgstr "Nouvelles tâches"
-
-#. module: project
-#: view:project.task:0
-msgid "Previous"
-msgstr "Précédente"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_partner_type
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_partner_type
+msgid "Types"
+msgstr "Types"
 
 #. module: openstc
+#: field:openstc.ask,intervention_assignement_id:0
+#: field:project.project,intervention_assignement_id:0
+msgid "Affectation"
+msgstr "Affectation"
+
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_view_reservations
+msgid "Gestion des Réservations"
+msgstr "Gestion des Réservations"
+
+#. module: openstc
+#: code:addons/openstc/wizard/ask_refused.py:46
+#: code:addons/openstc/wizard/ask_refused.py:72
+#: code:addons/openstc/wizard/create_task.py:167
+#, python-format
+msgid "There is no valid ask selected !"
+msgstr "There is no valid ask selected !"
+
+#. module: openstc
+#: view:res.company:0
+msgid "Préférences de la Collectivité"
+msgstr "Préférences de la Collectivité"
+
+#. module: openstc
+#: view:openstc.service:0
 #: view:openstc.site:0
 msgid "Organisation"
 msgstr "Organisation"
 
-#. module: project
-#: view:project.task:0
-msgid "Next"
-msgstr "Suivante"
-
-#. module: project
-#: model:process.transition,note:project.process_transition_draftopentask0
-msgid "From draft state, it will come into the open state."
-msgstr "De l'état brouillon, il passera à l'état ouvert"
-
-#. module: project
-#: view:project.task.history.cumulative:0
-msgid "Task's Analysis"
-msgstr "Analyse des tâches"
-
-#. module: project
-#: view:project.task.delegate:0
-#: field:project.task.delegate,new_task_description:0
-msgid "New Task Description"
-msgstr "Description de la nouvelle tâche"
-
-#. module: project
-#: field:report.project.task.user,delay_endings_days:0
-msgid "Overpassed Deadline"
-msgstr "Échéance dépassée"
+#. module: openstc
+#: field:openstc.task.category,child_id:0
+msgid "Child Categories"
+msgstr "Child Categories"
 
 #. module: openstc
+#: view:openstc.pret.envoie.mail.annulation.wizard:0
+msgid "Ne pas envoyer le mail"
+msgstr "Ne pas envoyer le mail"
+
+#. module: openstc
+#: field:openstc.site,lat:0
+msgid "Latitude"
+msgstr "Latitude"
+
+#. module: openstc
+#: field:openstc.equipment,type:0
 #: field:openstc.site,type:0
+#: field:res.partner,type_id:0
 msgid "Type"
 msgstr "Type"
 
-#. module: project
-#: view:report.project.task.user:0
-msgid "New tasks"
-msgstr "Nouvelles tâches"
+#. module: openstc
+#: field:product.category,cat_id:0
+msgid "category"
+msgstr "category"
 
-#. module: project
-#: selection:project.task,priority:0
-#: selection:report.project.task.user,priority:0
-msgid "Medium"
-msgstr "Moyenne"
+#. module: openstc
+#: selection:project.project,state:0
+msgid "Template"
+msgstr "Template"
 
-#. module: project
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:232
+#, python-format
+msgid "Intervention associated no longer exist or have been deleted, can not open it"
+msgstr "Intervention associated no longer exist or have been deleted, can not open it"
+
+#. module: openstc
+#: view:openstc.pret.warning.dispo.wizard:0
+msgid "Attention, certains des articles que vous voulez réserver ne sont pas disponibles."
+msgstr "Attention, certains des articles que vous voulez réserver ne sont pas disponibles."
+
+#. module: openstc
+#: view:openstc.pret.envoie.mail.annulation.wizard:0
+msgid "Envoi du mail d'annulation"
+msgstr "Envoi du mail d'annulation"
+
+#. module: openstc
+#: selection:openstc.pret.deliver.products.line.wizard,motif:0
+msgid "Livraison"
+msgstr "Livraison"
+
+#. module: openstc
+#: field:openstc.pret.checkout.line,product_id:0
+msgid "Article"
+msgstr "Article"
+
+#. module: openstc
+#: field:openstc.pret.checkout,purchase_id:0
+msgid "Facture associée"
+msgstr "Facture associée"
+
+#. module: openstc
+#: view:openstc.pret.emprunt.wizard:0
+msgid "Emprunter"
+msgstr "Emprunter"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:889
+#: code:addons/openstc/openstc_pret.py:892
+#, python-format
+msgid "Votre Réservation normalement prévue du ${object.checkin} au         ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
+msgstr "Votre Réservation normalement prévue du ${object.checkin} au         ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
+
+#. module: openstc
 #: view:project.task:0
-#: field:project.task,remaining_hours:0
-#: field:project.task.reevaluate,remaining_hours:0
-#: field:project.vs.hours,remaining_hours:0
 #: view:report.project.task.user:0
-#: field:report.project.task.user,remaining_hours:0
-msgid "Remaining Hours"
-msgstr "Heures restantes"
-
-#. module: project
-#: field:project.project,total_hours:0
-msgid "Total Time"
-msgstr "Temps total"
-
-#. module: project
-#: view:report.project.task.user:0
-msgid "Creation Date"
-msgstr "Date de création"
-
-#. module: project
-#: view:project.task.history.burndown:0
-msgid "Burndown Chart of Tasks"
-msgstr "Graphique d'avancement des tâches"
-
-#. modules: project, openstc
-#: view:project.task:0
-#: view:report.project.task.user:0
-#: view:project.task:0
-#: field:project.task,type_id:0
-#: field:project.task.history,type_id:0
-#: field:project.task.history.cumulative,type_id:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,type_id:0
 msgid "Stage"
 msgstr "Étape"
 
 #. module: openstc
-#: field:openstc.task.category,task_ids:0
-msgid "Sous-tâches"
-msgstr "Sous-tâches"
+#: model:res.groups,name:openstc.openstc_dst
+msgid "OpenSTC/DST"
+msgstr "OpenSTC/DST"
 
 #. module: openstc
-#: model:res.groups,name:openstc.openstc_employee
-msgid "openstc/Employee"
-msgstr "openstc/Employee"
+#: view:openstc.pret.checkout:0
+msgid "Ayant des actions à générer"
+msgstr "Ayant des actions à générer"
 
-#. module: project
-#: model:process.transition,name:project.process_transition_draftopentask0
-msgid "Draft Open task"
-msgstr "Ouvrir les tâches en brouillon"
-
-#. module: project
-#: model:res.request.link,name:project.req_link_task
-msgid "Project task"
-msgstr "Tâche de l'intervention"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Coordonnées Demandeur"
+msgstr "Coordonnées Demandeur"
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_refused_ask_wizard
 msgid "ask"
 msgstr "Demande"
 
-#. module: project
-#: view:board.board:0
-msgid "My Board"
-msgstr "Mon Tableau"
-
-#. module: project
-#: model:ir.ui.menu,name:project.menu_task_types_view
-msgid "Stages"
-msgstr "Étapes"
-
-#. module: project
-#: model:ir.model,name:project.model_project_task_delegate
-msgid "Task Delegate"
-msgstr "Déléguer une tâche"
-
-#. module: project
-#: view:report.project.task.user:0
-msgid "In progress"
-msgstr "En cours"
+#. module: openstc
+#: view:openstc.pret.emprunt.wizard:0
+#: field:openstc.pret.emprunt.wizard,emprunt_line:0
+msgid "Lignes d'emprunt"
+msgstr "Lignes d'emprunt"
 
 #. module: openstc
-#: field:res.users,position:0
-msgid "Grade"
-msgstr "Grade"
-
-#. module: project
-#: help:project.task,state:0
-msgid "If the task is created the state is 'Draft'.\n"
-" If the task is started, the state becomes 'In Progress'.\n"
-" If review is needed the task is in 'Pending' state.                                  \n"
-" If the task is over, the states is set to 'Done'."
-msgstr "Si la tâche est créée, son état est 'Brouillon'.\n"
-" Si la tâche est démarrée, l'état devient 'En cours'.\n"
-" Si une revue est nécessaire, l'état de la tâche est  'En attente'.                                  \n"
-" Si la tâche est terminée, l'état est 'Terminé'."
-
-#. module: project
-#: selection:report.project.task.user,priority:0
-msgid "Urgent"
-msgstr "Urgent"
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_carto_stat
+msgid "statistique"
+msgstr "statistique"
 
 #. module: openstc
-#: model:res.groups,name:openstc.openstc_qualifier
-msgid "openstc/Qualifier"
-msgstr "openstc/Qualifier"
+#: field:hotel.reservation,partner_mail:0
+msgid "Email Demandeur"
+msgstr "Email Demandeur"
 
 #. module: openstc
-#: field:res.users,postal_code_home:0
-msgid "Postal code"
-msgstr "Postal code"
+#: field:openstc.pret.deliver.products.line.wizard,qte_reserves:0
+msgid "Quantité de la Ressource"
+msgstr "Quantité de la Ressource"
 
-#. module: project
-#: selection:project.task,kanban_state:0
-#: selection:project.task.history,kanban_state:0
-#: selection:project.task.history.cumulative,kanban_state:0
-msgid "Ready To Pull"
-msgstr "Prêt à avancer"
+#. module: openstc
+#: field:openstc.pret.deliver.products.line.wizard,product_id:0
+msgid "Ressource concernée"
+msgstr "Ressource concernée"
 
-#. module: project
-#: view:project.project:0
-msgid "Contact Address"
-msgstr "Adresse du contact"
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_openstc_employees
+msgid "Employées"
+msgstr "Employées"
 
-#. module: project
-#: view:project.task:0
-msgid "Delegated tasks"
-msgstr "Tâches déléguées"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Mettre en Brouillon"
+msgstr "Mettre en Brouillon"
 
-#. module: project
-#: view:project.project:0
-msgid "Administration"
-msgstr "Administration"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.openstc_action_view_task
+msgid "Tâches"
+msgstr "Tâches"
 
-#. module: project
-#: code:addons/addons/project/wizard/project_task_delegate.py:81
-#: code:addons/project/wizard/project_task_delegate.py:81
-#, python-format
-msgid "CHECK: %s"
-msgstr "Vérification : %s"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstock_qte_dispo_graph2
+msgid "Test Vérif Dispo"
+msgstr "Test Vérif Dispo"
 
-#. module: project
-#: view:project.project:0
-msgid "Reset as Project"
-msgstr "Réinitialiser en intervention"
+#. module: openstc
+#: field:openstc.pret.checkout,date_order:0
+msgid "Date de l'Etat des lieux"
+msgstr "Date de l'Etat des lieux"
 
-#. module: project
-#: view:project.task:0
-msgid "Change Type"
-msgstr "Modifier le type"
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_carto
+msgid "Cartographie"
+msgstr "Cartographie"
 
-#. module: project
-#: field:project.project,effective_hours:0
-#: field:project.task.work,hours:0
-msgid "Time Spent"
-msgstr "Temps passé"
+#. module: openstc
+#: field:openstc.pret.emprunt.line.wizard,partner_id:0
+msgid "Collectivité prêtant"
+msgstr "Collectivité prêtant"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_project_task_work
+msgid "Project Task Work"
+msgstr "Avancement sur une tâche de projet"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Annuler la réservation"
+msgstr "Annuler la réservation"
+
+#. module: openstc
+#: field:openstc.service,technical:0
+msgid "Technical service"
+msgstr "Technical service"
+
+#. module: openstc
+#: field:product.product,type_prod:0
+msgid "Type de Produit"
+msgstr "Type de Produit"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_modify_ask_service_wizard
+msgid "Modify ask"
+msgstr "Modify ask"
 
 #. module: openstc
 #: field:openstc.create.task.wizard,inter_state:0
+#: field:openstc.pret.emprunt.line.wizard,line_id:0
 #: field:openstc.refused.ask.wizard,state:0
 msgid "unknown"
 msgstr "Inconnu"
 
-#. module: project
-#: view:project.task:0
-msgid "Change to Next Stage"
-msgstr "Faire passer à l'étape suivante"
+#. module: openstc
+#: model:res.groups,name:openstc.openstc_accueil
+msgid "OpenSTC/Accueil"
+msgstr "OpenSTC/Accueil"
 
 #. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_pret_voir_emprunts_ext
+msgid "Nos Emprunts externes à retourner"
+msgstr "Nos Emprunts externes à retourner"
+
+#. module: openstc
+#: view:openstc.ask:0
 #: field:project.project,ask_id:0
 #: field:project.task,ask_id:0
 msgid "Demande"
 msgstr "Demande"
 
 #. module: openstc
-#: model:res.groups,name:openstc.openstc_dst
-msgid "openstc/DST"
-msgstr "openstc/DST"
+#: selection:openstc.pret.checkout.line,etat_retour:0
+msgid "A Réparer"
+msgstr "A Réparer"
 
-#. modules: project, openstc
+#. module: openstc
 #: field:openstc.ask,current_date:0
-#: field:project.task.history,date:0
-#: field:project.task.history.cumulative,date:0
-#: field:project.task.work,date:0
 msgid "Date"
 msgstr "Date"
 
@@ -1064,49 +1082,67 @@ msgstr "Date"
 msgid "Post"
 msgstr "Fonction"
 
-#. module: project
-#: view:report.project.task.user:0
-msgid "Extended Filters..."
-msgstr "Filtres étendus..."
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_carto_inter
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_carto_intervention
+msgid "Statut interventions"
+msgstr "Statut interventions"
 
 #. module: openstc
-#: view:openstc.ask:0
+#: field:openstc.pret.deliver.products.line.wizard,service_id:0
 msgid "Service Concerné"
 msgstr "Service Concerné"
 
-#. modules: project, openstc
-#: constraint:project.task:0
-#: constraint:project.task:0
-msgid "Error! task limit date must be lower then intervention end-date."
-msgstr "Erreurr! la date butoir de la tâche doit être inférieur à la date de fin de l'intervention."
-
-#. module: project
-#: view:project.task:0
-msgid "Validate planned time and open task"
-msgstr "Valider le temps prévu et ouvrir une tâche"
-
-#. module: project
-#: model:ir.model,name:project.model_res_company
-msgid "Companies"
-msgstr "Sociétés"
-
-#. module: project
-#: field:project.task,work_ids:0
-msgid "Work done"
-msgstr "Travail effectué"
-
-#. module: project
-#: model:ir.ui.menu,name:project.next_id_86
-msgid "Dashboard"
-msgstr "Tableau de bord"
-
-#. module: project
-#: view:res.partner:0
-msgid "History"
-msgstr "Historique"
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Filtrer les Etat des Lieux"
+msgstr "Filtrer les Etat des Lieux"
 
 #. module: openstc
-#: field:openstc.qualification,code:0
+#: selection:product.product,etat:0
+msgid "Mauvais"
+msgstr "Mauvais"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_pret_deliver_products_line_wizard
+msgid "openstc.pret.deliver.products.line.wizard"
+msgstr "openstc.pret.deliver.products.line.wizard"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_task_work
+msgid "Task Work action"
+msgstr "Temps passés par tâche"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_ask
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_ask
+msgid "Demandes d'interventions"
+msgstr "Demandes d'interventions"
+
+#. module: openstc
+#: field:openstc.equipment,km:0
+#: field:project.task,km:0
+msgid "Km"
+msgstr "Km"
+
+#. module: openstc
+#: help:product.product,seuil_confirm:0
+msgid "Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"
+msgstr "Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"
+
+#. module: openstc
+#: field:openstc.ask,site_details:0
+#: field:project.project,site_details:0
+msgid "Précision sur le site"
+msgstr "Précision sur le site"
+
+#. module: openstc
+#: selection:hotel.reservation,in_option:0
+msgid "Rien à Signaler"
+msgstr "Rien à Signaler"
+
+#. module: openstc
+#: field:openstc.partner.type,code:0
 #: field:openstc.service,code:0
 #: field:openstc.site,code:0
 #: field:openstc.site.type,code:0
@@ -1115,47 +1151,74 @@ msgid "Code"
 msgstr "Code"
 
 #. module: openstc
+#: view:hotel.folio:0
+msgid "Annuler Folio"
+msgstr "Annuler Folio"
+
+#. module: openstc
 #: field:openstc.site,lenght:0
 msgid "Lenght"
 msgstr "Longueur"
 
-#. module: project
-#: help:project.project,analytic_account_id:0
-msgid "Link this project to an analytic account if you need financial management on projects. It enables you to connect projects with budgets, planning, cost and revenue analysis, timesheets on projects, etc."
-msgstr "Associe cette intervention à un compte analytique si vous avez besoin de la gestion financière des interventions. Il vous permet de relier des interventions aux budgets, la planification, l'analyse des coûts et des revenus, les feuilles de prestations sur des interventions, etc."
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "En cours de Confirmation"
+msgstr "En cours de Confirmation"
 
-#. modules: project, openstc
+#. module: openstc
+#: field:res.partner,technical_site_id:0
+msgid "Default Site"
+msgstr "Default Site"
+
+#. module: openstc
 #: view:openstc.ask:0
 #: view:openstc.create.task.wizard:0
+#: view:openstc.modify.ask.service.wizard:0
+#: view:openstc.pret.emprunt.wizard:0
 #: view:openstc.refused.ask.wizard:0
-#: model:process.transition.action,name:project.process_transition_action_draftcanceltask0
-#: model:process.transition.action,name:project.process_transition_action_opencanceltask0
-#: view:project.project:0
-#: view:project.task:0
 msgid "Cancel"
 msgstr "Annuler"
 
-#. modules: project, openstc
+#. module: openstc
 #: model:ir.model,name:openstc.model_res_users
-#: model:ir.model,name:project.model_res_users
 msgid "res.users"
 msgstr "res.users"
+
+#. module: openstc
+#: field:openstc.pret.emprunt.line.wizard,qty_needed:0
+msgid "Quantité Minimale nécessaire pour la réservation"
+msgstr "Quantité Minimale nécessaire pour la réservation"
 
 #. module: openstc
 #: field:openstc.task.category,unit:0
 msgid "Unit"
 msgstr "Unité"
 
-#. module: project
-#: view:project.task:0
-msgid "Information"
-msgstr "Suivi"
+#. module: openstc
+#: sql_constraint:purchase.order:0
+#: sql_constraint:sale.order:0
+msgid "Order Reference must be unique per Company!"
+msgstr "La référence de commande doit être unique par société !"
 
 #. module: openstc
-#: field:openstc.service,team_ids:0
-#: field:res.users,team_ids:0
+#: view:product.product:0
+msgid "Information"
+msgstr "Information"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Lignes de Réservation"
+msgstr "Lignes de Réservation"
+
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_teams
 msgid "Equipes"
 msgstr "Equipes"
+
+#. module: openstc
+#: field:hotel_reservation.line,state:0
+msgid "Etat Résa"
+msgstr "Etat Résa"
 
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_site
@@ -1164,44 +1227,65 @@ msgstr "Equipes"
 msgid "Sites"
 msgstr "Sites"
 
-#. module: project
-#: view:project.task.delegate:0
-msgid "_Delegate"
-msgstr "_Déléguer"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Date de début de Réservation"
+msgstr "Date de début de Réservation"
 
-#. module: project
-#: selection:project.task,priority:0
-#: selection:report.project.task.user,priority:0
-msgid "Very Low"
-msgstr "Très basse"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Booking Contact"
+msgstr "Booking Contact"
 
-#. module: project
-#: help:project.project,effective_hours:0
-msgid "Sum of spent hours of all tasks related to this project and its child projects."
-msgstr "Somme des heures consommées de toutes les tâches liées à cette intervention et à ses sous-interventions"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Create Invoice"
+msgstr "Créer Facture"
 
-#. module: project
-#: model:project.task.type,name:project.project_tt_development
-msgid "Development"
-msgstr "Développement"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Créer Facture"
+msgstr "Créer Facture"
 
-#. module: project
-#: view:project.task:0
+#. module: openstc
+#: field:openstc.task.category,parent_right:0
+msgid "Right Parent"
+msgstr "Right Parent"
+
+#. module: openstc
+#: selection:openstc.pret.checkout,state:0
+msgid "Brouillon"
+msgstr "Brouillon"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_view_openstc_pret_deliver_products_wizard
+msgid "Mise a dispo des produits"
+msgstr "Mise a dispo des produits"
+
+#. module: openstc
+#: field:openstc.team,user_ids:0
 msgid "Users"
-msgstr "Utilisateurs"
+msgstr "Users"
 
-#. module: project
-#: selection:project.task,priority:0
-msgid "Important"
-msgstr "Important"
+#. module: openstc
+#: field:openstc.pret.checkout.line,etat_retour:0
+msgid "Etat après utilisation"
+msgstr "Etat après utilisation"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.act_my_account
-msgid "My accounts to invoice"
-msgstr "Mes comptes à facturer"
+#. module: openstc
+#: view:openstc.ask:0
+#: selection:openstc.ask,state:0
+msgid "Refused"
+msgstr "Refusée"
+
+#. module: openstc
+#: selection:openstc.pret.checkout.line,state:0
+msgid "En cours de Traitement"
+msgstr "En cours de Traitement"
 
 #. module: openstc
 #: field:openstc.create.task.wizard,ask_id:0
+#: field:openstc.modify.ask.service.wizard,ask_id:0
 #: field:openstc.refused.ask.wizard,ask_id:0
 msgid "Ask"
 msgstr "Demande"
@@ -1211,72 +1295,145 @@ msgstr "Demande"
 msgid "Qualifier la demande"
 msgstr "Vérificateur la demande"
 
-#. module: project
-#: field:project.task.type,project_default:0
-msgid "Common to All Projects"
-msgstr "Commun à toutes les interventions"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Valider la réservation"
+msgstr "Valider la réservation"
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_create_task_wizard
 msgid "Link task to ask"
 msgstr "Lien vers la demande"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_task_by_days_graph
-#: model:ir.model,name:project.model_task_by_days
-#: view:task.by.days:0
-msgid "Task By Days"
-msgstr "Tâches par jour"
+#. module: openstc
+#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_done
+msgid "\n"
+"	<h2>Message Automatique</h2>\n"
+"	\n"
+"	<p> ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''} </p>\n"
+"	\n"
+"	<p>Votre Réservation de ressources est terminée\n"
+"	% if object.folio_id:\n"
+"	, ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
+"	% endif\n"
+"	</p>\n"
+"	<p>Récapitulatif de votre Réservation : </p>\n"
+"	<ul>\n"
+"	<li>Libellé : ${object.name or ''}</li>\n"
+"	<%\n"
+"	from datetime import datetime\n"
+"	import pytz\n"
+"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"	%>\n"
+"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"	<li><u>Ressources Réservées :</u> \n"
+"	<ul>\n"
+"	% for line in object.reservation_line:\n"
+"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"	% endfor\n"
+"	</ul>\n"
+"	</li>\n"
+"	</ul>\n"
+"	\n"
+"	Nous vous remercions d'avoir utilisé nos services de réservations en ligne.\n"
+"	\n"
+"   <br />\n"
+"   <p>Cordialement,</p>\n"
+"   <br />\n"
+"   <p>${object.shop_id.company_id.name or ''}</p>\n"
+"   <br />\n"
+"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"   <br />\n"
+"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"   \n"
+"			    "
+msgstr "\n"
+"	<h2>Message Automatique</h2>\n"
+"	\n"
+"	<p> ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''} </p>\n"
+"	\n"
+"	<p>Votre Réservation de ressources est terminée\n"
+"	% if object.folio_id:\n"
+"	, ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
+"	% endif\n"
+"	</p>\n"
+"	<p>Récapitulatif de votre Réservation : </p>\n"
+"	<ul>\n"
+"	<li>Libellé : ${object.name or ''}</li>\n"
+"	<%\n"
+"	from datetime import datetime\n"
+"	import pytz\n"
+"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"	%>\n"
+"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"	<li><u>Ressources Réservées :</u> \n"
+"	<ul>\n"
+"	% for line in object.reservation_line:\n"
+"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"	% endfor\n"
+"	</ul>\n"
+"	</li>\n"
+"	</ul>\n"
+"	\n"
+"	Nous vous remercions d'avoir utilisé nos services de réservations en ligne.\n"
+"	\n"
+"   <br />\n"
+"   <p>Cordialement,</p>\n"
+"   <br />\n"
+"   <p>${object.shop_id.company_id.name or ''}</p>\n"
+"   <br />\n"
+"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"   <br />\n"
+"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"   \n"
+"			    "
 
 #. module: openstc
+#: field:openstc.ask,people_name:0
 #: field:openstc.create.task.wizard,inter_name:0
-#: field:openstc.qualification,name:0
+#: field:openstc.equipment,complete_name:0
+#: field:openstc.modify.ask.service.wizard,name:0
+#: field:openstc.partner.type,name:0
+#: field:openstc.service,favcolor:0
 #: field:openstc.service,name:0
+#: field:openstc.site,complete_name:0
 #: field:openstc.site,name:0
 #: field:openstc.site.type,name:0
+#: field:openstc.task.category,complete_name:0
 #: field:openstc.task.category,name:0
 #: field:openstc.task.memory,name:0
-#: field:openstc.team,name:0
+#: field:res.users,complete_name:0
 msgid "Name"
 msgstr "Nom"
 
 #. module: openstc
-#: model:ir.actions.act_window,name:openstc.action_openstc_task_work
-msgid "Task Work action"
-msgstr "Temps passés par tâche"
+#: model:ir.model,name:openstc.model_openstc_pret_envoie_mail_annulation_wizard
+msgid "openstc.pret.envoie.mail.annulation.wizard"
+msgstr "openstc.pret.envoie.mail.annulation.wizard"
 
-#. module: project
-#: view:project.task.reevaluate:0
-msgid "Reevaluate Task"
-msgstr "Réévaluer la tâche"
-
-#. modules: project, openstc
+#. module: openstc
 #: model:ir.model,name:openstc.model_project_task_type
-#: model:ir.model,name:project.model_project_task_type
-#: view:project.task.type:0
 msgid "Task Stage"
 msgstr "Étape de tâche"
 
-#. module: project
-#: view:project.task.type:0
-msgid "Common"
-msgstr "Commun"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Folio No"
+msgstr "Numéro Bon de Location"
 
 #. module: openstc
+#: field:openstc.absent.type,code:0
 #: field:openstc.intervention.assignement,code:0
 msgid "Code affectation"
 msgstr "Code affectation"
-
-#. module: project
-#: model:ir.actions.act_window,name:project.action_project_vs_remaining_hours_graph
-#: view:project.vs.hours:0
-msgid "Remaining Hours Per Project"
-msgstr "Heures restantes par intervention"
-
-#. module: project
-#: field:project.task.delegate,state:0
-msgid "Validation State"
-msgstr "État de la validation"
 
 #. module: openstc
 #: field:openstc.site,site_parent_id:0
@@ -1284,204 +1441,279 @@ msgstr "État de la validation"
 msgid "Site parent"
 msgstr "Site parent"
 
-#. module: project
-#: code:addons/addons/project/project.py:888
-#: code:addons/project/project.py:888
-#, python-format
-msgid "The task '%s' is cancelled."
-msgstr "La tâche '%s' est annulée."
+#. module: openstc
+#: help:hotel.reservation,openstc_partner_id:0
+msgid "Personne demandant la réservation."
+msgstr "Personne demandant la réservation."
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Infos de la Réservation"
+msgstr "Infos de la Réservation"
 
 #. module: openstc
 #: field:res.users,is_manager:0
 msgid "Is manager"
 msgstr "Est-ce le reponsable?"
 
-#. module: project
-#: code:addons/addons/project/project.py:949
-#: code:addons/project/project.py:949
-#, python-format
-msgid "The task '%s' has been delegated to %s."
-msgstr "La demande '%s' a été sous traité à %s."
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Infos Générales"
+msgstr "Infos Générales"
 
-#. module: project
-#: code:addons/addons/project/project.py:155
-#: code:addons/project/project.py:155
-#, python-format
-msgid "Operation Not Permitted !"
-msgstr "Operation Non permise!"
+#. module: openstc
+#: help:openstc.task.category,sequence:0
+msgid "Gives the sequence order when displaying a list of product categories."
+msgstr "Gives the sequence order when displaying a list of product categories."
 
-#. modules: project, openstc
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:374
+#: code:addons/openstc/openstc_pret.py:417
+#, python-format
+msgid "Not available"
+msgstr "Non disponible"
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Recreate Procurement"
+msgstr "Recréer approvisionnement"
+
+#. module: openstc
+#: field:openstc.pret.checkout.line,date_order:0
+msgid "Date Etat des Lieux"
+msgstr "Date Etat des Lieux"
+
+#. module: openstc
 #: view:openstc.ask:0
-#: view:project.project:0
-#: view:project.task:0
-#: view:report.project.task.user:0
 msgid "Group By..."
 msgstr "Groupé par..."
 
-#. module: project
-#: view:project.project:0
-#: selection:project.vs.hours,state:0
-msgid "Template"
-msgstr "Modèle"
-
-#. module: project
-#: view:project.project:0
-msgid "Re-open project"
-msgstr "Rouvrir l'intervention"
-
-#. module: project
-#: help:project.project,priority:0
-msgid "Gives the sequence order when displaying the list of projects"
-msgstr "Donne l'ordre d'affichage des interventions dans la liste"
-
-#. modules: project, openstc
-#: constraint:project.project:0
-#: constraint:project.project:0
-msgid "Error! project start-date must be lower then project end-date."
-msgstr "Erreur! La date de début de l'intervention doit être antérieure à la date de fin de l'intervention."
-
-#. module: project
-#: field:project.project,members:0
-msgid "Project Members"
-msgstr "Membres de l'intervention"
-
-#. module: project
-#: model:process.node,note:project.process_node_donetask0
-msgid "Task is Completed"
-msgstr "La tâche est terminée"
-
-#. module: project
-#: field:project.task,child_ids:0
-msgid "Delegated Tasks"
-msgstr "Tâches déléguées"
-
-#. module: project
-#: view:project.task:0
-#: field:project.task,parent_ids:0
-msgid "Parent Tasks"
-msgstr "Tâche parente"
-
-#. module: project
-#: model:process.node,name:project.process_node_opentask0
-msgid "Open task"
-msgstr "Tâches ouvertes"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Recreate Invoice"
+msgstr "Recréer Facture"
 
 #. module: openstc
-#: field:project.project,qualifier_id:0
+#: constraint:project.project:0
+msgid "Error! project start-date must be lower then project end-date."
+msgstr "Erreur! La date de début du projet doit être antérieure à la date de fin du projet."
+
+#. module: openstc
+#: view:openstc.ask:0
+#: field:openstc.create.task.wizard,inter_service_id:0
+#: field:openstc.equipment,service:0
+#: field:openstc.modify.ask.service.wizard,service_id:0
+#: view:openstc.service:0
+#: field:openstc.site,service:0
+#: view:openstc.team:0
 #: field:project.project,service_id:0
-#: field:project.task,qualifier_id:0
-#: field:project.task.work,qualifier_id:0
+msgid "Service"
+msgstr "Service"
+
+#. module: openstc
+#: field:openstc.todo,title:0
+msgid "title"
+msgstr "title"
+
+#. module: openstc
+#: field:hotel_reservation.line,qte_dispo:0
+msgid "Qté Dispo"
+msgstr "Qté Dispo"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Réservation"
+msgstr "Réservation"
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Set to Draft"
+msgstr "Mettre en Brouillon"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_pret_deliver_products_wizard
+msgid "openstc.pret.deliver.products.wizard"
+msgstr "openstc.pret.deliver.products.wizard"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_service
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_service
+#: view:openstc.service:0
+#: field:openstc.task.category,service_ids:0
+#: field:openstc.team,service_ids:0
+#: field:project.task.work,manager_id:0
 #: field:res.users,service_ids:0
 msgid "Services"
 msgstr "Services"
+
+#. module: openstc
+#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_done
+msgid "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    \n"
+"			    Votre Réservation de ressources est terminée.\n"
+"			    % if object.folio_id:\n"
+"				Ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
+"				% endif\n"
+"			    Récapitulatif de votre Réservation :\n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"			    <%\n"
+"			    from datetime import datetime\n"
+"			    import pytz\n"
+"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    %>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
+msgstr "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    \n"
+"			    Votre Réservation de ressources est terminée.\n"
+"			    % if object.folio_id:\n"
+"				Ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
+"				% endif\n"
+"			    Récapitulatif de votre Réservation :\n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"			    <%\n"
+"			    from datetime import datetime\n"
+"			    import pytz\n"
+"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    %>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Confirmées mais pas Planifiées"
+msgstr "Confirmées mais pas Planifiées"
+
+#. module: openstc
+#: field:product.product,need_infos_supp:0
+msgid "Nécessite Infos Supp ?"
+msgstr "Nécessite Infos Supp ?"
 
 #. module: openstc
 #: view:openstc.create.task.wizard:0
 msgid "Add task"
 msgstr "Création des tâches"
 
-
-#. module: project
-#: model:process.node,name:project.process_node_drafttask0
-msgid "Draft task"
-msgstr "Tâche en brouillon"
-
-#. modules: project, openstc
-#: view:project.project:0
-#: view:project.project:0
-msgid "Members"
-msgstr "Membres"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Contact demandeur"
+msgstr "Contact demandeur"
 
 #. module: openstc
 #: field:res.users,lastname:0
 msgid "lastname"
 msgstr "lastname"
 
-#. modules: project, openstc
-#: view:project.project:0
-#: view:project.task:0
-#: field:project.task,notes:0
-msgid "Notes"
-msgstr "Notes"
+#. module: openstc
+#: view:product.product:0
+msgid "Résumé des Détériorations"
+msgstr "Résumé des Détériorations"
 
-#. module: project
-#: view:project.task:0
-#: view:project.task.history.cumulative:0
-msgid "Pending Tasks"
-msgstr "Tâches en attente"
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Etat des lieux"
+msgstr "Etat des lieux"
 
-#. module: project
-#: view:project.task:0
-msgid "Show only tasks having a deadline"
-msgstr "Afficher seulement les tâches avec une date limite"
+#. module: openstc
+#: view:openstc.pret.deliver.products.wizard:0
+msgid "Générer une intervention"
+msgstr "Générer une intervention"
+
+#. module: openstc
+#: view:product.product:0
+msgid "Products"
+msgstr "Produits"
+
+#. module: openstc
+#: help:product.product,bloquant:0
+msgid "Un produit dont la non dispo est bloquante empêche la réservation de se poursuivre (elle reste en Brouillon)"
+msgstr "Un produit dont la non dispo est bloquante empêche la réservation de se poursuivre (elle reste en Brouillon)"
 
 #. module: openstc
 #: field:openstc.ask,service_id:0
 msgid "Service concerné"
 msgstr "Service concerné"
 
-#. module: project
-#: view:project.task:0
-msgid "Change Stage"
-msgstr "Changer l'étape"
-
-#. module: project
-#: view:report.project.task.user:0
-#: field:report.project.task.user,hours_delay:0
-msgid "Avg. Plan.-Eff."
-msgstr "Moy. Planif-Effect"
-
-#. module: project
-#: view:report.project.task.user:0
-msgid "Current Month"
-msgstr "Mois en cours"
-
-#. module: project
-#: field:project.task.work,user_id:0
-msgid "Done by"
-msgstr "Assigné à"
-
-#. module: project
-#: view:project.task:0
-msgid "Extra Info"
-msgstr "Informations complémentaires"
-
-#. module: project
-#: code:addons/addons/project/project.py:279
-#: code:addons/addons/project/project.py:301
-#: code:addons/project/project.py:279
-#: code:addons/project/project.py:301
-#, python-format
-msgid " (copy)"
-msgstr " (copier)"
-
-#. module: project
-#: view:report.project.task.user:0
-#: field:report.project.task.user,nbr:0
-msgid "# of tasks"
-msgstr "Nb de tâches"
-
-#. module: project
-#: view:project.task.type:0
-msgid "Stages common to all projects"
-msgstr "Étapes communes à toutes les interventions"
+#. module: openstc
+#: field:openstc.service,service_id:0
+msgid "Service Parent"
+msgstr "Service Parent"
 
 #. module: openstc
-#: help:openstc.task.memory,name:0
-#: help:openstc.task.memory,wizard_id:0
-msgid "Help note"
-msgstr "Note d'aide"
+#: field:project.task.work,team_id:0
+msgid "Done by"
+msgstr "Done by"
 
-#. module: project
-#: field:project.task,priority:0
-#: field:report.project.task.user,priority:0
-msgid "Priority"
-msgstr "Priorité"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_absent_type
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_absent_type
+msgid "Types d'abscence"
+msgstr "Types d'abscence"
 
-#. module: project
-#: view:project.project:0
-msgid "Open Projects"
-msgstr "Interventions ouverts"
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_equipment
+msgid "openstc.equipment"
+msgstr "openstc.equipment"
+
+#. module: openstc
+#: sql_constraint:res.users:0
+msgid "You can not have two users with the same login !"
+msgstr "Vous ne pouvez pas avoir deux utilisateurs avec le même identifiant !"
+
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_view_fournitures
+msgid "Catalogue des ressources"
+msgstr "Catalogue des ressources"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Générer les interventions planifiées sur ce formulaire"
+msgstr "Générer les interventions planifiées sur ce formulaire"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:564
+#, python-format
+msgid "You have to write at least one reservation line"
+msgstr "Vous devez saisir au moins une ligne de réservation"
+
+#. module: openstc
+#: field:hotel_reservation.line,qte_reserves:0
+msgid "Qté désirée"
+msgstr "Qté désirée"
 
 #. module: openstc
 #: view:openstc.create.task.wizard:0
@@ -1489,145 +1721,299 @@ msgid "Location"
 msgstr "Lieu"
 
 #. module: openstc
-#: field:project.project,team_id:0
-#: field:project.task,team_id:0
-msgid "Equipe"
-msgstr "Equipe"
+#: field:openstc.pret.checkout,checkout_lines:0
+msgid "Ressources empruntées"
+msgstr "Ressources empruntées"
 
-#. module: project
-#: view:project.project:0
-msgid "Performance"
-msgstr "Performance"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_partner
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_partner
+#: model:ir.ui.menu,name:openstc.menu_openstc_partner
+msgid "Demandeurs"
+msgstr "Demandeurs"
 
-#. module: project
-#: help:project.task,total_hours:0
-msgid "Computed as: Time Spent + Remaining Time."
-msgstr "Calculé comme : Temps passé + Temps restant."
-
-#. module: project
-#: code:addons/addons/project/project.py:595
-#: code:addons/project/project.py:595
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:374
+#: code:addons/openstc/openstc_pret.py:417
 #, python-format
-msgid "%s (copy)"
-msgstr "%s (copier)"
+msgid "Not all of your products are available on those quantities for this period"
+msgstr "Tous les articles désirés ne sont pas dispo à ces dates"
 
-#. module: project
-#: view:project.task:0
-#: field:project.task.history,remaining_hours:0
-#: field:project.task.history.cumulative,remaining_hours:0
-msgid "Remaining Time"
-msgstr "Temps restant"
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_pret_resa_semaine_view
+msgid "Réservation de la semaine a traiter"
+msgstr "Réservation de la semaine a traiter"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_ask
+msgid "openstc.ask"
+msgstr "demande d'intervention"
+
+#. module: openstc
+#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_validee
+msgid "\n"
+"	<h2>Message Automatique</h2>\n"
+"	\n"
+"	<p>Votre Réservation a bien été enregistrée.  </p>\n"
+"	<p>Récapitulatif de votre Réservation : </p>\n"
+"	<ul>\n"
+"	<li>Libellé : ${object.name or ''}</li>\n"
+"	<%\n"
+"	from datetime import datetime\n"
+"	import pytz\n"
+"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"	%>\n"
+"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"	<li><u>Ressources Réservées :</u> \n"
+"	<ul>\n"
+"	% for line in object.reservation_line:\n"
+"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"	% endfor\n"
+"	</ul>\n"
+"	</li>\n"
+"	</ul>\n"
+"   \n"
+"   % if object.folio_id:\n"
+"   	<p>Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.<br/>\n"
+"   	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.</p>\n"
+"   % endif\n"
+"   <br />\n"
+"   <p>Cordialement,</p>\n"
+"   <br />\n"
+"   <p>${object.shop_id.company_id.name or ''}</p>\n"
+"   <br />\n"
+"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"   <br />\n"
+"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"   \n"
+"			    "
+msgstr "\n"
+"	<h2>Message Automatique</h2>\n"
+"	\n"
+"	<p>Votre Réservation a bien été enregistrée.  </p>\n"
+"	<p>Récapitulatif de votre Réservation : </p>\n"
+"	<ul>\n"
+"	<li>Libellé : ${object.name or ''}</li>\n"
+"	<%\n"
+"	from datetime import datetime\n"
+"	import pytz\n"
+"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"	%>\n"
+"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"	<li><u>Ressources Réservées :</u> \n"
+"	<ul>\n"
+"	% for line in object.reservation_line:\n"
+"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"	% endfor\n"
+"	</ul>\n"
+"	</li>\n"
+"	</ul>\n"
+"   \n"
+"   % if object.folio_id:\n"
+"   	<p>Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.<br/>\n"
+"   	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.</p>\n"
+"   % endif\n"
+"   <br />\n"
+"   <p>Cordialement,</p>\n"
+"   <br />\n"
+"   <p>${object.shop_id.company_id.name or ''}</p>\n"
+"   <br />\n"
+"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"   <br />\n"
+"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"   \n"
+"			    "
 
 #. module: openstc
 #: view:openstc.refused.ask.wizard:0
 msgid "Refuser la demande"
 msgstr "Refuser la demande"
 
-#. module: project
-#: field:project.task.delegate,name:0
-msgid "Delegated Title"
-msgstr "Intitulé"
-
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "July"
-msgstr "Juillet"
-
-#. module: project
-#: model:ir.model,name:project.model_project_task_reevaluate
-msgid "project.task.reevaluate"
-msgstr "project.task.reevaluate"
-
-#. module: project
-#: view:project.vs.hours:0
-msgid "Project vs Planned and Total Hours"
-msgstr "intervention vs. heures prévues et totales"
-
-#. module: project
-#: field:project.task,delay_hours:0
-msgid "Delay Hours"
-msgstr "Retard en heures"
-
-#. module: project
-#: help:project.project,warn_manager:0
-msgid "If you check this field, the project manager will receive an email each time a task is completed by his team."
-msgstr "Si vous cochez, le responsable recevra un courriel à chaque fois qu'une tâche est fermée par un des membres."
-
-#. module: project
-#: selection:project.task,priority:0
-msgid "Very important"
-msgstr "Très important"
-
-#. module: project
-#: code:addons/addons/project/project.py:860
-#: code:addons/project/project.py:860
-#, python-format
-msgid "Task '%s' set in progress"
-msgstr "Tâche '%s' est en cours"
-
-#. module: project
-#: field:project.task,progress:0
-msgid "Progress (%)"
-msgstr "Progression (%)"
-
-#. module: project
-#: view:project.task.history.cumulative:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,month:0
-msgid "Month"
-msgstr "Mois"
-
-#. module: project
-#: model:project.task.type,name:project.project_tt_specification
-msgid "Design"
-msgstr "Conception"
-
-#. module: project
+#. module: openstc
 #: view:project.project:0
-#: view:project.task:0
-msgid "Start Date"
-msgstr "Date de début"
+msgid "Members"
+msgstr "Membres"
 
-#. module: project
-#: code:addons/addons/project/project.py:880
-#: code:addons/project/project.py:880
+#. module: openstc
+#: field:product.product,service_technical_id:0
+msgid "Service Technique associé"
+msgstr "Service Technique associé"
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Facture corrigée"
+msgstr "Facture corrigée"
+
+#. module: openstc
+#: model:res.groups,name:openstc.group_view_all_menus
+msgid "Voir tous les menus"
+msgstr "Voir tous les menus"
+
+#. module: openstc
+#: field:openstc.equipment,commercial_vehicle:0
+msgid "Commercial vehicle"
+msgstr "Commercial vehicle"
+
+#. module: openstc
+#: model:res.groups,name:openstc.openstc_employee
+msgid "OpenSTC/Employee"
+msgstr "OpenSTC/Employee"
+
+#. module: openstc
+#: field:openstc.pret.deliver.products.wizard,deliver_line:0
+msgid "Interventions A Générer"
+msgstr "Interventions A Générer"
+
+#. module: openstc
+#: view:openstc.absent.type:0
+#: view:openstc.team:0
+#: field:project.task,team_id:0
+msgid "Team"
+msgstr "Team"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_service
+msgid "openstc.service"
+msgstr "service"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Réservations en cours de traitement, elles sont soit en Brouillon, soit en attente de validation."
+msgstr "Réservations en cours de traitement, elles sont soit en Brouillon, soit en attente de validation."
+
+#. module: openstc
+#: field:project.task,oil_qtity:0
+msgid "oil quantity"
+msgstr "oil quantity"
+
+#. module: openstc
+#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_validee
+msgid "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    Votre Réservation a bien été enregistrée.\n"
+"			    Récapitulatif de votre Réservation :\n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"			    <%\n"
+"			    from datetime import datetime\n"
+"			    import pytz\n"
+"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    %>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    \n"
+"			    % if object.folio_id:\n"
+"			    	Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.\n"
+"			    	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.\n"
+"			    % endif\n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
+msgstr "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    Votre Réservation a bien été enregistrée.\n"
+"			    Récapitulatif de votre Réservation :\n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"			    <%\n"
+"			    from datetime import datetime\n"
+"			    import pytz\n"
+"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    %>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    \n"
+"			    % if object.folio_id:\n"
+"			    	Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.\n"
+"			    	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.\n"
+"			    % endif\n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
+
+#. module: openstc
+#: constraint:hotel.reservation:0
+msgid "La date de Début de votre réservation est supérieure A la date de Fin, veuillez les modifier."
+msgstr "La date de Début de votre réservation est supérieure A la date de Fin, veuillez les modifier."
+
+#. module: openstc
+#: model:ir.actions.act_window,help:openstc.openstc_task_category_action
+msgid "Here is a list of all your products classified by category. You can click a category to get the list of all products linked to this category or to a child of this category."
+msgstr "Ceci est la liste de tous les produits classés par catégorie. Vous pouvez cliquer sur une catégorie pour obtenir une liste de tous les produits attachés à cette catégorie ou obtenir tous les enfants de cette catégorie."
+
+#. module: openstc
+#: field:openstock.qte.dispo.reserve.report,reservation_no:0
+msgid "Numéro"
+msgstr "Numéro"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret_checkout.py:161
 #, python-format
-msgid "Task '%s' cancelled"
-msgstr "Tâche '%s' annulée"
+msgid "Qty to purchase must be equal or lower than qty reserved, and must be written only if a purchase is to plan"
+msgstr "La quantité d'article à racheter ne peut pas dépasser la quantité réservée intialiement, et ne doit-être renseignée que si un rachat est planifié pour cet article"
 
-#. module: project
-#: selection:project.task,kanban_state:0
-#: selection:project.task.history,kanban_state:0
-#: view:project.task.history.cumulative:0
-#: selection:project.task.history.cumulative,kanban_state:0
-msgid "Blocked"
-msgstr "Bloqué"
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_task_category
+msgid "Task Category"
+msgstr "Task Category"
 
-#. module: project
-#: help:project.task,progress:0
-msgid "If the task has a progress of 99.99% you should close the task if it's finished or reevaluate the time"
-msgstr "Si la progression de la tâche est 99.99% vous devez soit clôturer la tâche si elle est terminée soit réévaluer le temps alloué"
+#. module: openstc
+#: field:openstc.todo,completed:0
+msgid "Completed"
+msgstr "Completed"
 
-#. module: project
-#: field:project.task,user_email:0
-msgid "User Email"
-msgstr "Courriel de l'utilisateur"
+#. module: openstc
+#: field:openstc.pret.checkout,state:0
+#: field:product.product,etat:0
+msgid "Etat"
+msgstr "Etat"
 
-#. module: project
-#: help:project.task,kanban_state:0
-msgid "A task's kanban state indicates special situations affecting it:\n"
-" * Normal is the default situation\n"
-" * Blocked indicates something is preventing the progress of this task\n"
-" * Ready To Pull indicates the task is ready to be pulled to the next stage"
-msgstr "L'état kanban de la tâche indique différentes situations qui peuvent l'affecter:\n"
-" * Normal : situation par défaut\n"
-" * Bloqué  : indique que quelquechose empêche la tâche d'avancer\n"
-" * Prêt à avancer : indique que la tâche peut passer à l'étape suivante"
+#. module: openstc
+#: field:openstc.pret.deliver.products.line.wizard,wizard_id:0
+msgid "Wizard parent"
+msgstr "Wizard parent"
 
-#. module: project
-#: help:project.task.delegate,prefix:0
-msgid "Title for your validation task"
-msgstr "Titre de votre tâche de validation"
+#. module: openstc
+#: field:hotel_reservation.line,name:0
+msgid "Libellé"
+msgstr "Libellé"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Plannifier une intervention pour cette ressource"
+msgstr "Plannifier une intervention pour cette ressource"
 
 #. module: openstc
 #: field:openstc.ask,note:0
@@ -1642,20 +2028,19 @@ msgstr "Note"
 msgid "Site principal"
 msgstr "Site principal"
 
-#. modules: project, openstc
-#: constraint:res.users:0
+#. module: openstc
 #: constraint:res.users:0
 msgid "The chosen company is not in the allowed companies for this user"
-msgstr "La société choisie n'est pas autorisée pour cet utilisateur."
+msgstr "La société choisie ne fait pas partie des sociétés autorisées pour cet utilisateur"
 
-#. module: project
-#: selection:project.task,priority:0
-#: selection:report.project.task.user,priority:0
-msgid "Low"
-msgstr "Basse"
+#. module: openstc
+#: field:openstc.refused.ask.wizard,refusal_reason:0
+msgid "Raison de refus"
+msgstr "Raison de refus"
 
 #. module: openstc
 #: selection:openstc.ask,state:0
+#: selection:project.project,state:0
 msgid "Closed"
 msgstr "Cloturée"
 
@@ -1664,255 +2049,293 @@ msgstr "Cloturée"
 msgid "Error: Invalid Time"
 msgstr "Error: Durée invalide"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_view_task_tree_deadline
-msgid "My Task's Deadlines"
-msgstr "Les dates limites de mes tâches"
-
-#. module: project
+#. module: openstc
+#: selection:project.project,state:0
 #: view:project.task:0
-#: view:res.partner:0
-msgid "For changing to done state"
-msgstr "Pour passer à l'état terminé"
+msgid "Pending"
+msgstr "En attente"
 
-#. modules: project, openstc
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Termine la Réservation, libérant les ressources. Un Etat des lieux sera généré pour pointer l'état des ressources après utilisation."
+msgstr "Termine la Réservation, libérant les ressources. Un Etat des lieux sera généré pour pointer l'état des ressources après utilisation."
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Générer Interventions restantes"
+msgstr "Générer Interventions restantes"
+
+#. module: openstc
+#: view:openstc.pret.warning.dispo.wizard:0
+msgid "Visualiser Planning"
+msgstr "Visualiser Planning"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstock_qte_dispo_calendar
+#: model:ir.actions.act_window,name:openstc.action_openstock_qte_dispo_graph
+#: view:openstock.qte.dispo.report:0
+#: view:openstock.qte.dispo.reserve.report:0
+msgid "Verif Dispo"
+msgstr "Verif Dispo"
+
+#. module: openstc
+#: field:openstc.intervention.assignement,asksAssigned:0
+#: field:openstc.service,asksBelongsto:0
+#: field:openstc.site,asksBelongsto:0
+msgid "asks"
+msgstr "asks"
+
+#. module: openstc
 #: model:ir.model,name:openstc.model_project_task_history
-#: model:ir.model,name:project.model_project_task_history
-#: model:ir.model,name:project.model_project_task_history_cumulative
 msgid "History of Tasks"
 msgstr "Historique des tâches"
 
-#. module: project
-#: help:project.task.delegate,state:0
-msgid "New state of your own task. Pending will be reopened automatically when the delegated task is closed"
-msgstr "Nouvel état de votre tâche. 'En attente' sera rouvert automatiquement, une fois que la tâche déléguée sera fermée."
-
-#. module: project
-#: model:ir.actions.act_window,name:project.open_board_project
-#: model:ir.ui.menu,name:project.menu_board_project
-msgid "Project Dashboard"
-msgstr "Tableau de bord de l'intervention"
+#. module: openstc
+#: field:openstc.ask,people_phone:0
+msgid "Phone"
+msgstr "Phone"
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_openstc_team
-msgid "openstc.team"
-msgstr "openstc.team"
-
-#. modules: project, openstc
-#: field:project.project,active:0
-msgid "Active"
-msgstr "Actif"
+#: view:openstc.pret.warning.dispo.wizard:0
+msgid "Une ou plusieurs dates ne sont disponibles pour les ressources sélectionnées.          Vous pouvez visualiser le planning pour adapter vos dates de réservation.          Vous avez aussi les droits pour déclencher une demande d'emprunt des articles manquants          auprès de collectivités extérieurs, si vous voulez le faire ,cliquez sur 'Commencer l'Emprunt'."
+msgstr "Une ou plusieurs dates ne sont disponibles pour les ressources sélectionnées.          Vous pouvez visualiser le planning pour adapter vos dates de réservation.          Vous avez aussi les droits pour déclencher une demande d'emprunt des articles manquants          auprès de collectivités extérieurs, si vous voulez le faire ,cliquez sur 'Commencer l'Emprunt'."
 
 #. module: openstc
 #: view:openstc.site:0
 msgid "Properties"
 msgstr "Proprietées"
 
-#. module: project
-#: code:addons/addons/project/project.py:229
-#: code:addons/project/project.py:229
-#, python-format
-msgid "The project '%s' has been closed."
-msgstr "Intervention '%s' a été fermée."
+#. module: openstc
+#: field:res.users,arrival_date:0
+msgid "Date d'arrivée"
+msgstr "Date d'arrivée"
 
-#. module: project
-#: help:project.project,resource_calendar_id:0
-msgid "Timetable working hours to adjust the gantt diagram report"
-msgstr "Emploi du temps des heures travaillés pour ajuster le rapport du diagramme de Gantt"
-
-#. module: project
-#: help:project.task,delay_hours:0
-msgid "Computed as difference between planned hours by the project manager and the total hours of the task."
-msgstr "Calcul correspondant à la différence entre le temps estimé par le Responsable de l'intervention et le temps réel pour fermer la tâche"
-
-#. modules: project, openstc
-#: view:project.task:0
+#. module: openstc
 #: view:project.task:0
 msgid "Delegations History"
 msgstr "Historique des délégations"
 
-#. module: project
-#: code:addons/addons/project/project.py:251
-#: code:addons/project/project.py:251
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:883
 #, python-format
-msgid "The project '%s' has been opened."
-msgstr "Intervention '%s' a été ouverte."
+msgid "modèle de mail pour résa annulée"
+msgstr "modèle de mail pour résa annulée"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.act_res_users_2_project_project
-msgid "User's projects"
-msgstr "Interventions de l'utilisateur"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Voir seulement les Salles"
+msgstr "Voir seulement les Salles"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Ouvrir l'intervention générée"
+msgstr "Ouvrir l'intervention générée"
+
+#. module: openstc
+#: field:hotel_reservation.line,action:0
+msgid "Action"
+msgstr "Action"
 
 #. module: openstc
 #: field:project.task,intervention_assignement_id:0
 msgid "Assignement"
 msgstr "Assignation"
 
-#. module: project
-#: help:report.project.task.user,opening_days:0
-msgid "Number of Days to Open the task"
-msgstr "Nb de jours pour démarrer la tâche"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_pret_voir_emprunts_ext
+msgid "Emprunts aux mairies extérieures encore à retourner"
+msgstr "Emprunts aux mairies extérieures encore à retourner"
 
-#. module: project
-#: field:project.task,delegated_user_id:0
-msgid "Delegated To"
-msgstr "Déléguer à"
+#. module: openstc
+#: view:openstc.pret.deliver.products.wizard:0
+msgid "Pour mettre les articles à dispositions, voulez-vous créer une intervention de livraison ou le demandeur vient les chercher sur place ?"
+msgstr "Pour mettre les articles à dispositions, voulez-vous créer une intervention de livraison ou le demandeur vient les chercher sur place ?"
 
-#. modules: project, openstc
+#. module: openstc
 #: help:openstc.task.memory,planned_hours:0
-#: help:project.task,planned_hours:0
 msgid "Estimated time to do the task, usually set by the project manager when the task is in draft state."
 msgstr "Temps estimé pour réaliser la tâche, habituellement fixé par le responsable de l'intervention quand la tâche est à l'état brouillon"
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_openstc_service
-msgid "openstc.service"
-msgstr "service"
+#: field:openstc.pret.checkout.line,checkout_id:0
+msgid "Etat des Lieux"
+msgstr "Etat des Lieux"
 
 #. module: openstc
-#: view:openstc.ask:0
+#: view:openstc.absent.type:0
 #: view:openstc.employee:0
+#: view:openstc.equipment:0
+#: view:openstc.service:0
 #: view:openstc.site:0
+#: view:openstc.task.category:0
+#: view:openstc.team:0
 msgid "General"
 msgstr "Géneral"
 
-#. module: project
-#: view:project.project:0
-msgid "Date Start: %(date_start)s"
-msgstr "Date de début: %(date_start)s"
+#. module: openstc
+#: selection:product.product,etat:0
+msgid "Inutilisable"
+msgstr "Inutilisable"
 
-#. module: project
-#: view:project.project:0
-#: view:project.task:0
-#: selection:project.task,state:0
-#: selection:project.task.delegate,state:0
-#: selection:project.task.history,state:0
-#: selection:project.task.history.cumulative,state:0
-#: view:report.project.task.user:0
-#: selection:report.project.task.user,state:0
-#: view:res.partner:0
-#: selection:task.by.days,state:0
-msgid "Done"
-msgstr "Terminé"
+#. module: openstc
+#: model:ir.model,name:openstc.model_account_invoice
+msgid "Invoice"
+msgstr "Facture"
 
-#. module: project
-#: code:addons/addons/project/project.py:849
-#: code:addons/project/project.py:849
-#, python-format
-msgid "The task '%s' is done"
-msgstr "La tâche '%s' est terminée"
+#. module: openstc
+#: field:openstc.pret.checkout.line,qte_reservee:0
+msgid "Qté prêtée"
+msgstr "Qté prêtée"
 
-#. module: project
-#: model:process.transition.action,name:project.process_transition_action_draftopentask0
-#: view:project.project:0
-#: selection:project.vs.hours,state:0
+#. module: openstc
+#: selection:project.project,state:0
 msgid "Open"
-msgstr "Ouvert"
+msgstr "Open"
 
-#. module: project
-#: view:project.project:0
-msgid "ID: %(task_id)s"
-msgstr "ID: %(task_id)s"
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_view_openstc_pret_create_emprunt_wizard
+#: model:ir.actions.act_window,name:openstc.action_view_openstc_pret_emprunt_wizard
+#: model:ir.ui.menu,name:openstc.menu_action_view_emprunt_ext
+msgid "Emprunter des Ressources à l'extérieur"
+msgstr "Emprunter des Ressources à l'extérieur"
 
 #. module: openstc
 #: field:res.users,city_home:0
 msgid "City"
 msgstr "Ville"
 
-#. module: project
-#: code:addons/addons/project/project.py:787
-#: code:addons/project/project.py:787
-#, python-format
-msgid "Child task still open.\n"
-"Please cancel or complete child task first."
-msgstr "Child task still open.\n"
-"Annulez ou completer d'abord les tâches sous-jacentes."
+#. module: openstc
+#: field:product.product,seuil_confirm:0
+msgid "Qté Max sans Validation"
+msgstr "Qté Max sans Validation"
 
-#. modules: project, openstc
-#: constraint:project.task:0
+#. module: openstc
+#: field:openstock.qte.dispo.reserve.report,qte:0
+msgid "Quantité réservée"
+msgstr "Quantité réservée"
+
+#. module: openstc
 #: constraint:project.task:0
 msgid "Error ! Task end-date must be greater then task start-date"
 msgstr "Erreur ! La date de fin de la tâche doit être postérieure à la date de démarrage"
 
-#. module: project
-#: field:project.task.history,user_id:0
-#: field:project.task.history.cumulative,user_id:0
-msgid "Responsible"
-msgstr "Responsable"
-
-#. modules: project, openstc
+#. module: openstc
 #: view:openstc.ask:0
-#: view:project.project:0
 msgid "Search Project"
 msgstr "Recherche d'intervention"
 
 #. module: openstc
-#: field:openstc.ask,phone:0
-msgid "Téléphone"
-msgstr "Téléphone"
+#: model:ir.model,name:openstc.model_project_vs_hours
+msgid " Project vs  hours"
+msgstr " Projet vs heures"
 
-#. module: project
-#: view:project.task.delegate:0
-msgid "Delegated Task"
-msgstr "Tache délégué"
+#. module: openstc
+#: view:openstc.pret.warning.dispo.wizard:0
+msgid "Annuler"
+msgstr "Annuler"
 
-#. module: project
-#: field:project.project,warn_manager:0
-msgid "Warn Manager"
-msgstr "Avertir le responsable"
+#. module: openstc
+#: field:openstock.qte.dispo.report,qte_dispo:0
+msgid "Quantité Disponible"
+msgstr "Quantité Disponible"
 
-#. module: project
-#: view:board.board:0
-msgid "My Remaining Hours by Project"
-msgstr "Mes heures restantes par intervention"
+#. module: openstc
+#: model:ir.model,name:openstc.model_product_product
+#: field:openstc.equipment,product_product_id:0
+msgid "Product"
+msgstr "Produit"
 
-#. module: project
-#: view:project.task:0
-msgid "For cancelling the task"
-msgstr "Pour supprimer la tâche"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Invoice Corrected"
+msgstr "Invoice Corrected"
 
-#. module: project
-#: model:project.task.type,name:project.project_tt_merge
-msgid "Deployment"
-msgstr "Déploiement"
+#. module: openstc
+#: view:openstc.pret.deliver.products.wizard:0
+msgid "Comment mettre les articles à disposition"
+msgstr "Comment mettre les articles à disposition"
 
-#. module: project
-#: field:project.project,tasks:0
-msgid "Project tasks"
-msgstr "Tâches de l'intervention"
+#. module: openstc
+#: field:openstc.pret.checkout.line,qte_to_purchase:0
+msgid "Qté à Racheter"
+msgstr "Qté à Racheter"
 
-#. module: project
-#: view:project.project:0
-#: view:project.task:0
-#: field:project.task.history,end_date:0
-#: field:project.task.history.cumulative,end_date:0
-msgid "End Date"
-msgstr "Date de fin"
+#. module: openstc
+#: view:openstc.pret.deliver.products.wizard:0
+msgid "Interventions pouvant être générées"
+msgstr "Interventions pouvant être générées"
 
-#. module: project
-#: help:project.task,active:0
-msgid "This field is computed automatically and have the same behavior than the boolean 'active' field: if the task is linked to a template or unactivated project, it will be hidden unless specifically asked."
-msgstr "Ce champ est mis à jour automatiquement et aura le même comportement que le champ 'actif' : si la tâche est liée à un modèle ou à une intervention inactif, elle sera masquée sauf si son affichage est explicitement demandé."
+#. module: openstc
+#: field:res.users,address_home:0
+msgid "Address"
+msgstr "Adresse"
 
-#. module: project
-#: help:report.project.task.user,closing_days:0
-msgid "Number of Days to close the task"
-msgstr "Nb de jours pour effectuer la tâche"
+#. module: openstc
+#: view:hotel.folio:0
+#: view:hotel.reservation:0
+#: field:hotel.reservation,openstc_partner_id:0
+#: view:openstc.ask:0
+#: field:openstc.pret.checkout,partner_id:0
+msgid "Demandeur"
+msgstr "Demandeur"
 
-#. module: project
-#: field:project.task,effective_hours:0
-msgid "Hours Spent"
-msgstr "Heures passés"
+#. module: openstc
+#: field:hotel_reservation.line,inter_ask_id:0
+msgid "Demande d'intervention associée"
+msgstr "Demande d'intervention associée"
 
-#. module: project
-#: field:project.task,id:0
-msgid "ID"
-msgstr "Id."
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_view_articles
+msgid "Gestion des Ressources"
+msgstr "Gestion des Ressources"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_view_task_overpassed_draft
-msgid "Overpassed Tasks"
-msgstr "Tâches en dépassement"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Actualiser la Page"
+msgstr "Actualiser la Page"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Abandonnées"
+msgstr "Abandonnées"
+
+#. module: openstc
+#: view:openstc.modify.ask.service.wizard:0
+msgid "Modification du service"
+msgstr "Modification du service"
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Approvisionnement Corrigé"
+msgstr "Approvisionnement Corrigé"
+
+#. module: openstc
+#: view:openstc.absent.type:0
+msgid "Absent Types"
+msgstr "Absent Types"
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Confirmer Folio"
+msgstr "Confirmer Folio"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:650
+#, python-format
+msgid "An error has occured, please notify following error to your supplier : \n"
+" prod_ids paramater of get_prods_available method  has an incorrect form"
+msgstr "une erreur est apparue, veuillez notifier l'erreur suivante à votre prestataire : \n"
+" prod_ids paramater of get_prods_available method  has an incorrect form"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_open_pret_location_reservation_create_form
+msgid "Réserver article(s)"
+msgstr "Réserver article(s)"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_hotel_reservation_line
+msgid "Reservation Line"
+msgstr "Reservation Line"
 
 #. module: openstc
 #: view:openstc.create.task.wizard:0
@@ -1920,75 +2343,85 @@ msgid "task"
 msgstr "Tâche"
 
 #. module: openstc
+#: view:hotel.folio:0
+msgid "Confirm Folio"
+msgstr "Confirm Folio"
+
+#. module: openstc
 #: view:openstc.ask:0
 msgid "Patrimoine"
 msgstr "Patrimoine"
 
-#. modules: project, openstc
-#: field:openstc.create.task.wizard,inter_manager:0
+#. module: openstc
+#: view:product.product:0
+msgid "Produits"
+msgstr "Produits"
+
+#. module: openstc
+#: field:hotel.reservation,in_option:0
+msgid "En Option"
+msgstr "En Option"
+
+#. module: openstc
 #: field:openstc.ask,manager_id:0
+#: field:openstc.create.task.wizard,inter_manager:0
+#: field:openstc.service,manager_id:0
 #: field:openstc.team,manager_id:0
-#: view:project.project:0
-#: model:res.groups,name:project.group_project_manager
 msgid "Manager"
 msgstr "Responsable"
 
-#. module: project
-#: field:project.task.delegate,user_id:0
-msgid "Assign To"
-msgstr "Attribué à"
-
-#. module: project
-#: model:process.node,note:project.process_node_taskbydelegate0
-msgid "Delegate your task to the other user"
-msgstr "Délégué votre tâche à un autre utilisateur"
-
-#. module: project
-#: view:project.project:0
-#: field:project.project,warn_footer:0
-msgid "Mail Footer"
-msgstr "Pied du courriel"
+#. module: openstc
+#: view:hotel.reservation:0
+#: field:hotel.reservation,prod_id:0
+msgid "Ressource"
+msgstr "Ressource"
 
 #. module: openstc
-#: field:openstc.create.task.wizard,inter_service_id:0
-#: field:openstc.site,service:0
-msgid "Service"
-msgstr "Service"
+#: field:openstc.task.memory,category_id:0
+#: field:project.task,category_id:0
+msgid "Category"
+msgstr "Catégorie"
 
-#. module: project
-#: help:project.task.reevaluate,remaining_hours:0
-msgid "Put here the remaining hours required to close the task."
-msgstr "Mettre ici le temps restant nécessaire pour terminer la tâche."
+#. module: openstc
+#: help:product.product,empruntable:0
+msgid "indique si l'on peut emprunter cette ressource à des collectivités extèrieures"
+msgstr "indique si l'on peut emprunter cette ressource à des collectivités extèrieures"
 
-#. module: project
-#: view:project.task:0
-msgid "Deadlines"
-msgstr "Date limite"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Valide les informations saisies et réserve les ressources sélectionnées aux dates indiquées. La réservation sera visible sur le planning et le demandeur sera notifié par mail (si adresse mail renseignée)."
+msgstr "Valide les informations saisies et réserve les ressources sélectionnées aux dates indiquées. La réservation sera visible sur le planning et le demandeur sera notifié par mail (si adresse mail renseignée)."
 
-#. module: project
-#: code:addons/addons/project/wizard/project_task_delegate.py:69
-#: code:addons/addons/project/wizard/project_task_delegate.py:70
-#: code:addons/addons/project/wizard/project_task_delegate.py:77
-#: code:addons/addons/project/wizard/project_task_delegate.py:78
-#: code:addons/project/wizard/project_task_delegate.py:69
-#: code:addons/project/wizard/project_task_delegate.py:70
-#: code:addons/project/wizard/project_task_delegate.py:77
-#: code:addons/project/wizard/project_task_delegate.py:78
-#, python-format
-msgid "CHECK: "
-msgstr "VERIFICATION: "
+#. module: openstc
+#: view:hotel.folio:0
+msgid "N° Folio"
+msgstr "N° Folio"
 
-#. module: project
-#: code:addons/addons/project/project.py:356
-#: code:addons/project/project.py:356
-#, python-format
-msgid "You must assign members on the project '%s' !"
-msgstr "Vous devez assigner des membres à l'intervention '%s' !"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "N° Réservation"
+msgstr "N° Réservation"
 
-#. module: project
-#: view:project.project:0
-msgid "Pending Projects"
-msgstr "Interventions en attente"
+#. module: openstc
+#: selection:hotel_reservation.line,action:0
+msgid "Intervention générée"
+msgstr "Intervention générée"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Calculer prix"
+msgstr "Calculer prix"
+
+#. module: openstc
+#: field:openstc.ask,create_date:0
+#: field:project.project,create_date:0
+msgid "Create Date"
+msgstr "Create Date"
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Branch"
+msgstr "Branch"
 
 #. module: openstc
 #: view:openstc.ask:0
@@ -1996,43 +2429,38 @@ msgid "For refuse the task"
 msgstr "Réintegrer la tâche"
 
 #. module: openstc
-#: view:openstc.ask:0
-#: selection:openstc.ask,state:0
-msgid "Refused"
-msgstr "Refusée"
-
-#. module: project
-#: code:addons/addons/project/wizard/mail_compose_message.py:64
-#: code:addons/project/wizard/mail_compose_message.py:64
-#, python-format
-msgid "Task '%s' Closed"
-msgstr "Tâche '%s' fermée"
-
-#. module: project
-#: field:project.project,warn_customer:0
-msgid "Warn Partner"
-msgstr "Avertir le partenaire"
-
-#. module: project
-#: help:project.project,warn_header:0
-msgid "Header added at the beginning of the email for the warning message sent to the customer when a task is closed."
-msgstr "En-tête ajouté au début du courriel contenant le message d'avertissement envoyé au client quand une tâche est terminée."
-
-#. modules: project, openstc
-#: view:report.project.task.user:0
-#: field:project.task,company_id:0
-#: field:project.task.work,company_id:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,company_id:0
-msgid "Company"
-msgstr "Compagnie"
-
-#. module: project
-#: model:process.node,note:project.process_node_drafttask0
-msgid "Define the Requirements and Set Planned Hours."
-msgstr "Définir les besoins et indiquer les estimations de durée des tâches"
+#: view:openstc.pret.envoie.mail.annulation.wizard:0
+msgid "Envoyer le mail"
+msgstr "Envoyer le mail"
 
 #. module: openstc
+#: selection:openstc.pret.checkout.line,state:0
+msgid "Remis en Etat"
+msgstr "Remis en Etat"
+
+#. module: openstc
+#: view:report.project.task.user:0
+msgid "Company"
+msgstr "Société"
+
+#. module: openstc
+#: field:openstc.equipment,fat_material:0
+msgid "Fat"
+msgstr "Fat"
+
+#. module: openstc
+#: view:openstc.ask:0
+msgid "Modify Service"
+msgstr "Modify Service"
+
+#. module: openstc
+#: code:addons/openstc/openstc.py:679
+#, python-format
+msgid "Des interventions sont liées à la demande"
+msgstr "Des interventions sont liées à la demande"
+
+#. module: openstc
+#: help:openstc.ask,partner_service_id:0
 #: help:openstc.task.memory,category_id:0
 msgid "..."
 msgstr "..."
@@ -2042,43 +2470,108 @@ msgstr "..."
 msgid "Phone Number"
 msgstr "Téléphone"
 
-#. modules: project, openstc
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstock_qte_dispo_report
+msgid "Disponibilités des Produits"
+msgstr "Disponibilités des Produits"
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_purchase_order
+msgid "Purchase Order"
+msgstr "Bon de commande"
+
+#. module: openstc
 #: model:ir.model,name:openstc.model_project_project
-#: model:ir.model,name:project.model_project_project
-#: view:project.project:0
-#: view:project.task:0
-#: field:project.task,project_id:0
-#: field:project.task.delegate,project_id:0
-#: field:project.task.history.cumulative,project_id:0
-#: field:project.vs.hours,project:0
-#: view:report.project.task.user:0
-#: field:report.project.task.user,project_id:0
-#: model:res.request.link,name:project.req_link_project
-#: field:res.users,context_project_id:0
-#: field:task.by.days,project_id:0
 msgid "Project"
-msgstr "Intervention"
+msgstr "Projet"
 
-#. module: project
-#: selection:project.task,state:0
-#: selection:project.task.history,state:0
-#: selection:project.task.history.cumulative,state:0
-#: selection:project.vs.hours,state:0
-#: selection:report.project.task.user,state:0
-#: selection:task.by.days,state:0
+#. module: openstc
+#: model:email.template,subject:openstc.openstc_pret_email_template_resa_en_attente
+msgid "Votre Réservation: ${object.name or 'inconnu'} est en attente de Validation"
+msgstr "Votre Réservation: ${object.name or 'inconnu'} est en attente de Validation"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_ask_modify_service
+#: view:openstc.ask:0
+#: view:openstc.modify.ask.service.wizard:0
+msgid "Modify service"
+msgstr "Modify service"
+
+#. module: openstc
+#: model:res.groups,name:openstc.openstc_chef
+msgid "OpenSTC/Chef d'équipe"
+msgstr "OpenSTC/Chef d'équipe"
+
+#. module: openstc
+#: selection:project.project,state:0
 msgid "Cancelled"
-msgstr "Annulé"
+msgstr "Cancelled"
 
-#. modules: project, openstc
-#: field:project.task,color:0
-msgid "Color Index"
-msgstr "Couleur"
+#. module: openstc
+#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_en_attente
+msgid "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. \n"
+"			    Récapitulatif de votre Réservation : \n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"			   <%\n"
+"			    import pytz\n"
+"			    from datetime import datetime\n"
+"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    %>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
+msgstr "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. \n"
+"			    Récapitulatif de votre Réservation : \n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"			   <%\n"
+"			    import pytz\n"
+"			    from datetime import datetime\n"
+"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    %>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
 
-#. module: project
-#: field:project.task,date_end:0
-#: field:report.project.task.user,date_end:0
-msgid "Ending Date"
-msgstr "Date de fin"
+#. module: openstc
+#: field:openstc.pret.deliver.products.line.wizard,motif:0
+msgid "Motif de l'Intervention"
+msgstr "Motif de l'Intervention"
 
 #. module: openstc
 #: field:openstc.ask,refusal_reason:0
@@ -2086,35 +2579,51 @@ msgid "Refusal reason"
 msgstr "Raison de refus"
 
 #. module: openstc
+#: model:ir.model,name:openstc.model_openstc_site
+msgid "openstc.site"
+msgstr "openstc.site"
+
+#. module: openstc
 #: view:openstc.employee:0
 msgid "Entreprise"
 msgstr "Entreprise"
 
-#. module: project
-#: view:project.project:0
-msgid "Projects in which I am a member."
-msgstr "Interventions dont je suis membre."
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_pret_emprunt_wizard
+msgid "openstc.pret.emprunt.wizard"
+msgstr "openstc.pret.emprunt.wizard"
 
 #. module: openstc
-#: field:openstc.refused.ask.wizard,refusal_reason:0
-msgid "Raison de refus"
-msgstr "Raison de refus"
+#: model:ir.model,name:openstc.model_sale_order
+msgid "Sales Order"
+msgstr "Commande de ventes"
+
+#. module: openstc
+#: view:openstc.pret.warning.dispo.wizard:0
+msgid "Des articles ne sont pas dispo"
+msgstr "Des articles ne sont pas dispo"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.openstc_valid_ask
+msgid "openstc.ask.valid"
+msgstr "openstc.ask.valid"
+
+#. module: openstc
+#: view:hotel.reservation:0
+#: model:ir.actions.act_window,name:openstc.action_openstock_view_reservation_calendar
+#: model:ir.ui.menu,name:openstc.menu_action_openstock_view_reservation_calendar
+msgid "Planning des Réservations"
+msgstr "Planning des Réservations"
 
 #. module: openstc
 #: view:openstc.ask:0
 msgid "Confirm"
 msgstr "A confirmer par le DST"
 
-#. module: project
-#: constraint:res.company:0
-msgid "Error! You can not create recursive companies."
-msgstr "Erreur ! Vous ne pouvez pas créer de sociétés récursives"
-
-#. module: project
-#: view:report.project.task.user:0
-#: field:report.project.task.user,no_of_days:0
-msgid "# of Days"
-msgstr "Nb de jours"
+#. module: openstc
+#: field:openstc.pret.deliver.products.line.wizard,to_generate:0
+msgid "A Générer ?"
+msgstr "A Générer ?"
 
 #. module: openstc
 #: view:openstc.ask:0
@@ -2123,197 +2632,133 @@ msgid "Valid"
 msgstr "Valide"
 
 #. module: openstc
+#: view:hotel.reservation:0
+msgid "Une intervention sera générée pour cette ressource."
+msgstr "Une intervention sera générée pour cette ressource."
+
+#. module: openstc
+#: help:product.product,service_technical_id:0
+msgid "Si renseigné, indique que cette ressource nécessite une manipulation technique pour être installée sur site, cette ressource est donc susceptible de générer une intervention sur ce service."
+msgstr "Si renseigné, indique que cette ressource nécessite une manipulation technique pour être installée sur site, cette ressource est donc susceptible de générer une intervention sur ce service."
+
+#. module: openstc
 #: view:openstc.employee:0
 msgid "Employee"
 msgstr "Employée"
 
-#. module: project
-#: view:project.task:0
-#: selection:project.task,state:0
-#: selection:project.task.history,state:0
-#: selection:project.task.history.cumulative,state:0
-#: view:report.project.task.user:0
-msgid "New"
-msgstr "Nouveau"
-
-#. module: project
-#: model:ir.actions.act_window,name:project.action_view_task_history_cumulative
-#: model:ir.ui.menu,name:project.menu_action_view_task_history_cumulative
-msgid "Cumulative Flow"
-msgstr "Flux cumulé"
-
 #. module: openstc
-#: field:openstc.ask,email:0
+#: field:openstc.ask,partner_email:0
+#: field:openstc.ask,people_email:0
 msgid "Email"
 msgstr "Email"
 
-#. module: project
-#: view:report.project.task.user:0
-msgid "OverPass delay"
-msgstr "Échéance dépassée"
-
-#. module: project
-#: model:ir.model,name:project.model_mail_compose_message
-msgid "E-mail composition wizard"
-msgstr "Assistant de composition de courriels"
-
-#. module: project
-#: view:project.project:0
-#: field:project.task,manager_id:0
-msgid "Project Manager"
-msgstr "Responsable"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Articles Réservés"
+msgstr "Articles Réservés"
 
 #. module: openstc
-#: view:openstc.ask:0
-msgid "Ask information"
-msgstr "Information sur la demande"
+#: model:ir.model,name:openstc.model_product_category
+msgid "Product Category"
+msgstr "Catégorie de produits"
 
-#. module: project
-#: view:project.task:0
-#: view:project.task.history.cumulative:0
-msgid "Unassigned Tasks"
-msgstr "Tâches non-assignées"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Factures associées (si onéreux)"
+msgstr "Factures associées (si onéreux)"
 
-#. module: project
-#: help:project.project,planned_hours:0
-msgid "Sum of planned hours of all tasks related to this project and its child projects."
-msgstr "Sommes des heures planifiées de toutes les tâches liées à cette intervention et ses sous-interventions."
-
-#. modules: project, openstc
-#: view:project.task:0
-#: view:project.project:0
-#: view:project.task:0
-#: selection:project.task,state:0
-#: selection:project.task.delegate,state:0
-#: selection:project.task.history,state:0
-#: view:project.task.history.cumulative:0
-#: selection:project.task.history.cumulative,state:0
-#: selection:project.vs.hours,state:0
-#: view:report.project.task.user:0
-#: selection:report.project.task.user,state:0
-#: selection:task.by.days,state:0
-msgid "Pending"
-msgstr "En attente"
-
-#. module: project
-#: view:report.project.task.user:0
-msgid "My Task"
-msgstr "Mes tâches"
-
-#. module: project
-#: view:project.task:0
-#: view:project.task.history.cumulative:0
-#: view:report.project.task.user:0
-msgid "My Projects"
-msgstr "Mes interventions"
-
-#. modules: project, openstc
+#. module: openstc
 #: model:ir.ui.menu,name:openstc.menu_configuration
 #: view:res.company:0
 msgid "Configuration"
 msgstr "Configuration"
 
-#. module: project
-#: field:project.task,date_start:0
-#: field:report.project.task.user,date_start:0
-msgid "Starting Date"
-msgstr "Démarrage de l'intervention"
-
-#. modules: project, openstc
+#. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_intervention
-#: code:addons/addons/project/project.py:322
-#: code:addons/project/project.py:322
-#: model:ir.actions.act_window,name:project.open_view_project_all
-#: view:project.project:0
-#: field:project.task.type,project_ids:0
-#, python-format
 msgid "Projects"
-msgstr "Interventions"
+msgstr "Projets"
 
-#. module: project
-#: code:addons/addons/project/project.py:901
-#: code:addons/project/project.py:901
-#, python-format
-msgid "The task '%s' is opened."
-msgstr "La tâche '%s' est ouverte."
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Magasin"
+msgstr "Magasin"
 
-#. module: project
-#: help:project.task.delegate,name:0
-msgid "New title of the task delegated to the user"
-msgstr "Nouveau titre de la tâche déléguée à cet utilisateur"
+#. module: openstc
+#: field:res.partner,technical_service_id:0
+msgid "Service technique concerné"
+msgstr "Service technique concerné"
 
-#. module: project
-#: code:addons/addons/project/project.py:155
-#: code:addons/project/project.py:155
-#, python-format
-msgid "You cannot delete a project containing tasks. I suggest you to desactivate it."
-msgstr "Vous ne pouvez pas effacer une intervention contenant des tâches. Vous pouvez désactiver l'intervention."
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_pret_checkout
+msgid "openstc.pret.checkout"
+msgstr "openstc.pret.checkout"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_project_task_user_tree
-#: model:ir.ui.menu,name:project.menu_project_task_user_tree
-#: view:report.project.task.user:0
-msgid "Tasks Analysis"
-msgstr "Analyse des tâches"
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Réservations annulées ou bloquées pour cause de non disponibilité des articles"
+msgstr "Réservations annulées ou bloquées pour cause de non disponibilité des articles"
 
 #. module: openstc
 #: field:openstc.ask,site3:0
-#: field:project.project,site3:0
 msgid "Place"
 msgstr "Lieu"
 
 #. module: openstc
-#: field:res.users,qualification:0
-msgid "Qualification"
-msgstr "Qualification"
+#: selection:product.product,etat:0
+msgid "Bon"
+msgstr "Bon"
 
 #. module: openstc
-#: field:openstc.ask,intervention_assignement_id:0
-msgid "Affectation"
-msgstr "Affectation"
+#: field:openstc.pret.deliver.products.line.wizard,site_details:0
+msgid "Détails du Site"
+msgstr "Détails du Site"
 
-#. module: project
-#: view:project.task:0
-#: view:project.task.history.cumulative:0
-msgid "Project Tasks"
-msgstr "Tâche intervention"
+#. module: openstc
+#: view:hotel.reservation:0
+#: model:ir.actions.act_window,name:openstc.action_openstock_view_reservation
+#: model:ir.ui.menu,name:openstc.menu_action_openstock_view_reservation
+msgid "Réservations"
+msgstr "Réservations"
 
-#. module: project
-#: view:project.task:0
-msgid "Change to Previous Stage"
-msgstr "Revenir à l'étape précédente"
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_intervention_assignement
+msgid "openstc.intervention.assignement"
+msgstr "openstc.intervention.assignement"
 
 #. module: openstc
 #: help:openstc.refused.ask.wizard,ask_id:0
 msgid "Select a ask to"
 msgstr "Attribuer une demande à"
 
-#. modules: project, openstc
-#: model:ir.actions.act_window,name:openstc.openstc_action_view_task
+#. module: openstc
 #: model:ir.ui.menu,name:openstc.openstc_menu_action_view_task
 #: field:openstc.create.task.wizard,task_ids:0
-#: model:ir.actions.act_window,name:project.act_project_project_2_project_task_all
-#: model:ir.ui.menu,name:project.menu_action_view_task
-#: model:ir.ui.menu,name:project.menu_tasks_config
-#: model:ir.ui.menu,name:project.project_report_task
-#: model:process.process,name:project.process_process_tasksprocess0
-#: view:project.task:0
-#: view:res.partner:0
-#: field:res.partner,task_ids:0
+#: field:openstc.team,tasks:0
+#: field:res.users,tasks:0
 msgid "Tasks"
 msgstr "Tâches"
 
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "December"
-msgstr "Décembre"
+#. module: openstc
+#: help:product.product,need_infos_supp:0
+msgid "Indiquer si, pour une Réservation, cette ressource nécessite des infos supplémentaires A saisir par le demandeur."
+msgstr "Indiquer si, pour une Réservation, cette ressource nécessite des infos supplémentaires A saisir par le demandeur."
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_openstc_site
-msgid "openstc.site"
-msgstr "openstc.site"
+#: view:hotel.reservation:0
+msgid "Ne plus plannifier d'intervention pour cette ressource"
+msgstr "Ne plus plannifier d'intervention pour cette ressource"
 
-#. module: project
+#. module: openstc
+#: field:openstc.ask,partner_type_code:0
+msgid "Partner code"
+msgstr "Partner code"
+
+#. module: openstc
+#: field:product.product,empruntable:0
+msgid "Se fournir à l'extérieur"
+msgstr "Se fournir à l'extérieur"
+
+#. module: openstc
 #: view:project.project:0
 msgid "Billing"
 msgstr "Facturation"
@@ -2323,310 +2768,334 @@ msgstr "Facturation"
 msgid "Add Intervention"
 msgstr "Add Intervention"
 
-#. module: project
-#: help:project.task.delegate,planned_hours:0
-msgid "Estimated time to close this task by the delegated user"
-msgstr "Temps estimé pour que l'utilisateur à qui est déléguée cette tâche la clôture"
-
-#. module: project
-#: model:process.transition.action,name:project.process_transition_action_opendrafttask0
-#: view:project.task:0
-#: selection:project.vs.hours,state:0
-#: selection:report.project.task.user,state:0
-#: selection:task.by.days,state:0
-msgid "Draft"
-msgstr "Brouillon"
-
-#. module: project
-#: field:project.task,kanban_state:0
-#: field:project.task.history,kanban_state:0
-#: field:project.task.history.cumulative,kanban_state:0
-msgid "Kanban State"
-msgstr "État kanban"
+#. module: openstc
+#: field:hotel.reservation,is_recur:0
+msgid "Issue d'une Récurrence"
+msgstr "Issue d'une Récurrence"
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_openstc_task_category
-msgid "openstc.task.category"
-msgstr "openstc.task.category"
-
-#. module: project
-#: model:ir.model,name:project.model_report_project_task_user
-msgid "Tasks by user and project"
-msgstr "Tâches par utilisateur et par intervention"
-
-#. module: project
-#: field:res.company,project_time_mode_id:0
-msgid "Project Time Unit"
-msgstr "Unité de temps de l'intervention"
-
-#. module: project
-#: view:project.task:0
-#: selection:project.task,kanban_state:0
-#: selection:project.task.history,kanban_state:0
-#: selection:project.task.history.cumulative,kanban_state:0
-msgid "Normal"
-msgstr "Normal"
-
-#. module: project
-#: code:addons/addons/project/wizard/mail_compose_message.py:45
-#: code:addons/project/wizard/mail_compose_message.py:45
-#, python-format
-msgid "Please specify the Customer or email address of Customer."
-msgstr "Spécifier le client ou son email"
-
-#. module: project
-#: view:report.project.task.user:0
-#: field:report.project.task.user,closing_days:0
-msgid "Days to Close"
-msgstr "Jours avant clôture"
-
-#. module: project
-#: model:res.groups,name:project.group_project_user
-msgid "User"
-msgstr "Utilisateur"
-
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "November"
-msgstr "Novembre"
-
-#. module: project
-#: view:project.task:0
-msgid "Task edition"
-msgstr "Édition de tâche"
-
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "January"
-msgstr "Janvier"
+#: view:hotel.reservation:0
+msgid "Terminer Réservation"
+msgstr "Terminer Réservation"
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_site_type
 msgid "openstc.site.type"
 msgstr "type de service"
 
-#. module: project
-#: code:addons/addons/project/wizard/mail_compose_message.py:43
-#: code:addons/addons/project/wizard/mail_compose_message.py:45
-#: code:addons/project/wizard/mail_compose_message.py:43
-#: code:addons/project/wizard/mail_compose_message.py:45
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_pret_checkout_line
+msgid "openstc.pret.checkout.line"
+msgstr "openstc.pret.checkout.line"
+
+#. module: openstc
+#: field:openstock.qte.dispo.report,prod_dispo:0
+msgid "Produit"
+msgstr "Produit"
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Compute"
+msgstr "Compute"
+
+#. module: openstc
+#: field:hotel_reservation.line,uom_qty:0
+msgid "Qté de Référence pour Facturation"
+msgstr "Qté de Référence pour Facturation"
+
+#. module: openstc
+#: field:hotel.reservation,site_id:0
+msgid "Site (Lieu)"
+msgstr "Site (Lieu)"
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Réservation de Ressources"
+msgstr "Réservation de Ressources"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_equipment
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_equipment
+msgid "Matériel"
+msgstr "Matériel"
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:232
+#: code:addons/openstc/openstc_pret.py:337
+#: code:addons/openstc/openstc_pret.py:403
+#: code:addons/openstc/openstc_pret.py:564
+#: code:addons/openstc/openstc_pret.py:650
 #, python-format
 msgid "Error"
 msgstr "Erreur"
 
-#. module: project
-#: field:project.task.delegate,prefix:0
-msgid "Your Task Title"
-msgstr "Votre titre de tâche"
+#. module: openstc
+#: field:openstc.equipment,small_material:0
+msgid "Small"
+msgstr "Small"
 
-#. module: project
-#: view:project.task.reevaluate:0
-msgid "Reevaluation Task"
-msgstr "Réévaluation de la tâche"
+#. module: openstc
+#: sql_constraint:account.invoice:0
+msgid "Invoice Number must be unique per Company!"
+msgstr "Le numéro de facture doit être unique par société !"
 
-#. module: project
-#: code:addons/addons/project/project.py:1146
-#: code:addons/project/project.py:1146
-#, python-format
-msgid "Please delete the project linked with this account first."
-msgstr "Spécifiéz l'intervention lié à ce compte."
+#. module: openstc
+#: field:openstc.pret.envoie.mail.annulation.wizard,body_html:0
+msgid "Message du mail notifiant l'annulation"
+msgstr "Message du mail notifiant l'annulation"
 
-#. modules: project, openstc
-#: sql_constraint:res.users:0
-#: sql_constraint:res.users:0
-msgid "You can not have two users with the same login !"
-msgstr "VOus ne pouvez pas avoir deux utilsiateurs avec le même login !"
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Date de fin de Réservation"
+msgstr "Date de fin de Réservation"
 
-#. module: project
-#: model:ir.actions.act_window,help:project.action_project_task_user_tree
-msgid "This report allows you to analyse the performance of your projects and users. You can analyse the quantities of tasks, the hours spent compared to the planned hours, the average number of days to open or close a task, etc."
-msgstr "Ce rapport vous permet d'analyser la performance de vos interventions et utilisateurs. Vous pouvez analyser les tâches, les heures consommées par rapport aux heures prévues, le nombre moyen de jours pour démarrer ou fermer une tâche, etc."
+#. module: openstc
+#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_en_attente
+msgid "\n"
+"			    <h2>Message Automatique</h2>\n"
+"			    \n"
+"			    <p>Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. </p>\n"
+"			    <p>Récapitulatif de votre Réservation : </p>\n"
+"			    <ul>\n"
+"			    <li>Libellé : ${object.name or ''}</li>\n"
+"			    <%\n"
+"			    import pytz\n"
+"			    from datetime import datetime\n"
+"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    %>\n"
+"			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"			    <li><u>Ressources Réservées :</u> \n"
+"			    <ul>\n"
+"			    % for line in object.reservation_line:\n"
+"			    <li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"			    % endfor\n"
+"			    </ul>\n"
+"			    </li>\n"
+"			    </ul>\n"
+"			    <br />\n"
+"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
+"			    <br />\n"
+"			    <p>Cordialement,</p>\n"
+"			    <br />\n"
+"			    <p>${object.shop_id.company_id.name or ''}</p>\n"
+"			    <br />\n"
+"			    <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"			    <br />\n"
+"			    <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"			    \n"
+"			    "
+msgstr "\n"
+"			    <h2>Message Automatique</h2>\n"
+"			    \n"
+"			    <p>Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. </p>\n"
+"			    <p>Récapitulatif de votre Réservation : </p>\n"
+"			    <ul>\n"
+"			    <li>Libellé : ${object.name or ''}</li>\n"
+"			    <%\n"
+"			    import pytz\n"
+"			    from datetime import datetime\n"
+"			    my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"			    my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x à %Hh%M\")\n"
+"			    %>\n"
+"			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"			    <li><u>Ressources Réservées :</u> \n"
+"			    <ul>\n"
+"			    % for line in object.reservation_line:\n"
+"			    <li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"			    % endfor\n"
+"			    </ul>\n"
+"			    </li>\n"
+"			    </ul>\n"
+"			    <br />\n"
+"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
+"			    <br />\n"
+"			    <p>Cordialement,</p>\n"
+"			    <br />\n"
+"			    <p>${object.shop_id.company_id.name or ''}</p>\n"
+"			    <br />\n"
+"			    <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"			    <br />\n"
+"			    <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"			    \n"
+"			    "
 
-#. module: project
-#: view:report.project.task.user:0
-msgid "Non Assigned Tasks to users"
-msgstr "Tâches non-assignées à un utilisateur"
+#. module: openstc
+#: view:purchase.order:0
+msgid "Renvoyer articles à la collecticité"
+msgstr "Renvoyer articles à la collecticité"
 
-#. module: project
-#: selection:project.vs.hours,state:0
-msgid "Close"
-msgstr "Fermer"
+#. module: openstc
+#: view:openstc.pret.checkout:0
+#: view:openstc.pret.deliver.products.wizard:0
+#: view:openstc.pret.envoie.mail.annulation.wizard:0
+msgid "Retour"
+msgstr "Retour"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_pret_view_checkout
+msgid "Voir Etats des Lieux"
+msgstr "Voir Etats des Lieux"
 
 #. module: openstc
 #: field:openstc.create.task.wizard,inter_id:0
 msgid "Intervention"
 msgstr "Intervention"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.action_review_task_stage
-msgid "Review Task Stages"
-msgstr "Réexaminer les étapes des tâches"
-
 #. module: openstc
 #: view:openstc.employee:0
 msgid "Personal"
 msgstr "Code Personnel"
 
-#. module: project
-#: view:project.project:0
-msgid "Projects in which I am a manager"
-msgstr "Interventions dans lesquels je suis membre"
-
-#. module: project
-#: code:addons/addons/project/project.py:957
-#: code:addons/project/project.py:957
-#, python-format
-msgid "The task '%s' is pending."
-msgstr "La tâche '%s' est en attente."
-
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "October"
-msgstr "Octobre"
+#. module: openstc
+#: view:openstc.pret.checkout:0
+msgid "Etats des lieux"
+msgstr "Etats des lieux"
 
 #. module: openstc
-#: field:openstc.ask,qualifier_id:0
+#: code:addons/openstc/openstc_pret_checkout.py:118
+#, python-format
+msgid "No purchase nor invoice have been created, because there is nothing to purchase."
+msgstr "Aucun achat n'a été lancé car rien n'est à racheter"
+
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_pret_view_checkout
+msgid "Voir Etats des lieux retour d'articles"
+msgstr "Voir Etats des lieux retour d'articles"
+
+#. module: openstc
+#: view:hotel.folio:0
+#: view:hotel.reservation:0
+msgid "Date de début Réservation"
+msgstr "Date de début Réservation"
+
+#. module: openstc
 #: field:openstc.refused.ask.wizard,qualifier_id:0
 msgid "Qualififier"
 msgstr "Verificateur"
 
 #. module: openstc
-#: field:project.task,team:0
-msgid "With team"
-msgstr "Mode équipe"
-
-#. module: project
-#: model:ir.actions.act_window,help:project.action_review_task_stage
-msgid "The stages can be common to all project or specific to one project. Each task will follow the different stages in order to be closed."
-msgstr "Les étapes peuvent être communes à tous les interventions ou spécifiques à une intervention. Chaque tâche suivra les différentes étapes avant de pouvoir être fermée."
-
-#. modules: project, openstc
+#: field:openstc.absent.type,description:0
 #: field:openstc.ask,description:0
-#: field:project.task,description:0
-#: view:project.task.type:0
-#: field:project.task.type,description:0
+#: field:openstock.qte.dispo.report,name:0
+#: field:project.project,description:0
 msgid "Description"
 msgstr "Description"
 
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "May"
-msgstr "Mai"
-
-#. module: project
-#: field:task.by.days,total_task:0
-msgid "Total tasks"
-msgstr "Total des tâches"
-
-#. module: project
-#: help:project.task.type,project_default:0
-msgid "If you check this field, this stage will be proposed by default on each new project. It will not assign this stage to existing projects."
-msgstr "Si vous cochez ce champ, cette étape sera proposée par défaut sur chaque nouvelle intervention. elle ne s'appliquera pas aux interventions existants."
-
-#. module: project
-#: view:report.project.task.user:0
-#: field:report.project.task.user,hours_effective:0
-msgid "Effective Hours"
-msgstr "Heures Effectives"
-
-#. module: project
-#: code:addons/addons/project/project.py:827
-#: code:addons/project/project.py:827
-#, python-format
-msgid "Task '%s' closed"
-msgstr "Tâche '%s' fermée"
-
-#. modules: project, openstc
-#: view:project.project:0
-msgid "Customer"
-msgstr "Client"
-
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "February"
-msgstr "Février"
-
-#. module: project
-#: view:project.task:0
-msgid "Edit"
-msgstr "Éditer"
+#. module: openstc
+#: field:project.task,oil_price:0
+msgid "oil price"
+msgstr "oil price"
 
 #. module: openstc
-#: view:openstc.team:0
-#: field:openstc.team,user_ids:0
-msgid "Employees"
-msgstr "Employés"
+#: view:openstc.ask:0
+msgid "partner_id"
+msgstr "partner_id"
 
-#. module: project
-#: field:project.task.work,name:0
-msgid "Work summary"
-msgstr "Résumé des tâches"
+#. module: openstc
+#: field:project.task,equipment_ids:0
+msgid "Equipments"
+msgstr "Equipments"
 
-#. module: project
-#: selection:report.project.task.user,month:0
-msgid "April"
-msgstr "Avril"
+#. module: openstc
+#: field:project.project,cancel_reason:0
+msgid "Cancel reason"
+msgstr "Cancel reason"
 
-#. module: project
-#: view:project.task:0
-msgid "Spent Hours"
-msgstr "Heures consommées"
+#. module: openstc
+#: view:hotel.folio:0
+#: field:hotel_reservation.line,prix_unitaire:0
+#: field:openstc.pret.emprunt.line.wizard,price_unit:0
+msgid "Prix Unitaire"
+msgstr "Prix Unitaire"
 
-#. module: project
-#: help:project.project,sequence:0
-msgid "Gives the sequence order when displaying a list of Projects."
-msgstr "Définit l'ordre utilisé pour afficher une liste des interventions"
+#. module: openstc
+#: view:hotel.folio:0
+#: view:hotel.reservation:0
+msgid "Date de fin Réservation"
+msgstr "Date de fin Réservation"
 
-#. module: project
-#: model:ir.actions.act_window,name:project.act_res_users_2_project_task_opened
-msgid "Assigned Tasks"
-msgstr "Tâches affectées"
+#. module: openstc
+#: field:openstc.pret.checkout.line,partner_id:0
+msgid "Emprunteur concerné"
+msgstr "Emprunteur concerné"
 
-#. module: project
-#: view:report.project.task.user:0
-msgid "Current Year"
-msgstr "Année en cours"
+#. module: openstc
+#: selection:openstc.pret.checkout.line,etat_retour:0
+msgid "Ne Rien Planifier"
+msgstr "Ne Rien Planifier"
 
-#. module: project
-#: field:project.project,priority:0
-#: field:project.project,sequence:0
-#: field:project.task,sequence:0
-#: field:project.task.type,sequence:0
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Service Line"
+msgstr "Service Line"
+
+#. module: openstc
+#: field:openstc.pret.checkout.line,infos_supp:0
+msgid "Infos Supplémentaires"
+msgstr "Infos Supplémentaires"
+
+#. module: openstc
+#: help:hotel.reservation,in_option:0
+msgid "Une réservation mise en option signifie que votre demande est prise en compte mais                                             dont on ne peut pas garantir la livraison à la date prévue.                                            Une réservation bloquée signifie que la réservation n'est pas prise en compte car nous ne pouvons pas                                             garantir la livraison aux dates indiquées"
+msgstr "Une réservation mise en option signifie que votre demande est prise en compte mais                                             dont on ne peut pas garantir la livraison à la date prévue.                                            Une réservation bloquée signifie que la réservation n'est pas prise en compte car nous ne pouvons pas                                             garantir la livraison aux dates indiquées"
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_view_openstc_pret_create_checkout
+msgid "Générer Etat des lieux"
+msgstr "Générer Etat des lieux"
+
+#. module: openstc
+#: field:openstc.task.category,sequence:0
 msgid "Sequence"
-msgstr "Séquence"
+msgstr "Sequence"
 
-#. module: project
-#: view:project.task:0
-#: view:project.task.work:0
-msgid "Task Work"
-msgstr "Travail effectué"
+#. module: openstc
+#: constraint:openstc.task.category:0
+#: constraint:product.category:0
+msgid "Error ! You cannot create recursive categories."
+msgstr "Error ! You cannot create recursive categories."
 
 #. module: openstc
 #: view:openstc.site:0
 msgid "Site"
 msgstr "Site"
 
-#. module: project
-#: help:project.task.delegate,planned_hours_me:0
-msgid "Estimated time for you to validate the work done by the user to whom you delegate this task"
-msgstr "Temps estimé pour valider le travail réalisé par l'utilisateur à qui vous avez délégué cette tâche"
-
-#. module: project
-#: view:report.project.task.user:0
-#: field:report.project.task.user,year:0
-msgid "Year"
-msgstr "Année"
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:886
+#, python-format
+msgid "Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée"
+msgstr "Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée"
 
 #. module: openstc
+#: field:hotel_reservation.line,reserve_product:0
+msgid "Article réservé"
+msgstr "Article réservé"
+
+#. module: openstc
+#: field:openstc.equipment,year:0
+msgid "Year"
+msgstr "Year"
+
+#. module: openstc
+#: field:openstc.absent.type,name:0
 #: field:openstc.intervention.assignement,name:0
 msgid "Affectation "
 msgstr "Affectation "
 
-#. modules: project, openstc
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstc_pret_emprunt_line_wizard
+msgid "openstc.pret.emprunt.line.wizard"
+msgstr "openstc.pret.emprunt.line.wizard"
+
+#. module: openstc
 #: view:project.project:0
-#: view:project.project:0
-#: field:project.project,type_ids:0
-#: view:project.task.type:0
 msgid "Tasks Stages"
 msgstr "Étapes des tâches"
 

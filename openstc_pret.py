@@ -823,8 +823,11 @@ class hotel_reservation(osv.osv):
             #Générer intervention de livraison et interventions optionnelles
             checkin = datetime.strptime(resa.checkin, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc)
             checkout = datetime.strptime(resa.checkout, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc)
-            checkin_str = checkin.astimezone(pytz.timezone('Europe/Paris')).strftime(u'%x à %H:%M')
-            checkout_str = checkout.astimezone(pytz.timezone('Europe/Paris')).strftime(u'%x à %H:%M')
+            checkin_str = checkin.astimezone(pytz.timezone('Europe/Paris')).strftime(_('%x at %H:%M').encode('utf-8'))
+            checkout_str = checkout.astimezone(pytz.timezone('Europe/Paris')).strftime(_('%x at %H:%M').encode('utf-8'))
+            checkin_str = checkin_str.decode('utf-8')
+            checkout_str = checkout_str.decode('utf-8')
+            
             user = self.pool.get("res.users").browse(cr, uid, uid, context=context)
             partner = user.company_id.partner_id        
             inter_ask = []
