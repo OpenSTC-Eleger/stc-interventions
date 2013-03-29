@@ -106,7 +106,7 @@
 						        </group>
 						        <group col="2" colspan="2" string="Coordonnées Demandeur">
 						            <field name="openstc_partner_id" required="1" on_change="onchange_openstc_partner_id(openstc_partner_id)"
-						                attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
+						                attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" domain="[('customer','=',True),('technical_service_id','=',False),('technical_site_id','=',False)]"/>
 						            <field name="partner_id" invisible="1" on_change="onchange_partner_id(partner_id)"
 						                attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 						            <field name="partner_shipping_id" on_change="onchange_partner_shipping_id(partner_shipping_id)"
@@ -475,6 +475,28 @@
 					    filter_domain="[('reservation_line.reserve_product','=',self)]"/>
 				</search>
 			</field>
+		</record>
+		
+		<record model="ir.ui.view" id="view_openstc_res_partner_inherit">
+			<field name="name">openstc.pret.res.partner.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="type">form</field>
+			<field name="inherit_id" ref="view_openstc_partner_form"/>
+			<field name="arch" type="xml">
+			    <field name="service_id" position="before">
+			        <field name="customer" invisible="1"/>
+			        <field name="supplier" invisible="1"/>
+			    </field>
+				<field name="service_id" position="attributes">
+				    <attribute name="attrs">{'invisible':[('customer','=',False)]}</attribute>
+				</field>    
+				<field name="technical_service_id" position="attributes">
+				    <attribute name="attrs">{'invisible':[('customer','=',False)]}</attribute>
+				</field>
+				<field name="technical_site_id" position="attributes">
+				    <attribute name="attrs">{'invisible':[('customer','=',False)]}</attribute>
+				</field>
+		    </field>
 		</record>
 		
 		<!-- Actions Prêts/Locations -->
