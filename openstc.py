@@ -449,6 +449,29 @@ class project(osv.osv):
                 ask_id[0]
         return False
 
+    def cancel(self, cr, uid, ids, params, context=None):
+        #print("test"+params)
+        project_obj = self.pool.get(self._name)
+        project = project_obj.browse(cr, uid, ids[0], context)
+        task_obj = self.pool.get('project.task')
+
+        for task in project.tasks:
+             task_obj.write(cr, uid, [task.id], {
+                'state' : params['state'],
+                'user_id': None,
+                'team_id': None,
+                'date_end': None,
+                'date_start': None,
+            }, context=context)
+
+        project_obj.write(cr, uid, ids[0], {
+                'state' : params['state'],
+                'cancel_reason': params['cancel_reason'],
+            }, context=context)
+
+
+        return True;
+
     _defaults = {
         'ask_id' : _get_ask,
     }
@@ -770,7 +793,7 @@ class ask(osv.osv):
         #self.pool.get("mail.message").write(cr, uid, [mail_id])
         self.pool.get("mail.message").send(cr, uid, [mail_id])
 
-        return true;
+        return True;
 
 
 ask()
