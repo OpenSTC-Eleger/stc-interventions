@@ -516,7 +516,7 @@ class project(osv.osv):
             }, context=context)
 
         ask_obj.write(cr, uid, project.ask_id.id, {
-                    'state': 'refused',
+                    'state': 'closed',
                 }, context=context)
 
 
