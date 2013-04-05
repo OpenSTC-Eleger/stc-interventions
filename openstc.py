@@ -328,6 +328,51 @@ class task(osv.osv):
     }
 
     _defaults = {'active': lambda *a: True,}
+
+
+    def saveTaskDone(self, cr, uid, ids, params, context=None):
+        task_obj = self.pool.get(self._name)
+        task = task_obj.browse(cr, uid, ids[0], context)
+        task_work_obj = self.pool.get('project.task.work')
+        project_obj = self.pool.get('project.project')
+        ask_obj = self.pool.get('openstc.ask')
+        equipment_obj = self.pool.get('openstc.equipment')
+
+        equipment_obj.write(cr, uid, params['vehicule'], {
+                 'km': params['km'],
+             }, context=context)
+
+        project_obj.write(cr, uid, task.project_id.id, {
+                'state': params['project_state'],
+            }, context=context)
+        project = project_obj.browse(cr, uid, [task.project_id.id], context=context)
+
+        if params['project_state'] == 'closed' and project[0]!=None and project[0].ask_id:
+            ask_obj.write(cr, uid, project[0].ask_id.id, {
+                    'state': params['project_state'],
+                }, context=context)
+
+        task_work_obj.create(cr, uid, {
+             'name': task.name,
+             'date': params['date'],
+             'task_id': task.id,
+             'hours': params['hours'],
+             'user_id': task.user_id.id or False,
+             'team_id': task.team_id.id or False,
+             'company_id': task.company_id.id or False,
+            }, context=context)
+
+        task_obj.write(cr, uid, ids[0], {
+                'state': params['task_state'],
+                'equipment_ids': [[6, 0, params['equipment_ids']]],
+                'remaining_hours': params['remaining_hours'],
+                'km': params['km'],
+                'oil_qtity': params['oil_qtity'],
+                'oil_price': params['oil_price'],
+            }, context=context)
+
+        return True
+
 task()
 
 
@@ -618,6 +663,36 @@ class ask(osv.osv):
         if manager_id:
             data['manager_id'] = manager_id[0]
         return super(ask, self).create(cr, uid, data, context)
+
+    def valid(self, cr, uid, ids, params, context=None):
+        ask_obj = self.pool.get(self._name)
+        ask = ask_obj.browse(cr, uid, ids[0], context)
+        project_obj = self.pool.get('project.project')
+        task_obj = self.pool.get('project.task')
+
+        ask_obj.write(cr, uid, ids[0], {
+                'state': params['request_state'],
+                'description': params['description'],
+                'intervention_assignement_id': params['intervention_assignement_id'],
+                'service_id':  params['service_id'],
+            }, context=context)
+
+        project_id = project_obj.create(cr, uid, {
+                'ask_id': ask.id,
+                'name': ask.name,
+                'state': params['project_state'],
+                'site1': params['site1'],
+                'service_id':  params['service_id'],
+            }, context=context)
+
+        task_obj.create(cr, uid, {
+             'project_id': project_id,
+             'name': ask.name,
+             'planned_hours': params['planned_hours'],
+            }, context=context)
+        #TODO : after configuration mail sender uncomment send_mail function
+        #send_email(self, cr, uid, ids, params, context=None)
+        return True
 
     def action_valid(self, cr, uid, ids, context=None):
         if context is None:
