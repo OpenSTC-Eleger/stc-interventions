@@ -499,6 +499,7 @@ class project(osv.osv):
         project_obj = self.pool.get(self._name)
         project = project_obj.browse(cr, uid, ids[0], context)
         task_obj = self.pool.get('project.task')
+        ask_obj = self.pool.get('openstc.ask')
 
         for task in project.tasks:
              task_obj.write(cr, uid, [task.id], {
@@ -513,6 +514,10 @@ class project(osv.osv):
                 'state' : params['state'],
                 'cancel_reason': params['cancel_reason'],
             }, context=context)
+
+        ask_obj.write(cr, uid, project.ask_id.id, {
+                    'state': 'refused',
+                }, context=context)
 
 
         return True;
