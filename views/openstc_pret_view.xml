@@ -52,6 +52,8 @@
 						<field name="seuil_confirm"/>
 						<field name="service_technical_id"/>
 						<field name="type_prod"/>
+						<field name="openstc_reservable"/>
+						<field name="openstc_maintenance"/>
 					</page>
 			</page>
 			</field>

@@ -66,7 +66,7 @@ class product_product(osv.osv):
     
     #Method to override in order to add some products type and being able to filter product.product according to work context (internvetions, resa etc...)
     def return_type_prod_values(self, cr, uid, context=None):
-        return [('ressource','Ressource Réservable'),('materiel','Matériel pour Intervention')]
+        return [('materiel','Matériel pour Intervention'),('fourniture','Fourniture Achetable'),('site','Site')]
     
     def _get_type_prod_values(self, cr, uid, context=None):
         return self.return_type_prod_values(cr, uid, context)
@@ -81,11 +81,15 @@ class product_product(osv.osv):
         'need_infos_supp':fields.boolean('Nécessite Infos Supp ?', help="Indiquer si, pour une Réservation, cette ressource nécessite des infos supplémentaires A saisir par le demandeur."),
         'service_technical_id':fields.many2one('openstc.service', 'Service Technique associé',help='Si renseigné, indique que cette ressource nécessite une manipulation technique pour être installée sur site, cette ressource est donc susceptible de générer une intervention sur ce service.'),
         'type_prod':fields.selection(_get_type_prod_values, 'Type de Produit'),
+        'openstc_reservable':fields.boolean('Reservable', help='Indicates if this ressource can be reserved or not by tiers'),
+        'openstc_maintenance':fields.boolean('Maintenance ?', help='Indicates if this ressource can be associated to contracts for maintenance'),
         }
 
     _defaults = {
         'seuil_confirm': 0,
         'need_infos_supp': lambda *a:0,
+        'openstc_reservable':lambda *a: False,
+        'openstc_maintenance':lambda *a: False,
     }
 
 product_product()
@@ -176,7 +180,7 @@ class hotel_reservation_line(osv.osv):
 
     _columns = {
         'categ_id': fields.many2one('product.category','Type d\'article'),
-        "reserve_product": fields.many2one("product.product", "Article réservé", domain=[('type_prod','=','ressource')]),
+        "reserve_product": fields.many2one("product.product", "Article réservé", domain=[('openstc_reservable','=',True)]),
         "qte_reserves":fields.float("Qté désirée", digits=(3,2)),
         "prix_unitaire": fields.float("Prix Unitaire", digit=(4,2)),
         #"dispo":fields.boolean("Disponible"),
