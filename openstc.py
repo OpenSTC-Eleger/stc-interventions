@@ -329,7 +329,7 @@ class task(osv.osv):
 
     _defaults = {'active': lambda *a: True,}
 
-
+    # Method called on mark task done from swif
     def saveTaskDone(self, cr, uid, ids, params, context=None):
         task_obj = self.pool.get(self._name)
         task = task_obj.browse(cr, uid, ids[0], context)
@@ -338,20 +338,24 @@ class task(osv.osv):
         ask_obj = self.pool.get('openstc.ask')
         equipment_obj = self.pool.get('openstc.equipment')
 
+        #Update kilometers on vehucule
         equipment_obj.write(cr, uid, params['vehicule'], {
                  'km': params['km'],
              }, context=context)
 
+        #Update intervention sate
         project_obj.write(cr, uid, task.project_id.id, {
                 'state': params['project_state'],
             }, context=context)
         project = project_obj.browse(cr, uid, [task.project_id.id], context=context)
 
+        #Also close ask when intevention is closing
         if params['project_state'] == 'closed' and project[0]!=None and project[0].ask_id:
             ask_obj.write(cr, uid, project[0].ask_id.id, {
                     'state': params['project_state'],
                 }, context=context)
 
+        #update task work
         task_work_obj.create(cr, uid, {
              'name': task.name,
              'date': params['date'],
@@ -362,6 +366,7 @@ class task(osv.osv):
              'company_id': task.company_id.id or False,
             }, context=context)
 
+        #update task
         task_obj.write(cr, uid, ids[0], {
                 'state': params['task_state'],
                 'equipment_ids': [[6, 0, params['equipment_ids']]],
@@ -494,6 +499,7 @@ class project(osv.osv):
                 ask_id[0]
         return False
 
+    #Cancel intervention from swif
     def cancel(self, cr, uid, ids, params, context=None):
         #print("test"+params)
         project_obj = self.pool.get(self._name)
@@ -501,6 +507,7 @@ class project(osv.osv):
         task_obj = self.pool.get('project.task')
         ask_obj = self.pool.get('openstc.ask')
 
+        #update intervention's tasks
         for task in project.tasks:
              task_obj.write(cr, uid, [task.id], {
                 'state' : params['state'],
@@ -510,11 +517,13 @@ class project(osv.osv):
                 'date_start': None,
             }, context=context)
 
+        #update intervention with cancel's reason
         project_obj.write(cr, uid, ids[0], {
                 'state' : params['state'],
                 'cancel_reason': params['cancel_reason'],
             }, context=context)
 
+        #update ask state of intervention
         ask_obj.write(cr, uid, project.ask_id.id, {
                     'state': 'closed',
                 }, context=context)
@@ -669,12 +678,14 @@ class ask(osv.osv):
             data['manager_id'] = manager_id[0]
         return super(ask, self).create(cr, uid, data, context)
 
+    #valid ask from swif
     def valid(self, cr, uid, ids, params, context=None):
         ask_obj = self.pool.get(self._name)
         ask = ask_obj.browse(cr, uid, ids[0], context)
         project_obj = self.pool.get('project.project')
         task_obj = self.pool.get('project.task')
 
+        #update ask with concerned service
         ask_obj.write(cr, uid, ids[0], {
                 'state': params['request_state'],
                 'description': params['description'],
@@ -682,6 +693,7 @@ class ask(osv.osv):
                 'service_id':  params['service_id'],
             }, context=context)
 
+        #create intervention
         project_id = project_obj.create(cr, uid, {
                 'ask_id': ask.id,
                 'name': ask.name,
@@ -690,11 +702,13 @@ class ask(osv.osv):
                 'service_id':  params['service_id'],
             }, context=context)
 
-        task_obj.create(cr, uid, {
-             'project_id': project_id,
-             'name': ask.name,
-             'planned_hours': params['planned_hours'],
-            }, context=context)
+        if params['create_task'] :
+            #create task
+            task_obj.create(cr, uid, {
+                 'project_id': project_id,
+                 'name': ask.name,
+                 'planned_hours': params['planned_hours'],
+                }, context=context)
         #TODO : after configuration mail sender uncomment send_mail function
         #send_email(self, cr, uid, ids, params, context=None)
         return True
