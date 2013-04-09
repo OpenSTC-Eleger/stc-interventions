@@ -22,6 +22,12 @@
         <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
     </record>
 
+    <record id="openstc_agent_non_technique" model="res.groups">
+        <field name="name">OpenSTC/Agent Non Technique</field>
+        <field name="category_id" ref="base.module_category_project_management"/>
+        <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
+    </record>
+
     <record id="openstc_chef" model="res.groups">
         <field name="name">OpenSTC/Chef d'équipe</field>
         <field name="category_id" ref="base.module_category_project_management"/>
