@@ -499,7 +499,12 @@ openstc_absent_type()
 # Interventions
 #----------------------------------------------------------
 
-
+class account_analytic_account(osv.osv):
+    _inherit = "account.analytic.account"
+    _columns = {
+        'service_id':fields.many2one('openstc.service', 'Service'),
+        }
+    
 class project(osv.osv):
     _name = "project.project"
     _description = "Interventon stc"
@@ -517,7 +522,7 @@ class project(osv.osv):
         'state': fields.selection([('closed', 'Closed'),('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
                                   'State', readonly=True, required=True, help=''),
 
-        'service_id': fields.many2one('openstc.service', 'Service'),
+        #'service_id': fields.many2one('openstc.service', 'Service'),
         'description': fields.text('Description'),
         'site_details': fields.text('Précision sur le site'),
         'cancel_reason': fields.text('Cancel reason'),
