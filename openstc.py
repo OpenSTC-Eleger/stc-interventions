@@ -22,9 +22,46 @@
 #
 #############################################################################
 from datetime import datetime
+import types
 
 from osv import fields, osv
 from tools.translate import _
+
+def send_email(self, cr, uid, ids, params, context=None):
+#def send_email( params ):
+    #print("test"+params)
+    ask_obj = self.pool.get('openstc.ask')
+    ask = ask_obj.browse(cr, uid, ids[0], context)
+
+    user_obj = self.pool.get('res.users')
+    user = user_obj.read(cr, uid, uid,
+                                    ['company_id'],
+                                    context)
+
+    company_obj = self.pool.get('res.company')
+    company = company_obj.read(cr, uid, user['company_id'][0],
+                            ['email'],
+                            context)
+
+    email_obj = self.pool.get("email.template")
+    ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=',self._name)])
+
+    email_tmpl_id = email_obj.create(cr, uid, {
+                #'name':'modèle de mail pour résa annulée',
+                'name':'Suivi de la demande ' + ask.name,
+                'model_id':ir_model[0],
+                'subject':'Suivi de la demande ' + ask.name,
+                'email_from': company['email'],
+                'email_to': ask.partner_email or ask.people_email or False,
+                'body_text':"Votre Demande est à l'état " + params['email_text'] +  "\r" +
+                    "pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
+        })
+
+    mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, ids[0])
+    #self.pool.get("mail.message").write(cr, uid, [mail_id])
+    self.pool.get("mail.message").send(cr, uid, [mail_id])
+
+    return True;
 
 #----------------------------------------------------------
 # Equipments
@@ -348,12 +385,14 @@ class task(osv.osv):
                 'state': params['project_state'],
             }, context=context)
         project = project_obj.browse(cr, uid, [task.project_id.id], context=context)
-
+        ask_id = project[0].ask_id.id
         #Also close ask when intevention is closing
         if params['project_state'] == 'closed' and project[0]!=None and project[0].ask_id:
-            ask_obj.write(cr, uid, project[0].ask_id.id, {
+            ask_obj.write(cr, uid, ask_id, {
                     'state': params['project_state'],
                 }, context=context)
+
+            send_email(self, cr, uid, [ask_id], params, context=None)
 
         #update task work
         task_work_obj.create(cr, uid, {
@@ -523,12 +562,13 @@ class project(osv.osv):
                 'cancel_reason': params['cancel_reason'],
             }, context=context)
 
+        ask_id = project.ask_id.id
         #update ask state of intervention
-        ask_obj.write(cr, uid, project.ask_id.id, {
+        ask_obj.write(cr, uid, ask_id , {
                     'state': 'closed',
                 }, context=context)
 
-
+        send_email(self, cr, uid, [ask_id], params, context=None)
         return True;
 
     _defaults = {
@@ -676,7 +716,20 @@ class ask(osv.osv):
         manager_id = self.pool.get('openstc.service').read(cr, uid, data['service_id'],['manager_id'],context)['manager_id']
         if manager_id:
             data['manager_id'] = manager_id[0]
-        return super(ask, self).create(cr, uid, data, context)
+
+        res = super(ask, self).create(cr, uid, data, context)
+        send_email(self, cr, uid, [res], data, context)
+        return res
+
+    def write(self, cr, uid, ids, vals, context=None):
+        isList = isinstance(ids, types.ListType)
+        if isList == False :
+            ids = [ids]
+        res = super(ask, self).write(cr, uid, ids, vals, context=context)
+        if vals and vals.has_key('email_text'):
+            send_email(self, cr, uid, ids, vals, context)
+        return res
+
 
     #valid ask from swif
     def valid(self, cr, uid, ids, params, context=None):
@@ -691,6 +744,7 @@ class ask(osv.osv):
                 'description': params['description'],
                 'intervention_assignement_id': params['intervention_assignement_id'],
                 'service_id':  params['service_id'],
+                'email_text': params['email_text'],
             }, context=context)
 
         #create intervention
@@ -712,6 +766,7 @@ class ask(osv.osv):
         #TODO : after configuration mail sender uncomment send_mail function
         #send_email(self, cr, uid, ids, params, context=None)
         return True
+
 
     def action_valid(self, cr, uid, ids, context=None):
         if context is None:
@@ -864,30 +919,7 @@ class ask(osv.osv):
             }
         return res
 
-    def send_email(self, cr, uid, ids, params, context=None):
-        #print("test"+params)
-        ask_obj = self.pool.get('openstc.ask')
-        ask = ask_obj.browse(cr, uid, ids[0], context)
 
-        email_obj = self.pool.get("email.template")
-        ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=',self._name)])
-
-        email_tmpl_id = email_obj.create(cr, uid, {
-                    #'name':'modèle de mail pour résa annulée',
-                    'name':'Suivi de la demande ' + ask.name,
-                    'model_id':ir_model[0],
-                    'subject':'Suivi de la demande ' + ask.name,
-                    'email_from':'albacorefr@gmail.com',
-                    'email_to': 'albacorefr@gmail.com', #ask.partner_email if ask.partner_email!=False else ask.people_email,
-                    'body_text':"Votre Demande est à l'état " + _(ask.state) +  "\r" +
-                        "pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
-            })
-
-        mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, ids[0])
-        #self.pool.get("mail.message").write(cr, uid, [mail_id])
-        self.pool.get("mail.message").send(cr, uid, [mail_id])
-
-        return True;
 
 
 ask()

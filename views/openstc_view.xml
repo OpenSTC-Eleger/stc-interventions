@@ -1164,7 +1164,12 @@
    			name="statistique"
    			groups="openstc_employee"
    			sequence="3"/>
-
+   	 <menuitem action="action_openstc_view_carto_inter"
+   			id="menu_action_openstc_view_carto_geoportail"
+   			parent="menu_carto"
+   			name="geoportail"
+   			groups="openstc_employee"
+   			sequence="4"/>
 
 		<!--  Dashboard -->
    		<!--  <menuitem id="base.menu_project_report"
