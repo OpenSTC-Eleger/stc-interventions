@@ -58,8 +58,8 @@ def send_email(self, cr, uid, ids, params, context=None):
         })
 
     mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, ids[0])
-    #self.pool.get("mail.message").write(cr, uid, [mail_id])
-    self.pool.get("mail.message").send(cr, uid, [mail_id])
+    #to uncomment
+    #self.pool.get("mail.message").send(cr, uid, [mail_id])
 
     return True;
 
