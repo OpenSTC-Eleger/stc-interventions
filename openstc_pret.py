@@ -39,7 +39,7 @@ import pytz
 class product_product(osv.osv):
 
     def _calc_qte_dispo_now(self, cr, uid, ids, name, args, context=None):
-        print("début calcul qté dispo now")
+        #print("début calcul qté dispo now")
         cr.execute("""select hrl.reserve_product as prod_id, sum(hrl.qte_reserves) as qte_reserves
         from hotel_reservation as hr, hotel_reservation_line as hrl
         where hr.id = hrl.line_id
@@ -72,7 +72,7 @@ class product_product(osv.osv):
         return self.return_type_prod_values(cr, uid, context)
     
     _columns = {
-        "qte_dispo": fields.function(_calc_qte_dispo_now, method=True, string="Disponible Aujourd'hui", type="integer"),
+        #"qte_dispo": fields.function(_calc_qte_dispo_now, method=True, string="Disponible Aujourd'hui", type="integer"),
         "etat": fields.selection(AVAILABLE_ETATS, "Etat"),
         "seuil_confirm":fields.integer("Qté Max sans Validation", help="Qté Maximale avant laquelle une étape de validation par un responsable est nécessaire"),
         "bloquant":fields.boolean("\"Non disponibilité\" bloquante", help="Un produit dont la non dispo est bloquante empêche la réservation de se poursuivre (elle reste en Brouillon)"),
