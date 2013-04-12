@@ -61,7 +61,7 @@ def send_email(self, cr, uid, ids, params, context=None):
     #to uncomment
     #self.pool.get("mail.message").send(cr, uid, [mail_id])
 
-    return True;
+    return True
 
 #----------------------------------------------------------
 # Equipments
