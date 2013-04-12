@@ -17,9 +17,9 @@
 				</page>
 	   		</field>
 	   	</record>
-	    
-	    
-		<!-- Vue Produits mère pour l'ensemble du projet OpenStock -->
+
+
+	<!-- Vue Produits mère pour l'ensemble du projet OpenStock -->
 		<record model="ir.ui.view" id="view_openstock_fournitures_tree">
 			<field name="name">fourniture.product.tree</field>
 			<field name="model">product.product</field>
