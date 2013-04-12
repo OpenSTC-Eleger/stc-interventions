@@ -391,8 +391,8 @@ class task(osv.osv):
             ask_obj.write(cr, uid, ask_id, {
                     'state': params['project_state'],
                 }, context=context)
-
-            send_email(self, cr, uid, [ask_id], params, context=None)
+            #TODO uncomment
+            #send_email(self, cr, uid, [ask_id], params, context=None)
 
         #update task work
         task_work_obj.create(cr, uid, {
@@ -567,8 +567,8 @@ class project(osv.osv):
         ask_obj.write(cr, uid, ask_id , {
                     'state': 'closed',
                 }, context=context)
-
-        send_email(self, cr, uid, [ask_id], params, context=None)
+        #TODO uncomment
+        #send_email(self, cr, uid, [ask_id], params, context=None)
         return True;
 
     _defaults = {
@@ -718,7 +718,8 @@ class ask(osv.osv):
             data['manager_id'] = manager_id[0]
 
         res = super(ask, self).create(cr, uid, data, context)
-        send_email(self, cr, uid, [res], data, context)
+        #TODO uncomment
+        #send_email(self, cr, uid, [res], data, context)
         return res
 
     def write(self, cr, uid, ids, vals, context=None):
@@ -726,8 +727,9 @@ class ask(osv.osv):
         if isList == False :
             ids = [ids]
         res = super(ask, self).write(cr, uid, ids, vals, context=context)
-        if vals and vals.has_key('email_text'):
-            send_email(self, cr, uid, ids, vals, context)
+        #if vals and vals.has_key('email_text'):
+            #TODO uncomment
+            #send_email(self, cr, uid, ids, vals, context)
         return res
 
 
