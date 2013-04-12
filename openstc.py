@@ -564,9 +564,10 @@ class project(osv.osv):
 
         ask_id = project.ask_id.id
         #update ask state of intervention
-        ask_obj.write(cr, uid, ask_id , {
-                    'state': 'closed',
-                }, context=context)
+        if ask_id :
+            ask_obj.write(cr, uid, ask_id , {
+                        'state': 'closed',
+                    }, context=context)
         #TODO uncomment
         #send_email(self, cr, uid, [ask_id], params, context=None)
         return True;
