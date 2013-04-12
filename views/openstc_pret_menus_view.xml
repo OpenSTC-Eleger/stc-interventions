@@ -10,6 +10,7 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 			<field name="domain">[('openstc_reservable','=',True)]</field>
+			<field name="context">{'default_openstc_reservable':'1','default_purchase_ok':False}</field>
 		</record>
 
 		<record id="action_openstock_view_reservation" model="ir.actions.act_window">

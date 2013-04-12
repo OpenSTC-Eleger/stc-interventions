@@ -66,7 +66,7 @@ class product_product(osv.osv):
     
     #Method to override in order to add some products type and being able to filter product.product according to work context (internvetions, resa etc...)
     def return_type_prod_values(self, cr, uid, context=None):
-        return [('materiel','Matériel pour Intervention'),('fourniture','Fourniture Achetable'),('site','Site')]
+        return [('materiel','Matériel'),('fourniture','Fourniture Achetable'),('site','Site')]
     
     def _get_type_prod_values(self, cr, uid, context=None):
         return self.return_type_prod_values(cr, uid, context)

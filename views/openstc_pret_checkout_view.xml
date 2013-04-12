@@ -44,7 +44,7 @@
 				    </group>
 				    <field nolabel="1" name="checkout_lines" colspan="4">
 				        <tree string="Lignes d'Etat des lieux" editable="top">
-				            <field name="product_id"/>
+				            <field name="product_id" context="{'default_openstc_reservable':'1','default_purchase_ok':False}"/>
 				            <field name="qte_reservee"/>
 				            <field name="etat_retour"/>
 				            <field name="qte_to_purchase"/>

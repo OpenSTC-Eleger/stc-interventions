@@ -127,7 +127,7 @@
 						            attrs="{'readonly':[('state','not in',('remplir','waiting_confirm'))]}">
 									<tree string="Ligne de réservation" editable="top" colors="green:dispo==True;red:dispo==False">
 <!-- 										<field name="categ_id"/> -->
-										<field name="reserve_product" colspan="1" required="1"/>
+										<field name="reserve_product" colspan="1" required="1" context="{'default_openstc_reservable':'1','default_purchase_ok':False}"/>
 										<field name="qte_reserves" />
 										<field name="qte_dispo"/>
 										<field name="dispo" readonly="1"/>
@@ -327,7 +327,7 @@
 							<field name="name" />
 							<field name="checkin_date" string="Date de début de Réservation" />
 							<field name="checkout_date" string="Date de fin de Réservation" />
-							<field name="product_id" string="Article Réservé" />
+							<field name="product_id" context="{'default_openstc_reservable':'1','default_purchase_ok':False}" string="Article Réservé" />
 							<field name="product_uom_qty" string="Quantité Réservée" />
 							<field name="price_unit" string="Prix Unitaire" />
 							<field name="price_subtotal" />
@@ -520,7 +520,7 @@
 			<field name="src_model">product.product</field>
 			<field name="view_id" ref="hotel_reservation.view_hotel_reservation_form" />
 			<field name="target">current</field>
-			<field name="context">{'from_product':'1', 'product_ids':active_ids}</field>
+			<field name="context">{'from_product':'1', 'product_ids':active_ids,'default_openstc_reservable':'1','default_purchase_ok':False}</field>
 		</record>
 
 		<record id="action_openstc_pret_resa_semaine_view" model="ir.actions.act_window">
