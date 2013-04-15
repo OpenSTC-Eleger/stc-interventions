@@ -49,7 +49,7 @@
     </record>
 
     <record id="openstc_manager" model="res.groups">
-        <field name="name">OpenSTC/Manager</field>
+        <field name="name">OpenSTC/Chef de service</field>
         <field name="category_id" ref="base.module_category_project_management"/>
         <field name="implied_ids" eval="[(4, ref('openstc_qualifier')),(4, ref('stock.group_stock_manager'))]"/>
     </record>
