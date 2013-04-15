@@ -5,7 +5,7 @@
 	<!--  GROUPS -->
 
 	<record id="openstc_employee" model="res.groups">
-        <field name="name">OpenSTC/Employee</field>
+        <field name="name">Employee</field>
         <field name="category_id" ref="base.module_category_project_management"/>
         <field name="implied_ids" eval="[(4,ref('base.group_user'))]"/>
     </record>
@@ -19,23 +19,25 @@
     <record id="openstc_agent" model="res.groups">
         <field name="name">OpenSTC/Agent</field>
         <field name="category_id" ref="base.module_category_project_management"/>
-        <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
+        <field name="implied_ids" eval="[(4, ref('openstc_employee')),(4, ref('stock.group_stock_user'))]"/>
     </record>
 
-    <record id="openstc_agent_non_technique" model="res.groups">
+     <!--<record id="openstc_agent_non_technique" model="res.groups">
         <field name="name">OpenSTC/Agent Non Technique</field>
         <field name="category_id" ref="base.module_category_project_management"/>
         <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
     </record>
+     -->
 
-    <record id="openstc_chef" model="res.groups">
+    <!-- <record id="openstc_chef" model="res.groups">
         <field name="name">OpenSTC/Chef d'équipe</field>
         <field name="category_id" ref="base.module_category_project_management"/>
         <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
     </record>
+     -->
 
     <record id="openstc_qualifier" model="res.groups">
-        <field name="name">OpenSTC/Qualifier</field>
+        <field name="name">Qualifier</field>
         <field name="category_id" ref="base.module_category_project_management"/>
         <field name="implied_ids" eval="[(4, ref('openstc_employee'))]"/>
     </record>
