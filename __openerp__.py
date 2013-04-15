@@ -10,7 +10,7 @@
     "version": "0.1",
     "depends": ["purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
     "author": "PYF & BP",
-    "shortdesc":"openstc for prets achats only",
+    "shortdesc":"openstc_prets",
     "category": "Category",
     "description": """
     Module STC For Prêts, temporary module to store changes specific to prets untested features on SWIF 
