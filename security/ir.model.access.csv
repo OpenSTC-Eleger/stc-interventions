@@ -86,6 +86,9 @@ access_project_task_work_dst,project_task_work dst,model_project_task_work,opens
 access_project_task_work_agent,project_task_work agent,model_project_task_work,openstc_agent,1,1,1,0
 access_project_task_work_qualifier,project_task_work qualifier,model_project_task_work,openstc_qualifier,1,1,1,0
 
+access_openstc_equipment_agent,openstc_equipment agent,model_openstc_equipment,openstc_agent,1,1,1,0
+
+
 access_project_task_work_employee,project_task_work employee,model_project_task_work,openstc_employee,1,0,0,0
 
 
