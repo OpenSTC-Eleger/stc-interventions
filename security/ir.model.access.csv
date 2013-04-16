@@ -72,7 +72,7 @@ access_project_vs_hours,project.vs.hours,model_project_vs_hours,,1,0,0,0
 
 access_project_task_dst,project_task dst,model_project_task,openstc_dst,1,1,1,1
 access_project_task_qualifier,project_task qualifier,model_project_task,openstc_qualifier,1,0,0,0
-access_project_task_agent,project_task agent,model_project_task,openstc_agent,1,1,0,0
+access_project_task_agent,project_task agent,model_project_task,openstc_agent,1,1,1,0
 access_project_task_employee,project_task employee,model_project_task,openstc_employee,1,0,0,0
 access_project_task_accueil,project_task accueil,model_project_task,openstc_accueil,1,0,0,0
 access_project_task_manager,project_task manager,model_project_task,openstc_manager,1,1,1,1
