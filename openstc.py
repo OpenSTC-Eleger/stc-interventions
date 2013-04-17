@@ -505,7 +505,7 @@ openstc_absent_type()
 #        'service_id':fields.many2one('openstc.service', 'Service'),
 #        }
 #account_analytic_account()
-    
+
 class project(osv.osv):
     _name = "project.project"
     _description = "Interventon stc"
@@ -771,6 +771,7 @@ class ask(osv.osv):
                  'project_id': project_id,
                  'name': ask.name,
                  'planned_hours': params['planned_hours'],
+                 'category_id': params['category_id'],
                 }, context=context)
         #TODO : after configuration mail sender uncomment send_mail function
         #send_email(self, cr, uid, ids, params, context=None)
