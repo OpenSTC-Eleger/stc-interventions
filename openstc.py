@@ -285,6 +285,8 @@ class users(osv.osv):
             'is_manager': fields.boolean('Is manager'),
             #'team_ids': fields.many2many('openstc.team', 'openstc_user_teams_rel', 'user_id', 'team_id', 'Teams'),
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
+
+            'team_ids': fields.many2many('openstc.team', 'openstc_team_users_rel', 'user_id', 'team_id', 'Teams'),
     }
 users()
 
@@ -760,6 +762,7 @@ class ask(osv.osv):
         project_id = project_obj.create(cr, uid, {
                 'ask_id': ask.id,
                 'name': ask.name,
+                'description': params['description'],
                 'state': params['project_state'],
                 'site1': params['site1'],
                 'service_id':  params['service_id'],
