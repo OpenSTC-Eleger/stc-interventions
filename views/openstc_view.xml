@@ -2,6 +2,26 @@
 <openerp>
     <data noupdate="0">
 
+        <!--  Intervention assignment -->
+
+        <record id="openstc_intervention_assignement_form_view" model="ir.ui.view">
+            <field name="name">openstc.intervention.assignement.form</field>
+            <field name="model">openstc.intervention.assignement</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="planning">
+					<field name="name" />
+                </form>
+            </field>
+        </record>
+        <record id="action_openstc_view_assignement" model="ir.actions.act_window">
+            <field name="name">Affectation intervention</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.intervention.assignement</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
     	<!--  planning -->
 
         <record id="openstc_task_category_form_view" model="ir.ui.view">
@@ -1090,6 +1110,8 @@
    			groups="openstc_dst"
    			sequence="4"/>
 
+
+
    		<menuitem
    			id="menu_openstc_employees"
    			groups="openstc_dst"
@@ -1115,6 +1137,13 @@
    			name="Equipes"
    			groups="openstc_dst"
    			sequence="6"/>
+
+   	 	<menuitem action="action_openstc_view_assignement"
+   			id="menu_action_openstc_view_assignement"
+   			parent="menu_configuration"
+   			name="Affectations"
+   			groups="openstc_dst"
+   			sequence="7"/>
 
 
 

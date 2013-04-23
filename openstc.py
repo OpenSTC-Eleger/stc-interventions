@@ -94,7 +94,7 @@ class equipment(osv.osv):
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade"),
             'service_ids':fields.many2many('openstc.equipment', 'openstc_equipment_services_rel', 'equipment_id', 'service_id', 'Services'),
-            #'service':fields.many2one('openstc.service', 'Service'),
+            'service_owner':fields.many2one('openstc.service', 'Service'),
 
             'marque': fields.char('Marque', size=128),
             'type': fields.char('Type', size=128),
