@@ -257,16 +257,21 @@ class hotel_reservation(osv.osv):
         seq = self.pool.get("ir.sequence").next_by_code(cr, uid, 'resa.number',context)
         user = self.pool.get("res.users").browse(cr, uid, uid)
         prog = re.compile('[Oo]pen[a-zA-Z]{3}/[Mm]anager')
-        service = None
+        service = False
         if 'service_id' in context:
+            #get service_id in context, it takes priority to any other service
             service = context['service_id']
-        for group in user.groups_id:
-            if prog.search(group.name):
-                if isinstance(user.service_ids, list) and not service:
-                    service = user.service_ids[0]
-                else:
-                    service = self.pool.get("openstc.service").browse(cr, uid, service)
-                seq = seq.replace('-xxx-','-' + self.remove_accents(service.name[:3]).upper() + '-')
+            service = self.pool.get("openstc.service").browse(cr, uid, service)
+        else:
+            #get first service_ids of user if the user is a manager
+            for group in user.groups_id:
+                if prog.search(group.name):
+                    if isinstance(user.service_ids, list) and not service:
+                        service = user.service_ids and user.service_ids[0] or False
+                    
+        if service:
+            #If sequence is configured to have service info, we write it
+            seq = seq.replace('xxx',self.remove_accents(service.name[:3]).upper())
                 
         return seq
 
@@ -280,7 +285,7 @@ class hotel_reservation(osv.osv):
             checkin = strptime(resa.checkin, '%Y-%m-%d %H:%M:%S')
             for line in resa.reservation_line:
                 #Vérif si résa dans les délais, sinon, in_option est cochée
-                d = timedelta(days=int(line.reserve_product.sale_delay))
+                d = timedelta(days=int(line.reserve_product.sale_delay and line.reserve_product.sale_delay or 0))
                 print("now :"+str(date_crea))
                 print("checkin :" + str(checkin))
                 #Si l'un des produits est hors délai
@@ -739,7 +744,9 @@ class hotel_reservation(osv.osv):
     #param record: browse_record hotel.reservation.line
     def get_prod_price(self, cr, uid, ids, record, context=None):
         pricelist_obj = self.pool.get("product.pricelist")
-        pricelist_id = record.line_id.partner_id.property_product_pricelist.id
+        pricelist_id = record.line_id.pricelist_id.id
+        if not pricelist_id:
+            pricelist_id = record.line_id.partner_id.property_product_pricelist.id
         res = pricelist_obj.price_get_multi(cr, uid, [pricelist_id], [(record.reserve_product.id,record.qte_reserves,record.line_id.partner_id.id)], context=None)
         return res and res[record.reserve_product.id][pricelist_id] or False
         #return record.reserve_product.product_tmpl_id.standard_price
@@ -747,8 +754,9 @@ class hotel_reservation(osv.osv):
     #param record: browse_record hotel.reservation.line
     #if product uom refers to a resa time, we compute uom according to checkin, checkout
     def get_prod_uom_qty(self, cr, uid, ids, record, length, context=None):
-        if re.search(u"[Rr]{1}[ée]{1}servation", record.reserve_product.uom_id.category_id.name):
-            #uom factor refers to journey, to have uom factor refering to hours, we have to adust ratio
+        #if re.search(u"[Rr]{1}[ée]{1}servation", record.reserve_product.uom_id.category_id.name):
+        if re.search(u"[Tt]emporel", record.reserve_product.uom_id.category_id.name):
+            #uom factor refers to journey, to have uom factor refering to hours, we have to adjust ratio
             factor = 24.0 / record.reserve_product.uom_id.factor
             res = length / factor
             #round to direct superior int
