@@ -605,7 +605,7 @@ class project_work(osv.osv):
 
     _columns = {
         'manager_id': fields.related('ask_id', 'manager_id', type='many2one', string='Services'),
-        #'user_id': fields.many2one('res.users', 'Done by', required=False, select="1"),
+        'user_id': fields.many2one('res.users', 'Done by', required=False, select="1"),
         'team_id': fields.many2one('openstc.team', 'Done by', required=False, select="1"),
     }
 
