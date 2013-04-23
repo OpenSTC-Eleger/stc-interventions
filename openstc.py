@@ -93,7 +93,8 @@ class equipment(osv.osv):
             'immat': fields.char('Imatt', size=128),
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade"),
-            'service':fields.many2one('openstc.service', 'Service'),
+            'service_ids':fields.many2many('openstc.equipment', 'openstc_equipment_services_rel', 'equipment_id', 'service_id', 'Services'),
+            #'service':fields.many2one('openstc.service', 'Service'),
 
             'marque': fields.char('Marque', size=128),
             'type': fields.char('Type', size=128),
@@ -345,8 +346,8 @@ class task(osv.osv):
         'team_id': fields.many2one('openstc.team', 'Team'),
 
         'km': fields.integer('Km', select=1),
-        'oil_qtity': fields.integer('oil quantity', select=1),
-        'oil_price': fields.integer('oil price', select=1),
+        'oil_qtity': fields.float('oil quantity', select=1),
+        'oil_price': fields.float('oil price', select=1),
 
 
 #        'planned_hours': fields.float('Planned print_on_orderHours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
