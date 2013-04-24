@@ -89,12 +89,22 @@ class equipment(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
+#    def create(self, cr, uid, data, context={}):
+#        res = super(equipment, self).create(cr, uid, data, context)
+#        return res
+#
+#    def write(self, cr, uid, data, context={}):
+#        res = super(equipment, self).create(cr, uid, data, context)
+#        return res
+
     _columns = {
             'immat': fields.char('Imatt', size=128),
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'product_product_id': fields.many2one('product.product', 'Product', help="", ondelete="cascade"),
-            'service_ids':fields.many2many('openstc.equipment', 'openstc_equipment_services_rel', 'equipment_id', 'service_id', 'Services'),
-            'service_owner':fields.many2one('openstc.service', 'Service'),
+            #Service authorized for use equipment
+            'service_ids':fields.many2many('openstc.service', 'openstc_equipment_services_rel', 'equipment_id', 'service_id', 'Services'),
+            #Service owner
+            'service':fields.many2one('openstc.service', 'Service'),
 
             'marque': fields.char('Marque', size=128),
             'type': fields.char('Type', size=128),
