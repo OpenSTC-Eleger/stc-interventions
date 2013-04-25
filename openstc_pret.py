@@ -173,7 +173,7 @@ class hotel_reservation_line(osv.osv):
     def _get_amount(self, cr, uid, ids, name, args, context=None):
         ret = {}.fromkeys(ids, 0.0)
         for line in self.browse(cr, uid, ids, context):
-            amount = line.prix_unitaire * line.uom_qty
+            amount = line.prix_unitaire * line.uom_qty * line.qte_reserves
             ret[line.id] = amount
             #TOCHECK: is there any taxe when collectivity invoice people ?
         return ret
@@ -195,7 +195,7 @@ class hotel_reservation_line(osv.osv):
         "name":fields.char('Libellé', size=128),
         'state':fields.related('line_id','state', type='selection',string='Etat Résa', selection=_get_state_line, readonly=True),
         'uom_qty':fields.float('Qté de Référence pour Facturation',digit=(2,1)),
-        'amount':fields.function(_get_amount, string="Prix (si onéreux)", type="float", method=True),
+        'amount':fields.function(_get_amount, string="Prix (si tarifé)", type="float", method=True),
         'qte_dispo':fields.function(_calc_qte_dispo, method=True, string='Qté Dispo', multi="dispo", type='float'),
         'action':fields.selection(_AVAILABLE_ACTION_VALUES, 'Action'),
         'inter_ask_id':fields.many2one('openstc.ask','Demande d\'intervention associée'),
@@ -305,6 +305,18 @@ class hotel_reservation(osv.osv):
     def _get_state_values(self, cr, uid, context=None):
         return self.return_state_values(cr, uid, context)
 
+    def _get_amount_total(self, cr, uid, ids, name, args, context=None):
+        ret = {}
+        for resa in self.browse(cr, uid, ids, context=None):
+            amount_total = 0.0
+            all_dispo = True
+            for line in resa.reservation_line:
+                if all_dispo and not line.dispo:
+                    all_dispo = False
+                amount_total += line.amount
+            ret[resa.id] = {'amount_total':amount_total,'all_dispo':all_dispo}
+        return ret
+
     _columns = {
                 'state': fields.selection(_get_state_values, 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(get_resa_modified,['checkin','reservation_line'],10)},
@@ -319,6 +331,9 @@ class hotel_reservation(osv.osv):
                 'prod_id':fields.many2one('product.product','Ressource'),
                 'openstc_partner_id':fields.many2one('res.partner','Demandeur', help="Personne demandant la réservation."),
                 'resa_checkout_id':fields.many2one('openstc.pret.checkout','Etat des Lieux associé'),
+                'amount_total':fields.function(_get_amount_total, type='float', string='Amount Total', method=True, multi="resa",
+                                               help='Optionnal, if positive, a sale order will be created once resa validated and invoice will be created once resa done.'),
+                'all_dispo':fields.function(_get_amount_total, type="boolean", string="All Dispo", method=True, multi="resa"),
         }
     _defaults = {
                  'in_option': lambda *a :0,
@@ -385,18 +400,12 @@ class hotel_reservation(osv.osv):
         return True
 
     def waiting_confirm(self, cr, uid, ids):
-        form_amount = 0.0
-        line_ids = []
-        for resa in self.browse(cr, uid, ids):
-            for line in resa.reservation_line:
-                form_amount += line.prix_unitaire * line.qte_reserves
-            amount = self.get_amount_resa(cr, uid, ids)
-            if form_amount <> amount:
-                self.compute_lines_price(cr, uid, [resa.id])
-        self.envoyer_mail(cr, uid, ids, {'state':'waiting'})
-        self.write(cr, uid, ids, {'state':'wait_confirm'})
-        return True
-
+        if self.is_all_dispo(cr, uid, ids[0]):
+            self.envoyer_mail(cr, uid, ids, {'state':'waiting'})
+            self.write(cr, uid, ids, {'state':'wait_confirm'})
+            return True
+        raise osv.except_osv(_("""Not available"""),_("""Not all of your products are available on those quantities for this period"""))
+        return False
     #Mettre à l'état cancle et retirer les mouvements de stocks (supprimer mouvement ou faire le mouvement inverse ?)
     def cancelled_reservation(self, cr, uid, ids):
         self.write(cr, uid, ids, {'state':'cancle', 'reservation_line':self.uncheck_all_dispo(cr, uid, ids)})
@@ -481,7 +490,7 @@ class hotel_reservation(osv.osv):
     def need_confirm(self, cr, uid, ids):
         reservations = self.browse(cr, uid, ids)
         etape_validation = False
-        prog = re.compile(u'[Oo]pen(STC|[SC]TM)/[Mm]anager')
+        prog = re.compile(u'[Oo]pen(STC|[SC]TM)/([Mm]anager|[Dd][Ss][Tt])')
         groups = self.pool.get("res.users").browse(cr, uid, uid, context=None).groups_id
         #if group == "Responsable", no need confirm
         for group in groups:
@@ -536,7 +545,7 @@ class hotel_reservation(osv.osv):
         return res
 
     def get_nb_prod_reserved(self, cr, prod_list, checkin, checkout, states=['cancle','done','remplir'], where_optionnel=""):
-        print("start get_nb_prod_reserved method")
+        #print("start get_nb_prod_reserved method")
         cr.execute("select reserve_product, sum(qte_reserves) as qte_reservee \
                     from hotel_reservation as hr, \
                     hotel_reservation_line as hrl \
@@ -747,7 +756,7 @@ class hotel_reservation(osv.osv):
         pricelist_id = record.line_id.pricelist_id.id
         if not pricelist_id:
             pricelist_id = record.line_id.partner_id.property_product_pricelist.id
-        res = pricelist_obj.price_get_multi(cr, uid, [pricelist_id], [(record.reserve_product.id,record.qte_reserves,record.line_id.partner_id.id)], context=None)
+        res = pricelist_obj.price_get_multi(cr, uid, [pricelist_id], [(record.reserve_product.id,record.uom_qty,record.line_id.partner_id.id)], context=None)
         return res and res[record.reserve_product.id][pricelist_id] or False
         #return record.reserve_product.product_tmpl_id.standard_price
 
@@ -755,7 +764,7 @@ class hotel_reservation(osv.osv):
     #if product uom refers to a resa time, we compute uom according to checkin, checkout
     def get_prod_uom_qty(self, cr, uid, ids, record, length, context=None):
         #if re.search(u"[Rr]{1}[ée]{1}servation", record.reserve_product.uom_id.category_id.name):
-        if re.search(u"[Tt]emporel", record.reserve_product.uom_id.category_id.name):
+        if re.search(u"([Tt]emporel|[Rr][ée]servation)", record.reserve_product.uom_id.category_id.name):
             #uom factor refers to journey, to have uom factor refering to hours, we have to adjust ratio
             factor = 24.0 / record.reserve_product.uom_id.factor
             res = length / factor

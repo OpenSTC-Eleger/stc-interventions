@@ -2001,7 +2001,7 @@ msgstr "Demande d'intervention associée"
 #. module: openstc_prets
 #: field:product.product,openstc_reservable:0
 msgid "Reservable"
-msgstr "Reservable"
+msgstr "Réservable"
 
 #. module: openstc_prets
 #: model:ir.ui.menu,name:openstc_prets.menu_action_view_articles
@@ -2230,7 +2230,7 @@ msgstr "Motif de l'Intervention"
 #. module: openstc_prets
 #: help:product.product,openstc_reservable:0
 msgid "Indicates if this ressource can be reserved or not by tiers"
-msgstr "Indicates if this ressource can be reserved or not by tiers"
+msgstr "Indique si cette ressource peut-être réservée ou non par des tiers (Associations, particuliers, ...)"
 
 #. module: openstc_prets
 #: field:openstc.ask,refusal_reason:0

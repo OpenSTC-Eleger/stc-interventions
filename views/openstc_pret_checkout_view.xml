@@ -46,16 +46,17 @@
 				        <tree string="Lignes d'Etat des lieux" editable="top">
 				            <field name="product_id" context="{'default_openstc_reservable':'1','default_purchase_ok':False}"/>
 				            <field name="qte_reservee"/>
-				            <field name="etat_retour"/>
+				            <field name="qte_to_repair"/>
 				            <field name="qte_to_purchase"/>
 				            <field name="infos_supp"/>
 				        </tree>
 				    </field>
-				    <newline/>
 				    <field name="state"/>
+					<newline/>
 					<button icon="gtk-go-back" colspan="1" string="Retour" special="cancel" states="draft"/>
-					<button icon="gtk-ok" colspan="1" name="generer_actions" type="object" string="Générer les actions saisies" states="draft"/>
-					<button icon="gtk-go-forward" colspan="1" string="Ne pas générerles actions saisies" type="object" name="generer_no_actions" states="draft"/>
+					<button icon="gtk-go-forward" colspan="1" context="{'default_location_id':%(stock.stock_location_stock)d, 'default_location_dest_id':%(stock.stock_location_output)d}"
+					    name="generer_actions" type="object" string="Valider" states="draft"/>
+					
 				</form>
 			</field>
 		</record>
