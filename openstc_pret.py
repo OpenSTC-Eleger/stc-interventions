@@ -32,6 +32,7 @@ import base64
 import unicodedata
 import re
 import pytz
+import calendar
 
 #----------------------------------------------------------
 # Fournitures
@@ -177,7 +178,21 @@ class hotel_reservation_line(osv.osv):
             ret[line.id] = amount
             #TOCHECK: is there any taxe when collectivity invoice people ?
         return ret
-
+    
+    def _get_complete_name(self, cr, uid, ids, name, args, context=None):
+        ret = {}
+        weekday_to_str = {0:'Lundi',1:'Mardi',2:'Mercredi',3:'Jeudi',4:'Vendredi',5:'Samedi',6:'Dimanche'}
+        for line in self.browse(cr, uid, ids, context=context):
+            weekday_start = calendar.weekday(int(line.checkin[:4]), int(line.checkin[5:7]), int(line.checkin[8:10]))
+            weekday_end = calendar.weekday(int(line.checkout[:4]), int(line.checkout[5:7]), int(line.checkout[8:10]))
+            date_str = ''
+            if weekday_start == weekday_end:
+                date_str = '%s %s-%s' %(weekday_to_str[weekday_start],line.checkin[11:16],line.checkout[11:16])
+            else:
+                date_str = '%s %s - %s %s ' % (weekday_to_str[weekday_start][:3],line.checkin[11:16],weekday_to_str[weekday_end][:3],line.checkout[11:16])
+            ret[line.id] = '%s : %d x %s (%s)' %(date_str,line.qte_reserves, line.reserve_product.name_template, line.partner_id.name)
+        return ret
+    
     _columns = {
         'categ_id': fields.many2one('product.category','Type d\'article'),
         "reserve_product": fields.many2one("product.product", "Article réservé", domain=[('openstc_reservable','=',True)]),
@@ -199,7 +214,12 @@ class hotel_reservation_line(osv.osv):
         'qte_dispo':fields.function(_calc_qte_dispo, method=True, string='Qté Dispo', multi="dispo", type='float'),
         'action':fields.selection(_AVAILABLE_ACTION_VALUES, 'Action'),
         'inter_ask_id':fields.many2one('openstc.ask','Demande d\'intervention associée'),
-
+        'state':fields.related('line_id','state', type='char'),
+        'partner_id':fields.related('line_id','partner_id', type="many2one", relation="res.partner"),
+        'checkin':fields.related('line_id','checkin', type="datetime"),
+        'checkout':fields.related('line_id','checkout', type="datetime"),
+        'resa_name':fields.related('line_id','name',type="char"),
+        'complete_name':fields.function(_get_complete_name, string='Complete Name', size=128),
 #        store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
 #        'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids, ['reserve_product'], 11],
 #        'stock.inventory.line':[_get_resa_via_prods,['product_id','product_qty','inventory_id','location_id'],12]}
@@ -317,6 +337,12 @@ class hotel_reservation(osv.osv):
             ret[resa.id] = {'amount_total':amount_total,'all_dispo':all_dispo}
         return ret
 
+    def _get_prods_reserved(self, cr, uid, ids, name, args, context=None):
+        ret = {}
+        for resa in self.browse(cr, uid, ids, context=context):
+            ret[resa.id] = [(line.reserve_product.id, line.reserve_product.name) for line in resa.reservation_line]            
+        return ret
+
     _columns = {
                 'state': fields.selection(_get_state_values, 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(get_resa_modified,['checkin','reservation_line'],10)},
@@ -334,6 +360,7 @@ class hotel_reservation(osv.osv):
                 'amount_total':fields.function(_get_amount_total, type='float', string='Amount Total', method=True, multi="resa",
                                                help='Optionnal, if positive, a sale order will be created once resa validated and invoice will be created once resa done.'),
                 'all_dispo':fields.function(_get_amount_total, type="boolean", string="All Dispo", method=True, multi="resa"),
+                #'reserve_product':fields.function(_get_prods_reserved, type='many2many', relation='product.product',string='prods reserved'),
         }
     _defaults = {
                  'in_option': lambda *a :0,

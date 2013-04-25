@@ -237,6 +237,7 @@
 							<field name="price_unit" string="Prix Unitaire" />
 							<field name="price_subtotal" />
 						</tree>
+						
 					</field>
 				</field>
 				<field name="partner_id" on_change="onchange_partner_id(partner_id)"
@@ -329,6 +330,17 @@
 					    <field name="site_id"/>
 					</calendar>
 				</xpath>
+			</field>
+		</record>
+		
+		<record model="ir.ui.view" id="view_openstock_reservation_line_calendar">
+			<field name="name">openstc.hotel.reservation.line.calendar</field>
+			<field name="model">hotel_reservation.line</field>
+			<field name="type">calendar</field>
+			<field name="arch" type="xml">
+				<calendar string="Planning des Réservations" color="reserve_product" date_start="checkin" date_stop="checkout" day_length="24" mode="week">
+				    <field name="complete_name"/>
+				</calendar>
 			</field>
 		</record>
 		
