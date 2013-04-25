@@ -34,7 +34,7 @@
 		<record id="action_openstock_view_reservation_calendar" model="ir.actions.act_window">
 			<field name="name">Planning des Réservations</field>
 			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
+			<field name="res_model">hotel_reservation.line</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">calendar,tree,form</field>
 			<field name="domain">[('state','not in',('done','cancle','remplir'))]</field>
