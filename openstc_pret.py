@@ -186,11 +186,12 @@ class hotel_reservation_line(osv.osv):
             weekday_start = calendar.weekday(int(line.checkin[:4]), int(line.checkin[5:7]), int(line.checkin[8:10]))
             weekday_end = calendar.weekday(int(line.checkout[:4]), int(line.checkout[5:7]), int(line.checkout[8:10]))
             date_str = ''
-            if weekday_start == weekday_end:
-                date_str = '%s %s-%s' %(weekday_to_str[weekday_start],line.checkin[11:16],line.checkout[11:16])
-            else:
-                date_str = '%s %s - %s %s ' % (weekday_to_str[weekday_start][:3],line.checkin[11:16],weekday_to_str[weekday_end][:3],line.checkout[11:16])
-            ret[line.id] = '%s : %d x %s (%s)' %(date_str,line.qte_reserves, line.reserve_product.name_template, line.partner_id.name)
+            #if weekday_start == weekday_end:
+                #date_str = '%s %s-%s : ' %(weekday_to_str[weekday_start],line.checkin[11:16],line.checkout[11:16])
+                
+            if weekday_start <> weekday_end:
+                date_str = '%s %s - %s %s : ' % (weekday_to_str[weekday_start][:3],line.checkin[11:16],weekday_to_str[weekday_end][:3],line.checkout[11:16])
+            ret[line.id] = '%s %d x %s (%s)' %(date_str,line.qte_reserves, line.reserve_product.name_template, line.partner_id.name)
         return ret
     
     _columns = {
