@@ -8,7 +8,7 @@
 {
     "name": "openstc_prets",
     "version": "0.1",
-    "depends": ["purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
+    "depends": ["web","purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
     "author": "PYF & BP",
     "shortdesc":"openstc",
     "category": "Category",
@@ -38,6 +38,7 @@
         "unit_tests/unit_tests.xml",
 
     ],
+    "js":['static/js/calendar_inherit.js'],
     "demo": [],
     "test": [],
     "installable": True,
