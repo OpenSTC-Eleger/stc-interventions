@@ -219,7 +219,7 @@ class hotel_reservation_line(osv.osv):
         'checkin':fields.related('line_id','checkin', type="datetime"),
         'checkout':fields.related('line_id','checkout', type="datetime"),
         'resa_name':fields.related('line_id','name',type="char"),
-        'complete_name':fields.function(_get_complete_name, string='Complete Name', size=128),
+        'complete_name':fields.function(_get_complete_name, type="char", string='Complete Name', size=128),
 #        store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
 #        'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids, ['reserve_product'], 11],
 #        'stock.inventory.line':[_get_resa_via_prods,['product_id','product_qty','inventory_id','location_id'],12]}

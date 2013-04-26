@@ -85,6 +85,17 @@
 			</field>
 		</record>
 		
+		<record id="action_openstock_view_reservation_calendar_popup" model="ir.actions.act_window">
+			<field name="name">Planning des Réservations</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hotel_reservation.line</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">calendar,tree</field>
+			<field name="context">{}</field>
+			<field name="target">new</field>
+			<field name="domain">[('state','not in',('done','cancle','remplir'))]</field>
+		</record>
+		
 		<!-- Vues Réservation d'articles -->
 		<record model="ir.ui.view" id="view_openstock_reservation_form">
 			<field name="name">open.pret_location.reservation.form</field>
@@ -153,6 +164,8 @@
 									<button name="put_in_use_with_intervention" type="object" states="confirm" string="Générer Interventions restantes" icon="gtk-execute" help="Générer les interventions planifiées sur ce formulaire"/>
 								    <button name="open_checkout" string="Etat des lieux et clôture" type="object" states="confirm" icon="gtk-go-forward"
 								        help="Termine la Réservation, libérant les ressources. Un Etat des lieux sera généré pour pointer l'état des ressources après utilisation."/>
+								    <button name="%(action_openstock_view_reservation_calendar_popup)d" string="Visualiser sur le planning" icon="gtk-find"
+ 									    type="action" context="{'start_calendar':checkin}" states="remplir,wait_confirm',confirm"/>
 								    <button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler la réservation" type="action" states="draft,confirm" icon="gtk-cancel"/>
  									<!-- <button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/> -->
 								    <!-- <button name="put_in_use" string="Planifier" states="confirm" icon="gtk-go-forward" help="La réservation sera visible sur le planning. Si vous avez planifié des interventions, elles vont être générées."/> -->
@@ -198,6 +211,19 @@
 			</field>
 		</record>
 
+		<record model="ir.ui.view" id="view_openstock_reservation_line_form">
+			<field name="name">openstc.hotel.reservation.line.form</field>
+			<field name="model">hotel_reservation.line</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+			    <field name="complete_name" readonly="1"/>
+			    <field name="line_id" string="Réservation associée" readonly="1"/>
+			    <field name="reserve_product" readonly="1"/>
+			    <field name="qte_reserves" readonly="1"/>
+			    <field name="action"/>
+			    <field name="inter_ask_id"/>
+			</field>
+		</record>
 		<record model="ir.ui.view" id="view_openstock_reservation_folio_form">
 			<field name="name">open.pret_location.reservation.form</field>
 			<field name="model">hotel.folio</field>
