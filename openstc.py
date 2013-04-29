@@ -150,6 +150,8 @@ class service(osv.osv):
             'technical': fields.boolean('Technical service'),
             'manager_id': fields.many2one('res.users', 'Manager'),
             'asksBelongsto': fields.one2many('openstc.ask', 'service_id', "asks"),
+
+            #'employees': fields.one2many('res.partner.address', 'partner_id', 'Contacts'),
     }
 service()
 
