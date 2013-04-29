@@ -175,12 +175,12 @@ class site(osv.osv):
     def name_get(self, cr, uid, ids, context=None):
         if not len(ids):
             return []
-        reads = self.read(cr, uid, ids, ['name','type','service'], context=context)
+        reads = self.read(cr, uid, ids, ['name','type'], context=context)
         res = []
         for record in reads:
             name = record['name']
             if record['type']:
-                name =  name + ' / '+ record['type'][1] + ' / '+ record['service'][1]
+                name =  name + ' / '+ record['type'][1]
             res.append((record['id'], name))
         return res
 
@@ -194,7 +194,8 @@ class site(osv.osv):
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'code': fields.char('Code', size=32),
             'type': fields.many2one('openstc.site.type', 'Type', required=True),
-            'service': fields.many2one('openstc.service', 'Service', required=True),
+            'service_ids':fields.many2many('openstc.service', 'openstc_site_services_rel', 'site_id', 'service_id', 'Services'),
+            #'service': fields.many2one('openstc.service', 'Service', required=True),
             'site_parent_id': fields.many2one('openstc.site', 'Site parent', help='Site parent', ondelete='set null'),
             'lenght': fields.integer('Lenght'),
             'width': fields.integer('Width'),
