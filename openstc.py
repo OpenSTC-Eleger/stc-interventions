@@ -151,7 +151,8 @@ class service(osv.osv):
             'manager_id': fields.many2one('res.users', 'Manager'),
             'asksBelongsto': fields.one2many('openstc.ask', 'service_id', "asks"),
 
-            #'employees': fields.one2many('res.partner.address', 'partner_id', 'Contacts'),
+            #'employees': fields.one2many('res.users', 'service_id', 'Employees'),
+            'user_ids': fields.many2many('res.users', 'openstc_user_services_rel', 'service_id', 'user_id', 'Employees'),
     }
 service()
 
