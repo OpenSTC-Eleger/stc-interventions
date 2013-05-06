@@ -9,7 +9,7 @@
 #
 #    penCivil is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
+#    the Free Software Foundation, either version 3 of the License, ors_user
 #    (at your option) any later version.
 #
 #    penCivil is distributed in the hope that it will be useful,
@@ -152,7 +152,8 @@ class service(osv.osv):
             'asksBelongsto': fields.one2many('openstc.ask', 'service_id', "asks"),
 
             #'employees': fields.one2many('res.users', 'service_id', 'Employees'),
-            'user_ids': fields.many2many('res.users', 'openstc_user_services_rel', 'service_id', 'user_id', 'Employees'),
+            #'user_ids': fields.many2many('res.users', 'openstc_user_services_rel', 'service_id', 'user_id', 'Employees'),
+            'user_ids': fields.one2many('res.users', 'service_id', "Users"),
     }
 service()
 
@@ -258,6 +259,72 @@ class res_partner(osv.osv):
     }
 res_partner()
 
+
+
+#----------------------------------------------------------
+# Employees
+#----------------------------------------------------------
+
+class res_partner_address(osv.osv):
+    _description ='Partner Addresses'
+    _name = 'res.partner.address'
+    _order = 'type, name'
+
+    _columns = {
+    }
+
+    def create(self, cr, uid, data, context={}):
+
+
+
+#        if data.has_key('login') and data.has_key('password'):
+#
+#            user_obj = self.pool.get('res.users')
+#
+#            user_id = user_obj.create(cr, uid,{
+#                    'firstname': data['name'],
+#                    'user_email': data['user_email'],
+#                    'login': data['login'],
+#                    'new_password': data['password'],
+#                    'groups_id' : [(6, 0, [35])],
+#                    })
+#
+#            partner_obj = self.pool.get('res.partner')
+#            partner_obj.write(cr, uid, data['partner_id'], {
+#                         'user_id': user_id,
+#                     }, context=context)
+
+        res = super(users, self).create(cr, uid, data, context)
+
+        return res
+
+    def write(self, cr, uid, ids, data, context=None):
+
+#        if data.has_key('isManager') and data['isManager']==True :
+#            service_obj = self.pool.get('openstc.service')
+#
+#            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
+#            #Previous manager become an agent
+#            manager = service_obj.read(cr, uid, data['service_id'],
+#                                        ['manager_id'], context)
+#            if manager and manager['manager_id']:
+#                self.write(cr, uid, [manager['manager_id'][0]], {
+#                        'groups_id' : [(6, 0, [17])],
+#                    }, context=context)
+#
+#            #Update service : current user is service's manager
+#            service_obj.write(cr, uid, data['service_id'], {
+#                     'manager_id': ids[0],
+#                 }, context=context)
+
+
+
+        res = super(users, self).write(cr, uid, ids, data, context=context)
+        return res
+
+
+res_partner_address()
+
 #----------------------------------------------------------
 # Employees
 #----------------------------------------------------------
@@ -288,6 +355,8 @@ class users(osv.osv):
             'firstname': fields.char('firstname', size=128),
             'lastname': fields.char('lastname', size=128),
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
+            'service_id':fields.many2one('openstc.service', 'Service    '),
+            'partner_id': fields.one2many('res.partner', 'user_id', "Partner"),
             'service_ids': fields.many2many('openstc.service', 'openstc_user_services_rel', 'user_id', 'service_id', 'Services'),
             'cost': fields.integer('Coût horaire'),
             'post': fields.char('Post', size=128),
@@ -303,6 +372,55 @@ class users(osv.osv):
 
             'team_ids': fields.many2many('openstc.team', 'openstc_team_users_rel', 'user_id', 'team_id', 'Teams'),
     }
+
+    def create(self, cr, uid, data, context={}):
+
+        res = super(users, self).create(cr, uid, data, context)
+
+        if data.has_key('isManager') and data['isManager']==True :
+            service_obj = self.pool.get('openstc.service')
+
+            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
+            #Previous manager become an agent
+            manager = service_obj.read(cr, uid, data['service_id'],
+                                        ['manager_id'], context)
+            if manager and manager['manager_id']:
+                self.write(cr, uid, [manager['manager_id'][0]], {
+                        'groups_id' : [(6, 0, [17])],
+                    }, context=context)
+
+            #Update service : this user is service's manager
+            service_obj.write(cr, uid, data['service_id'], {
+                     'manager_id': res,
+                 }, context=context)
+
+        return res
+
+    def write(self, cr, uid, ids, data, context=None):
+
+        if data.has_key('isManager') and data['isManager']==True :
+            service_obj = self.pool.get('openstc.service')
+
+            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
+            #Previous manager become an agent
+            manager = service_obj.read(cr, uid, data['service_id'],
+                                        ['manager_id'], context)
+            if manager and manager['manager_id']:
+                self.write(cr, uid, [manager['manager_id'][0]], {
+                        'groups_id' : [(6, 0, [17])],
+                    }, context=context)
+
+            #Update service : current user is service's manager
+            service_obj.write(cr, uid, data['service_id'], {
+                     'manager_id': ids[0],
+                 }, context=context)
+
+
+
+        res = super(users, self).write(cr, uid, ids, data, context=context)
+        return res
+
+
 users()
 
 class team(osv.osv):
@@ -719,7 +837,7 @@ class ask(osv.osv):
         'manager_id': fields.many2one('res.users', 'Manager'),
         'partner_service_id': fields.related('partner_id', 'service_id', type='many2one', relation='openstc.service', string='Service du demandeur', help='...'),
         'service_id':fields.many2one('openstc.service', 'Service concerné'),
-        'date_deadline': fields.date('Deadline',select=True),
+        #'date_deadline': fields.date('Deadline',select=True),
         'state': fields.selection([('wait', 'Wait'),('confirm', 'To be confirm'),('valid', 'Valid'),('refused', 'Refused'),('closed', 'Closed')], 'State', readonly=True,
                           help='If the task is created the state is \'Wait\'.\n If the task is started, the state becomes \'In Progress\'.\n If review is needed the task is in \'Pending\' state.\
                           \n If the task is over, the states is set to \'Done\'.'),
