@@ -265,65 +265,65 @@ res_partner()
 # Employees
 #----------------------------------------------------------
 
-class res_partner_address(osv.osv):
-    _description ='Partner Addresses'
-    _name = 'res.partner.address'
-    _order = 'type, name'
-
-    _columns = {
-    }
-
-    def create(self, cr, uid, data, context={}):
-
-
-
-#        if data.has_key('login') and data.has_key('password'):
+#class res_partner_address(osv.osv):
+#    _description ='Partner Addresses'
+#    _name = 'res.partner.address'
+#    _order = 'type, name'
 #
-#            user_obj = self.pool.get('res.users')
+#    _columns = {
+#    }
 #
-#            user_id = user_obj.create(cr, uid,{
-#                    'firstname': data['name'],
-#                    'user_email': data['user_email'],
-#                    'login': data['login'],
-#                    'new_password': data['password'],
-#                    'groups_id' : [(6, 0, [35])],
-#                    })
+#    def create(self, cr, uid, data, context={}):
 #
-#            partner_obj = self.pool.get('res.partner')
-#            partner_obj.write(cr, uid, data['partner_id'], {
-#                         'user_id': user_id,
-#                     }, context=context)
-
-        res = super(users, self).create(cr, uid, data, context)
-
-        return res
-
-    def write(self, cr, uid, ids, data, context=None):
-
-#        if data.has_key('isManager') and data['isManager']==True :
-#            service_obj = self.pool.get('openstc.service')
 #
-#            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
-#            #Previous manager become an agent
-#            manager = service_obj.read(cr, uid, data['service_id'],
-#                                        ['manager_id'], context)
-#            if manager and manager['manager_id']:
-#                self.write(cr, uid, [manager['manager_id'][0]], {
-#                        'groups_id' : [(6, 0, [17])],
-#                    }, context=context)
 #
-#            #Update service : current user is service's manager
-#            service_obj.write(cr, uid, data['service_id'], {
-#                     'manager_id': ids[0],
-#                 }, context=context)
-
-
-
-        res = super(users, self).write(cr, uid, ids, data, context=context)
-        return res
-
-
-res_partner_address()
+##        if data.has_key('login') and data.has_key('password'):
+##
+##            user_obj = self.pool.get('res.users')
+##
+##            user_id = user_obj.create(cr, uid,{
+##                    'firstname': data['name'],
+##                    'user_email': data['user_email'],
+##                    'login': data['login'],
+##                    'new_password': data['password'],
+##                    'groups_id' : [(6, 0, [35])],
+##                    })
+##
+##            partner_obj = self.pool.get('res.partner')
+##            partner_obj.write(cr, uid, data['partner_id'], {
+##                         'user_id': user_id,
+##                     }, context=context)
+#
+#        res = super(users, self).create(cr, uid, data, context)
+#
+#        return res
+#
+#    def write(self, cr, uid, ids, data, context=None):
+#
+##        if data.has_key('isManager') and data['isManager']==True :
+##            service_obj = self.pool.get('openstc.service')
+##
+##            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
+##            #Previous manager become an agent
+##            manager = service_obj.read(cr, uid, data['service_id'],
+##                                        ['manager_id'], context)
+##            if manager and manager['manager_id']:
+##                self.write(cr, uid, [manager['manager_id'][0]], {
+##                        'groups_id' : [(6, 0, [17])],
+##                    }, context=context)
+##
+##            #Update service : current user is service's manager
+##            service_obj.write(cr, uid, data['service_id'], {
+##                     'manager_id': ids[0],
+##                 }, context=context)
+#
+#
+#
+#        res = super(users, self).write(cr, uid, ids, data, context=context)
+#        return res
+#
+#
+#res_partner_address()
 
 #----------------------------------------------------------
 # Employees
@@ -356,7 +356,7 @@ class users(osv.osv):
             'lastname': fields.char('lastname', size=128),
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'service_id':fields.many2one('openstc.service', 'Service    '),
-            'partner_id': fields.one2many('res.partner', 'user_id', "Partner"),
+            #'partner_id': fields.one2many('res.partner', 'user_id', "Partner"),
             'service_ids': fields.many2many('openstc.service', 'openstc_user_services_rel', 'user_id', 'service_id', 'Services'),
             'cost': fields.integer('Coût horaire'),
             'post': fields.char('Post', size=128),
