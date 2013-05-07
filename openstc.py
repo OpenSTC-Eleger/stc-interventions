@@ -289,7 +289,7 @@ class res_partner_address(osv.osv):
                     })
 
             self.write(cr, uid, [res], {
-                    'user_id': [(6, 0, [user_id])],
+                    'contact_id': user_id,
                 }, context=context)
 
 #            partner_obj = self.pool.get('res.partner')
