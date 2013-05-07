@@ -14,8 +14,8 @@
                 </form>
             </field>
         </record>
-        <record id="action_openstc_view_assignement" model="ir.actions.act_window">
-            <field name="name">Affectation des interventions</field>
+        <record id="action_openstc_view_assignement2" model="ir.actions.act_window">
+            <field name="name">Affectations des interventions</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">openstc.intervention.assignement</field>
             <field name="view_type">form</field>
@@ -123,7 +123,7 @@
                 </tree>
             </field>
         </record>
-        <record id="openstc_task_category_action" model="ir.actions.act_window">
+        <record id="openstc_task_category_action2" model="ir.actions.act_window">
             <field name="name">Catégories des tâches</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">openstc.task.category</field>
@@ -300,7 +300,7 @@
             </field>
         </record>
 
-       <record id="action_openstc_view_absent_type" model="ir.actions.act_window">
+       <record id="action_openstc_view_absent_type2" model="ir.actions.act_window">
             <field name="name">Types d'abscence</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">openstc.absent.type</field>
@@ -588,7 +588,7 @@
             </field>
         </record>
 
-       <record id="action_openstc_view_partner_type" model="ir.actions.act_window">
+       <record id="action_openstc_view_partner_type2" model="ir.actions.act_window">
             <field name="name">Types de demandeur</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">openstc.partner.type</field>
@@ -1131,26 +1131,27 @@
    			parent="menu_configuration"
    			sequence="6"/>
 
-   	 	<menuitem action="action_openstc_view_assignement"
-   			id="menu_action_openstc_view_assignement"
+   	 	<menuitem action="action_openstc_view_assignement2"
+   			id="menu_action_openstc_view_assignement2"
    			parent="menu_openstc_dico"
    			groups="openstc_dst"
    			sequence="1"/>
 
-   		<menuitem action="openstc_task_category_action"
-   			id="menu_action_openstc_view_task_category"
+   		<menuitem action="openstc_task_category_action2"
+   			id="menu_action_openstc_view_task_category2"
    			parent="menu_openstc_dico"
    			groups="openstc_dst"
+   			name="Catégories des tâches"
    			sequence="2"/>
 
-   	 	<menuitem action="action_openstc_view_absent_type"
-   			id="menu_action_openstc_view_absent_type"
+   	 	<menuitem action="action_openstc_view_absent_type2"
+   			id="menu_action_openstc_view_absent_type2"
    			parent="menu_openstc_dico"
    			groups="openstc_dst"
    			sequence="3"/>
 
-   		<menuitem action="action_openstc_view_partner_type"
-   			id="menu_action_openstc_view_partner_type"
+   		<menuitem action="action_openstc_view_partner_type2"
+   			id="menu_action_openstc_view_partner_type2"
    			parent="menu_openstc_dico"
    			groups="openstc_dst"
    			sequence="4"/>
