@@ -45,7 +45,7 @@ access_openstc_site_type_dst,openstc_site_type dst,model_openstc_site_type,opens
 access_openstc_team_dst,openstc_team dst,model_openstc_team,openstc_dst,1,1,1,1
 access_openstc_site_dst,openstc_site dst,model_openstc_site,openstc_dst,1,1,1,1
 access_openstc_openstc_partner_type_dst,openstc_openstc_partner_type dst,model_openstc_partner_type,openstc_dst,1,1,1,1
-access_openstc_res_partner_dst,openstc_res_partner  dst,model_res_partner,openstc_dst,1,1,1,1
+access_openstc_res_partner_dst,openstc_res_partner  dst,base.model_res_partner,openstc_dst,1,1,1,1
 access_openstc_res_partner_address user,openstc_res_partner_address dst,base.model_res_partner_address,openstc_dst,1,1,1,1
 
 

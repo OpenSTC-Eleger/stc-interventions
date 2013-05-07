@@ -255,6 +255,7 @@ class res_partner(osv.osv):
          'service_id':fields.many2one('openstc.service', 'Service du demandeur'),
          'technical_service_id':fields.many2one('openstc.service', 'Service technique concerné'),
          'technical_site_id': fields.many2one('openstc.site', 'Default Site'),
+         #'user_ids': fields.many2many('res.users', 'openstc_partner_users_rel', 'partner_id', 'user_id', 'Users'),
 
     }
 res_partner()
@@ -267,7 +268,12 @@ class res_partner_address(osv.osv):
     _order = 'type, name'
 
 
-    def create(self, cr, uid, data, context={}):
+    columns = {
+        'user_id': fields.many2one('res.users', 'User'),
+    }
+
+    def create(self, cr, uid, data, context=None):
+        res = super(res_partner_address, self).create(cr, uid, data, context)
 
         if data.has_key('login') and data.has_key('password'):
 
@@ -282,49 +288,36 @@ class res_partner_address(osv.osv):
                     'groups_id' : [(6, 0, [35])],
                     })
 
-            partner_obj = self.pool.get('res.partner')
-            partner_obj.write(cr, uid, data['partner_id'], {
-                         'user_id': user_id,
-                     }, context=context)
+            self.write(cr, uid, [res], {
+                    'user_id': [(6, 0, [user_id])],
+                }, context=context)
 
-        res = super(res_partner_address, self).create(cr, uid, data, context)
-
+#            partner_obj = self.pool.get('res.partner')
+#            partner_obj.write(cr, uid, [data['partner_id']], {
+#                        'user_ids': [(6, 0, [user_id])],
+#                     }, context=context)
         return res
 
     def write(self, cr, uid, ids, data, context=None):
 
         if data.has_key('login') and data.has_key('password'):
             user_obj = self.pool.get('res.users')
-            partner_obj = self.pool.get('res.partner')
-            partner = partner_obj.read(cr, uid, data['partner_id'],
+            partner_address = self.read(cr, uid, data['partner_id'],
                                         ['user_id'],
                                         context)
 
 
-            user_id = user_obj.browse(cr, uid, [partner['user_id']], context=context)
-            if user_id[0].id != 0:
-                partner_obj.write(cr, uid, [user_id[0].id], {
+            user = user_obj.browse(cr, uid, [partner_address['user_id']], context=context)
+            if user[0].id != 0:
+                user_obj.write(cr, uid, [user_id[0].id], {
                                 'name': data['name'],
                                 'firstname': data['name'],
                                 'user_email': data['email'],
                                 'login': data['login'],
                                 'new_password': data['password'],
                         }, context=context)
-            else :
-                user_id = user_obj.create(cr, uid,{
-                    'name': data['name'],
-                    'firstname': data['name'],
-                    'user_email': data['email'],
-                    'login': data['login'],
-                    'new_password': data['password'],
-                    'groups_id' : [(6, 0, [35])],
-                    })
-                partner_obj.write(cr, uid, data['partner_id'], {
-                             'user_id': user_id,
-                         }, context=context)
 
         res = super(res_partner_address, self).write(cr, uid, ids, data, context)
-
         return res
 
 
