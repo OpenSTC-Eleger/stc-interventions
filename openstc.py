@@ -354,7 +354,7 @@ class users(osv.osv):
             'lastname': fields.char('lastname', size=128),
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
             'service_id':fields.many2one('openstc.service', 'Service    '),
-            'partner_id': fields.one2many('res.partner', 'user_id', "Partner"),
+            'contact_id': fields.one2many('res.partner.address', 'user_id', "Partner"),
             'service_ids': fields.many2many('openstc.service', 'openstc_user_services_rel', 'user_id', 'service_id', 'Services'),
             'cost': fields.integer('Coût horaire'),
             'post': fields.char('Post', size=128),
