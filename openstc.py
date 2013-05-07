@@ -268,7 +268,7 @@ class res_partner_address(osv.osv):
     _order = 'type, name'
 
 
-    columns = {
+    _columns = {
         'user_id': fields.many2one('res.users', 'User'),
     }
 
