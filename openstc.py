@@ -298,18 +298,19 @@ class res_partner_address(osv.osv):
 #                     }, context=context)
         return res
 
+
+
     def write(self, cr, uid, ids, data, context=None):
 
-        if data.has_key('login') and data.has_key('password'):
-            user_obj = self.pool.get('res.users')
-            partner_address = self.read(cr, uid, data['partner_id'],
-                                        ['user_id'],
-                                        context)
+        user_obj = self.pool.get('res.users')
+        partner_address = self.read(cr, uid, ids[0],
+                                    ['user_id'],
+                                    context)
 
-
-            user = user_obj.browse(cr, uid, partner_address['user_id'], context=context)
-            if user[0].id != 0:
-                user_obj.write(cr, uid, [user_id[0].id], {
+        if partner_address['user_id'] != False :
+            user = user_obj.browse(cr, uid, partner_address['user_id'][0], context=context)
+            if user.id != 0:
+                user_obj.write(cr, uid, [user.id], {
                                 'name': data['name'],
                                 'firstname': data['name'],
                                 'user_email': data['email'],
@@ -714,6 +715,10 @@ class project(osv.osv):
     _defaults = {
         'ask_id' : _get_ask,
     }
+
+    _sql_constraints = [
+        ('ask_uniq', 'unique(name,ask_id)', 'Demande déjà validée!'),
+    ]
 
 project()
 
