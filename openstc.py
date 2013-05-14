@@ -307,7 +307,7 @@ class res_partner_address(osv.osv):
                                         context)
 
 
-            user = user_obj.browse(cr, uid, [partner_address['user_id']], context=context)
+            user = user_obj.browse(cr, uid, partner_address['user_id'], context=context)
             if user[0].id != 0:
                 user_obj.write(cr, uid, [user_id[0].id], {
                                 'name': data['name'],
