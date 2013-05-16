@@ -144,7 +144,7 @@ class hotel_reservation_line(osv.osv):
         if not context:
             context = {}
         resa_ids = []
-        ret = {}
+        ret = {}.fromkeys(ids,{'dispo':False,'qte_dispo':0.0})
         if 'qte_dispo' in name:
             #get all resa linked with lines
             for line in self.browse(cr, uid, ids):
@@ -565,7 +565,7 @@ class hotel_reservation(osv.osv):
                                                                                         'categ_id':produit.categ_id.id,
                                                                                         'reserve':[(4, produit.id)],
                                                                                         'prix_unitaire':produit.product_tmpl_id.list_price,
-                                                                                        'qte_reserves':10
+                                                                                        'qte_reserves':1.0
                                                                                 }))
 
             res.update({'reservation_line':reservation_lines})
