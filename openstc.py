@@ -27,6 +27,12 @@ import types
 from osv import fields, osv
 from tools.translate import _
 
+def _get_request_states(self, cursor, user_id, context=None):
+    return (
+                ('wait', 'Wait'),('confirm', 'To be confirm'),('valid', 'Valid'),('refused', 'Refused'),('closed', 'Closed')
+            )
+
+
 def send_email(self, cr, uid, ids, params, context=None):
 #def send_email( params ):
     #print("test"+params)
@@ -234,21 +240,21 @@ class res_partner(osv.osv):
     _inherit = "res.partner"
     _rec_name = "name"
 
-    def _get_services_list(self, cr, uid, context=None):
-        user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
-        list = []
-        for service_id in user.service_ids:
-            list.append(service_id.id)
-        return list
-
-
-    def fields_get(self, cr, uid, fields=None, context=None):
-        res = super(res_partner, self).fields_get(cr, uid, fields, context)
-        list = self._get_services_list(cr, uid,context)
-        for field in res:
-            if field == "service_id":
-                res[field]['domain']=[('id','in',list)]
-        return res
+#    def _get_services_list(self, cr, uid, context=None):
+#        user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
+#        list = []
+#        for service_id in user.service_ids:
+#            list.append(service_id.id)
+#        return list
+#
+#
+#    def fields_get(self, cr, uid, fields=None, context=None):
+#        res = super(res_partner, self).fields_get(cr, uid, fields, context)
+#        list = self._get_services_list(cr, uid,context)
+#        for field in res:
+#            if field == "service_id":
+#                res[field]['domain']=[('id','in',list)]
+#        return res
 
     _columns = {
          'type_id': fields.many2one('openstc.partner.type', 'Type',required=True),
@@ -307,16 +313,17 @@ class res_partner_address(osv.osv):
                                     ['user_id'],
                                     context)
 
-        if partner_address['user_id'] != False :
-            user = user_obj.browse(cr, uid, partner_address['user_id'][0], context=context)
-            if user.id != 0:
-                user_obj.write(cr, uid, [user.id], {
-                                'name': data['name'],
-                                'firstname': data['name'],
-                                'user_email': data['email'],
-                                'login': data['login'],
-                                'new_password': data['password'],
-                        }, context=context)
+        if partner_address.has_key('user_id') :
+            if partner_address['user_id'] != False :
+                user = user_obj.browse(cr, uid, partner_address['user_id'][0], context=context)
+                if user.id != 0:
+                    user_obj.write(cr, uid, [user.id], {
+                                    'name': data['name'],
+                                    'firstname': data['name'],
+                                    'user_email': data['email'],
+                                    'login': data['login'],
+                                    'new_password': data['password'],
+                            }, context=context)
 
         res = super(res_partner_address, self).write(cr, uid, ids, data, context)
         return res
@@ -327,6 +334,38 @@ res_partner_address()
 #----------------------------------------------------------
 # Employees
 #----------------------------------------------------------
+
+#class openstc_groups(osv.osv):
+#    """
+#        A portal is a group of users with specific menu, widgets, and typically
+#        restricted access rights.
+#    """
+#    _name = 'openstc.group'
+#    _description = 'OpenSTC groups'
+#    _inherits = {'res.groups': 'group_id'}
+#
+#    _columns = {
+#        'group_id': fields.many2one('res.groups', required=True, ondelete='cascade',
+#            string='Group',
+#            help='The group corresponding to this portal'),
+#        'code': fields.char('Code', size=128),
+#        'perm_request_confirm' : fields.boolean('Demander la Confirmation'),
+#    }
+#
+#openstc_groups()
+
+class groups(osv.osv):
+    _name = "res.groups"
+    _description = "Access Groups"
+    _inherit = "res.groups"
+    _rec_name = 'full_name'
+
+    _columns = {
+        'code': fields.char('Code', size=128),
+        'perm_request_confirm' : fields.boolean('Demander la Confirmation'),
+    }
+
+groups()
 
 class users(osv.osv):
     _name = "res.users"
@@ -498,7 +537,16 @@ class task(osv.osv):
 #            }),
     }
 
-    _defaults = {'active': lambda *a: True,}
+    _defaults = {'active': lambda *a: True, 'user_id':None}
+
+#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+#        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+
+    def _is_template(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        for task in self.browse(cr, uid, ids, context=context):
+            res[task.id] = True
+        return res
 
     # Method called on mark task done from swif
     def saveTaskDone(self, cr, uid, ids, params, context=None):
@@ -787,6 +835,30 @@ project_vs_hours()
 #----------------------------------------------------------
 # Demandes
 #----------------------------------------------------------
+#class ir_rule(osv.osv):
+#    _name = 'ir.rule'
+#    _description = 'ir rule STC'
+#    _inherit = 'ir.rule'
+#    _MODES = ['read', 'write', 'create', 'unlink','confirm','valid','refuse']
+#
+#    _columns = {
+#        'perm_confirm': fields.boolean('Apply For Confirm'),
+#        'perm_valid': fields.boolean('Apply For Valid'),
+#        'perm_refuse': fields.boolean('Apply For Refuse'),
+#    }
+#
+#    _defaults = {
+#        'perm_read': True,
+#        'perm_write': True,
+#        'perm_create': True,
+#        'perm_unlink': True,
+#        'perm_confirm': True,
+#        'perm_valid': True,
+#        'perm_refuse': True,
+#        'global': True,
+#    }
+#
+#ir_rule()
 
 
 class ask(osv.osv):
@@ -805,6 +877,74 @@ class ask(osv.osv):
         user_obj = self.pool.get('res.users')
         return user_obj.read(cr, uid, uid, ['service_ids'],context)['service_ids']
 
+    def _is_possible_action(self, cr, uid, ids, fields, arg, context):
+        res = {}
+        user_obj = self.pool.get('res.users')
+        group_obj = self.pool.get('res.groups')
+
+        for id in ids:
+            res[id] = []
+            isDST = False
+            isManager = False
+
+            asks = self.read(cr, uid, [id], ['intervention_ids','service_id','state'], context=context)
+            user = user_obj.read(cr, uid, uid,
+                                        ['groups_id','service_ids'],
+                                        context)
+            group_ids = group_obj.search(cr, uid, [('code','=','DIRECTOR'),('id','in',user['groups_id'])])
+            if len( group_ids ) != 0:
+                isDST = True
+
+            group_ids = group_obj.search(cr, uid, [('code','in',('DIRECTOR','MANAGER'))])
+            if set(user['groups_id']).intersection(set(group_ids)) :
+                isManager = True
+
+            ask = asks[0] or False
+            if isManager and ask and ask.has_key('intervention_ids') and ask.has_key('service_id') and user.has_key('service_ids') :
+                if len(ask['intervention_ids'])==0 and ask['service_id'][0] in user['service_ids']:
+                        if ask['state'] == 'wait' :
+                            res[id] = ['valid', 'refused']
+                            if isDST == False:
+                                res[id] = ['valid', 'refused', 'confirm']
+
+                        if ask['state'] == 'confirm' :
+                            res[id] = ['valid', 'refused']
+
+                        if ask['state'] == 'closed' :
+                            res[id] = ['valid']
+                            if isDST == False:
+                                res[id] = ['valid', 'confirm']
+
+        return res
+
+#    def _is_valid_action(self, cr, uid, ids, fields, arg, context):
+#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
+#        for id in res:
+#            asks = self.read(cr, uid, [id], ['state'], context=context)
+#            ask = asks[0] or False
+#            if ask['state'] in arg:
+#                res[id] = True;
+#        return res
+#
+#    def _is_request_confirm_action(self, cr, uid, ids, fields, arg, context):
+#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
+#        for id in res:
+#            asks = self.read(cr, uid, [id], ['state'], context=context)
+#            group_obj = self.pool.get('res.groups')
+#            group_ids = group_obj.search(cr, uid, [('code','=','DIRECTOR')])
+#            ask = asks[0] or False
+#            if ask['state'] in arg and len(group_ids)>0 :
+#                res[id] = True;
+#        return res
+#
+#    def _is_refuse_action(self, cr, uid, ids, fields, arg, context):
+#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
+#        for id in res:
+#            asks = self.read(cr, uid, [id], ['state'], context=context)
+#            ask = asks[0] or False
+#            if ask['state'] in arg:
+#                res[id] = True;
+#        return res
 
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True),
@@ -841,9 +981,15 @@ class ask(osv.osv):
         'partner_service_id': fields.related('partner_id', 'service_id', type='many2one', relation='openstc.service', string='Service du demandeur', help='...'),
         'service_id':fields.many2one('openstc.service', 'Service concerné'),
         #'date_deadline': fields.date('Deadline',select=True),
-        'state': fields.selection([('wait', 'Wait'),('confirm', 'To be confirm'),('valid', 'Valid'),('refused', 'Refused'),('closed', 'Closed')], 'State', readonly=True,
+        'state': fields.selection(_get_request_states, 'State', readonly=True,
                           help='If the task is created the state is \'Wait\'.\n If the task is started, the state becomes \'In Progress\'.\n If review is needed the task is in \'Pending\' state.\
                           \n If the task is over, the states is set to \'Done\'.'),
+
+        'actions' : fields.function(_is_possible_action, method=True, string='Valider',type='selection', store=False),
+#        'action_request_confirm' : fields.function(_is_possible_action, arg=['wait','refused'],
+#                                                   method=True, string='Demander la Confirmation',type='boolean', store=False),
+#        'action_refuse' : fields.function(_is_possible_action, arg=['wait','confirm'],
+#                                          method=True, string='Refuser',type='boolean', store=False),
 
     }
 
@@ -852,9 +998,16 @@ class ask(osv.osv):
         'name' : lambda self, cr, uid, context : context['name'] if context and 'name' in context else None,
         'state': '',
         'current_date': lambda *a: datetime.now().strftime('%Y-%m-%d'),
+        'actions': [],
+#        'action_valid' : False,
+#        'action_request_confirm' : False,
+#        'action_refuse' : False,
     }
 
 
+#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+#        res = super(ask, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+#        return res
 
     def create(self, cr, uid, data, context={}):
         data['state'] = 'wait'

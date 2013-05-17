@@ -79,6 +79,8 @@
         <field eval="0" name="perm_create"/>
     </record>
 
+
+
     <record model="ir.rule" id="ask_non_technique_rule">
         <field name="name">Project Rule non technique</field>
         <field name="model_id" ref="model_openstc_ask"/>
