@@ -268,6 +268,42 @@ class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
     
 openstc_pret_envoie_mail_annulation_wizard()
 
+
+
+class openstc_pret_create_inter_wizard(osv.osv_memory):
+    
+    def _default_service_id_value(self, cr, uid, context=None):
+        service_ids = self.pool.get("openstc.service").search(cr, uid, [('name','in',('Voirie','voirie'))], context=context)
+        return service_ids and service_ids[0] or False
+    
+    _name = "openstc.pret.create.inter.wizard"
+    _columns = {
+        'service_id':fields.many2one('openstc.service', 'Service concerné', required=True),
+        'time_planned':fields.float('Heures planifiées',digits=(2,1), required=True),
+        'categ_id':fields.many2one('openstc.task.category','Catégorie de la tâche', required=True),
+        }
+    
+    _defaults = {
+        'service_id':_default_service_id_value,
+        }
+    
+    def validate(self, cr, uid, ids, context=None):
+        if isinstance(ids, list):
+            ids = ids[0]
+        resa_id = context.get('active_id', False)
+        if resa_id:
+            wizard = self.browse(cr, uid, ids, context=None)
+            if wizard.time_planned <= 0.0:
+                raise osv.except_osv(_('Error'),_('You can\'t plan a task with a non-positive length'))
+            self.pool.get("hotel.reservation").put_in_use_with_intervention(cr, uid, [resa_id], task_values={'planned_hours':wizard.time_planned,
+                                                                                                             'category_id':wizard.categ_id.id},
+                                                                             service_id=wizard.service_id.id, context=context)
+        return {'type':'ir.actions.act_window.close'}
+
+openstc_pret_create_inter_wizard()
+
+
+
 #Pop-up permettant de savoir si, pour mettre à disposition les articles, on fait une livraison ou le demandeur vient les chercher
 class openstc_pret_deliver_products_wizard(osv.osv_memory):
     _name = "openstc.pret.deliver.products.wizard"

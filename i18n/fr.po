@@ -22,6 +22,12 @@ msgstr "Confirmer la demande par le DST"
 
 
 #. module: openstc_prets
+#: code:addons/openstc_prets/wizard/openstc_pret_wizard.py:297
+#, python-format
+msgid "You can\'t plan a task with a non-positive length"
+msgstr "Vous ne pouvez pas planifier une intervention avec une tâche d'une durée inférieure à zéro"
+
+#. module: openstc_prets
 #: view:openstc.partner.type:0
 #: view:openstc.partner.type.type:0
 msgid "Demandeur type"
@@ -2501,6 +2507,7 @@ msgstr "Matériel"
 #: code:addons/openstc_prets/openstc_pret.py:573
 #: code:addons/openstc_prets/openstc_pret.py:659
 #: code:addons/openstc_prets/openstc_pret.py:851
+#: code:addons/openstc_prets/wizard/openstc_pret_wizard.py:297
 #, python-format
 msgid "Error"
 msgstr "Erreur"

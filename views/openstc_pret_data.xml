@@ -37,6 +37,12 @@
 	    <field name="factor">24.0</field>
 	</record>
 	
+	<!-- task category for default value when generating inter and task from reservation -->
+	<record id="openstc_pret_supply_categ_task" model="openstc.task.category">
+	    <field name="name">Livraison</field>
+	    <field name="code">LIVRAISON</field>
+	</record>
+	
 	    <record id="openstc_pret_email_template_resa_validee" model="email.template">
 	        <field name="name">Réservation Validée</field>
 	        <field name="model_id" ref="model_hotel_reservation"/>
