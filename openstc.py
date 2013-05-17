@@ -910,7 +910,7 @@ class ask(osv.osv):
                         if ask['state'] == 'confirm' :
                             res[id] = ['valid', 'refused']
 
-                        if ask['state'] == 'closed' :
+                        if ask['state'] == 'refused' :
                             res[id] = ['valid']
                             if isDST == False:
                                 res[id] = ['valid', 'confirm']
