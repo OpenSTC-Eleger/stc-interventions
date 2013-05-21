@@ -178,7 +178,7 @@
 									<button name="dummy" string="Vérifier dispo articles" icon="gtk-execute" states="remplir,draft,wait_confirm"/>
 									<button name="confirm" string="Valider la réservation" states="remplir,draft" attrs="{'readonly':[('all_dispo','=',False)]}"
 									    icon="gtk-go-forward" help="Valide les informations saisies et réserve les ressources sélectionnées aux dates indiquées. La réservation sera visible sur le planning et le demandeur sera notifié par mail (si adresse mail renseignée)."/>
-									<button name="confirm" string="Valider la réservation (responsable)" states="wait_confirm" attrs="{'readonly':[('all_dispo','=',False)]}" groups="openstc_prets.openstc_manager,openstc_prets.openstc_dst"
+									<button name="confirm" string="Valider la réservation (responsable)" states="wait_confirm" attrs="{'readonly':[('all_dispo','=',False)]}" groups="openstc.openstc_manager,openstc.openstc_dst"
 									    icon="gtk-go-forward" help="Valide les informations saisies et réserve les ressources sélectionnées aux dates indiquées. La réservation sera visible sur le planning et le demandeur sera notifié par mail (si adresse mail renseignée)."/>
 									<button name="%(action_view_openstc_pret_create_inter_wizard)d" type="action" string="Générer Interventions restantes" attrs="{'invisible':['|',('inter_id','&lt;&gt;',False),('state','&lt;&gt;','confirm')]}"
 									    context="{'default_categ_id':%(openstc_pret_supply_categ_task)d}" icon="gtk-execute" help="Générer les interventions planifiées sur ce formulaire"/>
