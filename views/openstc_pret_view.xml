@@ -17,11 +17,10 @@
 				</page>
 	   		</field>
 	   	</record>
-
-
-	<!-- Vue Produits mère pour l'ensemble du projet OpenStock -->
-		<record model="ir.ui.view" id="view_openstock_fournitures_tree">
-			<field name="name">fourniture.product.tree</field>
+    
+   		<!-- Vue Produits par défaut -->
+		<record model="ir.ui.view" id="view_openstock_fournitures_main_tree">
+			<field name="name">fourniture.product.tree.main</field>
 			<field name="model">product.product</field>
 			<field name="inherit_id" ref="product.product_product_tree_view" />
 			<field name="type">tree</field>
@@ -30,9 +29,25 @@
 					string="Products" position="replace">
 					<tree string="Produits">
 						<field name="name" />
-						<field name="list_price" />
-						<field name="seuil_confirm"/>
+						<field name="categ_id"/>
+						<field name="qty_available"/>
 					</tree>
+				</tree>
+			</field>
+		</record>
+	    
+		<!-- Vue Produits mère pour l'ensemble du projet OpenStock -->
+		<record model="ir.ui.view" id="view_openstock_fournitures_tree">
+			<field name="name">fourniture.product.tree</field>
+			<field name="model">product.product</field>
+			<field name="type">tree</field>
+			<field name="priority">20</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name" />
+					<field name="categ_id"/>
+					<field name="virtual_available" />
+					<field name="seuil_confirm"/>
 				</tree>
 			</field>
 		</record>
