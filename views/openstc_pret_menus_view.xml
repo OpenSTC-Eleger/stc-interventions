@@ -10,6 +10,7 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 			<field name="domain">[('openstc_reservable','=',True)]</field>
+			<field name="view_ids" eval="[(5,),(0,0,{'view_mode':'tree','view_id':ref('view_openstock_fournitures_tree')})]"/>
 			<field name="context" eval="{'default_openstc_reservable':'1','default_purchase_ok':False,'default_uom_id':ref('openstc_pret_uom_day')}"/>
 		</record>
 
