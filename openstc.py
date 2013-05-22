@@ -948,7 +948,7 @@ class ask(osv.osv):
 
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True),
-        'create_date' : fields.datetime('Create Date', readonly=True),
+        'create_date' : fields.datetime('Create Date', readonly=True, select=False),
         'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'write_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'current_date': fields.datetime('Date'),
