@@ -8,7 +8,7 @@
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<form string="Emprunter des Ressources auprès de Collectivités extérieures">
-					<field name="emprunt_line" nolabel="1" colspan="4" required="1" on_change="onchange_emprunt_line(emprunt_line, context)">
+					<field name="emprunt_line" nolabel="1" colspan="4" required="1">
 						<tree string="Lignes d'emprunt" editable="top">
 							<field name="product_id" context="{'default_openstc_reservable':'1','default_purchase_ok':False}"/>
 							<field name="partner_id" domain="[('supplier','=',True)]"/>

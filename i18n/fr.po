@@ -88,7 +88,7 @@ msgstr "Recréer Approvisionnement"
 #: code:addons/openstc_prets/openstc_pret.py:859
 #, python-format
 msgid "[Evenemential] supply of %s ont the site %s"
-msgstr "[Evenemential] supply of %s ont the site %s"
+msgstr "[Evenemential] Livraison de %s sur le site %s"
 
 #. module: openstc_prets
 #: field:project.task,absent_type_id:0
@@ -1979,6 +1979,11 @@ msgstr "La quantité d'article à racheter ne peut pas dépasser la quantité r�
 #: field:openstc.pret.checkout.line,qte_to_purchase:0
 msgid "Qté à Racheter"
 msgstr "Qté à Racheter"
+
+#. module: openstc_prets
+#: field:openstc.pret.checkout.line,qte_to_repair:0
+msgid "Qty to repair"
+msgstr "Qté à réparer"
 
 #. module: openstc_prets
 #: field:res.users,address_home:0
