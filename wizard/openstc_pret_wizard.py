@@ -216,32 +216,16 @@ class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
         email_tmpl_id = 0
         print("envoyer mail pour résa annulée")
         email_tmpl_id = email_obj.search(cr, uid, [('model','=','hotel.reservation'),('name','ilike','annulée')])
-        if not email_tmpl_id:
-            print("création email_template pour résa annulée")
-            ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=','hotel.reservation')])
-            email_tmpl_id = email_obj.create(cr, uid, {
-                                        'name':'modèle de mail pour résa annulée', 
-                                        'name':'Réservation Annulée',
-                                        'model_id':ir_model[0],
-                                        'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
-                                        'email_from':'bruno.plancher@gmail.com',
-                                        'email_to':'bruno.plancher@gmail.com',
-                                        'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
-                                        ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-                                        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
-                                        'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
-                                        ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-                                        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
-                                       })
-        else:
-            email_tmpl_id = email_tmpl_id[0]
-        mail_values = email_obj.generate_email(cr, uid, email_tmpl_id, id, context)
-        #TODO: ajouter les attachments au mail, voir sources de email.message
-        attachments = mail_values.pop('attachments') or {}
-        ret['body_html'] = mail_values['body_html']
-        ret['email_template'] = email_tmpl_id
-        return ret
-
+        if email_tmpl_id:
+            if isinstance(email_tmpl_id, list):
+                email_tmpl_id = email_tmpl_id[0]
+            mail_values = email_obj.generate_email(cr, uid, email_tmpl_id, id, context)
+            #TODO: ajouter les attachments au mail, voir sources de email.message
+            attachments = mail_values.pop('attachments') or {}
+            ret['body_html'] = mail_values['body_html']
+            ret['email_template'] = email_tmpl_id
+            return ret
+        return {}
     #Bouton Pour Annuler Résa : Affiche le mail pré-rempli à envoyer à l'association pour signifier l'annulation
     def do_cancel(self, cr, uid, ids, context=None):
         if isinstance(ids, list):

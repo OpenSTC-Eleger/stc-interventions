@@ -173,6 +173,7 @@
 		<!-- test of cancelling a resa: wkf step and mail notif -->
 		<record model="openstc.pret.envoie.mail.annulation.wizard" id="openstc_prets_tests_annulation1">
 		    <field name="body_html">Test automatisé, ne pas tenir compte de ce message</field>
+			<field name="email_template" ref="openstc_pret_email_template_resa_cancelled"/>
 		</record>
 		
 		<function model="openstc.pret.envoie.mail.annulation.wizard" name="do_cancel">
@@ -182,7 +183,7 @@
 
 		<assert search="[('model','=','hotel.reservation'),('res_id','=',ref('openstc_prets_tests_resa1'))]" model="mail.message"
 		    severity="error" string="Failed to generate / send mail notif 'resa cancelled' !">
-		    <test expr="state">sent</test>
+		    <test expr="state in ('sent','outgoing')"/>
 		</assert>
 		
 		<assert model="hotel.reservation" id="openstc_prets_tests_resa1" severity="error" string="Wkf failure, resa is not at cancel state.">

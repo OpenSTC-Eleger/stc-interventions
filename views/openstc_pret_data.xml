@@ -295,5 +295,60 @@
 		    ]]></field>
     </record>
 	
+        <record id="openstc_pret_email_template_resa_cancelled" model="email.template">
+	        <field name="name">Réservation annulée</field>
+	        <field name="model_id" ref="model_hotel_reservation"/>
+	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'bruno.plancher@siclic.fr'}</field>
+			<field name="email_to">${object.partner_mail or ''}</field>
+			<field name="subject">Votre Réservation: ${object.name or 'inconnu'} a été annulée</field>
+			<field name="body_html"><![CDATA[
+	<h2>Message Automatique</h2>
+	<%
+	from datetime import datetime
+	import pytz
+	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkin_str = my_checkin_str.decode('utf-8')
+	my_checkout_str = my_checkout_str.decode('utf-8')
+	%>
+	
+	<p>Votre Réservation normalement prévue du ${my_checkin_str} au ${my_checkout_str} dans le cadre de votre manifestation : ${object.name} a été annulée pour la raison suivante :</p> 
+	<p<i>Saisir ici la raison de votre refus</i></p>
+	<br />
+	<p>Cordialement,</p>
+	<br />
+	<p>${object.shop_id.company_id.name or ''}</p>
+	<br />
+	<img src="data:image/png;base64,${object.shop_id.company_id.logo or ''}"/>
+	<br />
+	<p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>
+   
+			    ]]></field>
+			<field name="body_text"><![CDATA[
+	Message Automatique
+	
+	<%
+	from datetime import datetime
+	import pytz
+	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkin_str = my_checkin_str.decode('utf-8')
+	my_checkout_str = my_checkout_str.decode('utf-8')
+	%>
+	
+	Votre Réservation normalement prévue du ${my_checkin_str} au ${my_checkout_str} dans le cadre de votre manifestation : ${object.name} a été annulée pour la raison suivante : 
+	<pSaisir ici la raison de votre refus
+	
+	Cordialement,
+	
+	${object.shop_id.company_id.name or ''}
+	
+	Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.
+		    ]]></field>
+		</record> 
 	</data>
 </openerp>
