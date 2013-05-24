@@ -736,6 +736,7 @@ class hotel_reservation(osv.osv):
 
     #Renvoies actions bdd permettant de mettre toutes les dispo de la résa à False
     #Ne renvoie que les actions de mises à jours des lignes déjà enregistrées dans la réservation
+    #@TOREMOVE
     def uncheck_all_dispo(self, cr, uid, ids, context=None):
         line_ids = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id','in',ids)])
         reservation_line = []
@@ -1058,7 +1059,7 @@ class hotel_reservation(osv.osv):
         #    self.trigger_reserv_modified(cr, uid, ids, context)
         return res
 
-    def unlink(self, cr, uid, ids, context):
+    def unlink(self, cr, uid, ids, context=None):
         if not isinstance(ids, list):
             ids = [ids]
         line_ids = []
