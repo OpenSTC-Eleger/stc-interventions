@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data noupdate="1">
+	<!-- Tests data initialization -->
+	<!-- 		Products init and their stock qty -->
+	<record model="product.product" id="openstc_prets_tests_mat1">
+	    <field name="name">matériel 1 tests</field>
+	    <field name="openstc_reservable" eval="True"/>
+	</record>
+	
+    <record model="product.product" id="openstc_prets_tests_mat2">
+	    <field name="name">matériel 2 tests</field>
+	    <field name="openstc_reservable" eval="True"/>
+	</record>
+	
+    <record model="stock.change.product.qty" id="openstc_prets_tests_qty_mat1">
+		    <field name="product_id" ref="openstc_prets_tests_mat1"/>
+		    <field name="new_quantity">30.0</field>
+		    <field name="location_id" search="[('name','like','Stock')]" model="stock.location"/>
+		</record>
+		
+		<function name="change_product_qty" model="stock.change.product.qty">
+		    <value eval="[ref('openstc_prets_tests_qty_mat1')]"/>
+		    <value eval="{'active_id':ref('openstc_prets_tests_mat1')}"/>
+		</function>
+		
+		<record model="stock.change.product.qty" id="openstc_prets_tests_qty_mat2">
+		    <field name="product_id" ref="openstc_prets_tests_mat2"/>
+		    <field name="new_quantity">12.0</field>
+		    <field name="location_id" search="[('name','like','Stock')]" model="stock.location"/>
+		</record>
+		
+		<function name="change_product_qty" model="stock.change.product.qty">
+		    <value eval="[ref('openstc_prets_tests_qty_mat2')]"/>
+		    <value eval="{'active_id':ref('openstc_prets_tests_mat2')}"/>
+		</function>
+	
+	<!-- 		Partners init and their own address -->
+	<record model="res.partner" id="openstc_prets_tests_partner1">
+	    <field name="name">Association 1</field>
+	    <field name="partner_type" search="[('name','like','Association')]" model="openstc.partner.type"/>
+	    <field name="customer" eval="True"/>
+	    <field name="address" eval="[(0,0,{'name':'asso1 contact1'})]"/>
+	</record>
+
+	<record model="res.partner" id="openstc_prets_tests_partner2">
+	    <field name="name">Association 2</field>
+	    <field name="partner_type" search="[('name','like','Association')]" model="openstc.partner.type"/>
+	    <field name="customer" eval="True"/>
+	    <field name="address" eval="[(0,0,{'name':'asso2 contact1')]"/>
+	</record>
+	
+	<record model="res.partner.address" id="openstc_prets_tests_partner1_address1">
+	    <field name="name">Asso1 contact1</field>
+	    <field name="partner_id" ref="openstc_prets_tests_partner1"/>
+	</record>
+	<record model="res.partner.address" id="openstc_prets_tests_partner2_address1">
+	    <field name="name">Asso2 contact1</field>
+	    <field name="partner_id" ref="openstc_prets_tests_partner2"/>
+	</record>
+	
+	
+	</data>
+	
+	<data>
+		<!-- 	    start of the tests -->
+		<!-- first, test resa creation invariants -->
+		<record model="hotel.reservation" id="openstc_prets_tests_resa1">
+		    <field name="name">Réservation 1</field>
+		    <field name="checkin">2013-06-01 08:00:00</field>
+		    <field name="checkout">2013-06-02 10:00:00</field>
+		    <field name="site_id" search="[('id','&lt;',0)]" model="openstc.site"/>
+		    <field name="openstc_partner_id" ref="openstc_prets_tests_partner1"/>
+		    <field name="partner_id" ref="openstc_prets_tests_partner1"/>
+		    <field name="partner_shipping_id" ref="openstc_prets_tests_partner1_address1"/>
+		    <field name="partner_order_id" ref="openstc_prets_tests_partner1_address1"/>
+		    <field name="partner_invoice_id" ref="openstc_prets_tests_partner1_address1"/>
+		    <field name="partner_mail">bruno.plancher@siclic.fr></field>
+			<field name="pricelist_id" ref="product.list0"/>
+		</record>
+		
+		<record model="hotel.reservation" id="openstc_prets_tests_resa2">
+		    <field name="name">Réservation 2</field>
+		    <field name="checkin">2013-06-01 15:00:00</field>
+		    <field name="checkout">2013-06-01 23:00:00</field>
+		    <field name="site_id" search="[('id','&lt;',0)]" model="openstc.site"/>
+		    <field name="openstc_partner_id" ref="openstc_prets_tests_partner2"/>
+		    <field name="partner_id" ref="openstc_prets_tests_partner2"/>
+		    <field name="partner_shipping_id" ref="openstc_prets_tests_partner2_address1"/>
+		    <field name="partner_order_id" ref="openstc_prets_tests_partner2_address1"/>
+		    <field name="partner_invoice_id" ref="openstc_prets_tests_partner2_address1"/>
+		    <field name="partner_mail">bruno.plancher@siclic.fr</field>
+		    <field name="pricelist_id" ref="product.list0"/>
+		</record>
+		
+		<record id="openstc_prets_resa1_line1" model="hotel_reservation.line">
+		    <field name="reserve_product" ref="openstc_prets_tests_mat1"/>
+		    <field name="line_id" ref="openstc_prets_tests_resa1"/>
+		    <field name="qte_reserves">10.0</field>
+		</record>
+		<record id="openstc_prets_resa1_line2" model="hotel_reservation.line">
+		    <field name="reserve_product" ref="openstc_prets_tests_mat2"/>
+		    <field name="line_id" ref="openstc_prets_tests_resa1"/>
+		    <field name="qte_reserves">3.0</field>
+		</record>
+		<record id="openstc_prets_resa2_line1" model="hotel_reservation.line">
+		    <field name="reserve_product" ref="openstc_prets_tests_mat1"/>
+		    <field name="line_id" ref="openstc_prets_tests_resa2"/>
+		    <field name="qte_reserves">25.0</field>
+		</record>
+		<record id="openstc_prets_resa2_line2" model="hotel_reservation.line">
+		    <field name="reserve_product" ref="openstc_prets_tests_mat2"/>
+		    <field name="line_id" ref="openstc_prets_tests_resa2"/>
+		    <field name="qte_reserves">2.0</field>
+		</record>
+		
+		
+<!-- 		force error resa creation because of dates validation failure -->
+<!-- 		<record model="hotel.reservation" id="openstc_prets_tests_resa_date_faliure"> -->
+<!-- 		    <field name="name">Failure date : Réservation tests</field> -->
+<!-- 		    <field name="checkin">2013-06-01 08:00:00</field> -->
+<!-- 		    <field name="checkout">2013-05-02 10:00:00</field> -->
+<!-- 		    <field name="site_id" search="[('id','&lt;',0)]" model="openstc.site"/> -->
+<!-- 		    <field name="openstc_partner_id" ref="openstc_prets_tests_partner1"/> -->
+<!-- 		    <field name="partner_id" ref="openstc_prets_tests_partner1"/> -->
+<!-- 		    <field name="partner_shipping_id" ref="openstc_prets_tests_partner1_address1"/> -->
+<!-- 		    <field name="partner_order_id" ref="openstc_prets_tests_partner1_address1"/> -->
+<!-- 		    <field name="partner_invoice_id" ref="openstc_prets_tests_partner1_address1"/> -->
+<!-- 			<field name="pricelist_id" ref="product.list0"/> -->
+<!-- 		</record> -->
+		
+<!-- 		<assert search="[('name','like','Failure date%')]" model="hotel.reservation" count="0" severity="error" -->
+<!-- 		    string="dates validation failed ! Checkout &lt; checkin"/> -->
+		
+		
+		<!-- then, test onchange_partner_id -->
+		<function model="hotel.reservation" name="onchange_openstc_partner_id">
+		    <value eval="[ref('openstc_prets_tests_resa1')]"/>
+		    <value eval="ref('openstc_prets_tests_partner1_address1')"/>
+		</function>
+		
+		
+		<!-- test qte dispo without any other resa on same dates -->
+		
+		<assert id="openstc_prets_resa1_line1" model="hotel_reservation.line" severity="error"
+		    string="Qté dispo does not return correct value !">
+			<test expr="qte_dispo == 30.0"/>
+	    </assert>
+		
+		<!-- 	To test qte dispo, one of resa must be confirmed, so let's test confirmation step -->
+		<workflow ref="openstc_prets_tests_resa1" model="hotel.reservation" action="confirm" uid="base.user_admin"/>
+		
+		<assert id="openstc_prets_tests_resa1" model="hotel.reservation" severity="error" string="resa validation failed">
+		    <test expr="state == 'confirm'"/>
+		</assert>
+		
+		
+		<!-- 		@TODO: user resa confirm with wait_confirm step -->
+		
+		<!-- 		user resa confirm without wait_confirm step -->
+		<!-- 		Test if mail notif is sent -->
+		<assert search="[('model','=','hotel.reservation'),('res_id','=',ref('openstc_prets_tests_resa1'))]" model="mail.message" severity="error" string="Notif 'resa valided' mail failed">
+			<test expr="state">sent</test>
+		</assert>
+		
+		<!-- 	test qte dispo and dispo boolean info with the 2 resas created here -->
+		<assert id="openstc_prets_resa2_line1" model="hotel_reservation.line" severity="error" 
+		    string="resa Dispo calculation failed, return True instead of False expected">
+			<test expr="qte_dispo == 20"/>
+			<test expr="not dispo"/>
+		</assert>
+		
+		<!-- test of cancelling a resa: wkf step and mail notif -->
+		<record model="openstc.pret.envoie.mail.annulation.wizard" id="openstc_prets_tests_annulation1">
+		    <field name="body_html">Test automatisé, ne pas tenir compte de ce message</field>
+		</record>
+		
+		<function model="openstc.pret.envoie.mail.annulation.wizard" name="do_cancel">
+		    <value eval="ref('openstc_prets_tests_annulation1')"/>
+		    <value eval="{'active_id':ref('openstc_prets_tests_resa1')}"/>
+		</function>
+
+		<assert search="[('model','=','hotel.reservation'),('res_id','=',ref('openstc_prets_tests_resa1'))]" model="mail.message"
+		    severity="error" string="Failed to generate / send mail notif 'resa cancelled' !">
+		    <test expr="state">sent</test>
+		</assert>
+		
+		<assert model="hotel.reservation" id="openstc_prets_tests_resa1" severity="error" string="Wkf failure, resa is not at cancel state.">
+		    <test expr="state">cancle</test>
+		</assert>
+		
+		<!-- End of tests, we delete data of the tests having workflow -->
+		
+		<function model="hotel.reservation" name="unlink">
+		    <value eval="ref('openstc_prets_tests_resa1')"/>
+		</function>
+		
+		<function model="hotel.reservation" name="unlink">
+		    <value eval="ref('openstc_prets_tests_resa2')"/>
+		</function>
+		
+	</data>
+</openerp>

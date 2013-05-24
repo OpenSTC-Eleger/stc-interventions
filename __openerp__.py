@@ -36,7 +36,8 @@
 
         "report/openstc_pret_qte_dispo_report_view.xml",
         "unit_tests/unit_tests.xml",
-
+        "unit_tests/openstc_prets_tests.xml",
+        
     ],
     "js":['static/js/calendar_inherit.js'],
     "demo": [],
