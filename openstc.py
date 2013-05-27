@@ -283,10 +283,6 @@ class res_partner_address(osv.osv):
 
         self.create_account(cr, uid, [res], data, context)
 
-#            partner_obj = self.pool.get('res.partner')
-#            partner_obj.write(cr, uid, [data['partner_id']], {
-#                        'user_ids': [(6, 0, [user_id])],
-#                     }, context=context)
         return res
 
 
