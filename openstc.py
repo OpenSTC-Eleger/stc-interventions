@@ -281,22 +281,7 @@ class res_partner_address(osv.osv):
     def create(self, cr, uid, data, context=None):
         res = super(res_partner_address, self).create(cr, uid, data, context)
 
-        if data.has_key('login') and data.has_key('password'):
-
-            user_obj = self.pool.get('res.users')
-
-            user_id = user_obj.create(cr, uid,{
-                    'name': data['name'],
-                    'firstname': data['name'],
-                    'user_email': data['email'],
-                    'login': data['login'],
-                    'new_password': data['password'],
-                    'groups_id' : [(6, 0, [35])],
-                    })
-
-            self.write(cr, uid, [res], {
-                    'user_id': user_id,
-                }, context=context)
+        self.create_account(cr, uid, [res], data, context)
 
 #            partner_obj = self.pool.get('res.partner')
 #            partner_obj.write(cr, uid, [data['partner_id']], {
@@ -325,8 +310,34 @@ class res_partner_address(osv.osv):
                                     'new_password': data['password'],
                             }, context=context)
 
+            else :
+                self.create_account(cr, uid, ids, data, context)
+
+
+
         res = super(res_partner_address, self).write(cr, uid, ids, data, context)
         return res
+
+    def create_account(self, cr, uid, ids, data, context):
+        if data.has_key('login') and data.has_key('password'):
+
+            user_obj = self.pool.get('res.users')
+
+            group_obj = self.pool.get('res.groups')
+            group_id = group_obj.search(cr, uid, [('code','=','PARTNER')])[0]
+
+            user_id = user_obj.create(cr, uid,{
+                    'name': data['name'],
+                    'firstname': data['name'],
+                    'user_email': data['email'],
+                    'login': data['login'],
+                    'new_password': data['password'],
+                    'groups_id' : [(6, 0, [group_id])],
+                    })
+
+            self.write(cr, uid, ids, {
+                    'user_id': user_id,
+                }, context=context)
 
 
 res_partner_address()
@@ -416,48 +427,38 @@ class users(osv.osv):
         res = super(users, self).create(cr, uid, data, context)
 
         if data.has_key('isManager') and data['isManager']==True :
-            service_obj = self.pool.get('openstc.service')
-
-            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
-            #Previous manager become an agent
-            manager = service_obj.read(cr, uid, data['service_id'],
-                                        ['manager_id'], context)
-            if manager and manager['manager_id']:
-                self.write(cr, uid, [manager['manager_id'][0]], {
-                        'groups_id' : [(6, 0, [17])],
-                    }, context=context)
-
-            #Update service : this user is service's manager
-            service_obj.write(cr, uid, data['service_id'], {
-                     'manager_id': res,
-                 }, context=context)
+            self.set_manager(cr, uid, [res], data, context)
 
         return res
 
     def write(self, cr, uid, ids, data, context=None):
 
         if data.has_key('isManager') and data['isManager']==True :
-            service_obj = self.pool.get('openstc.service')
-
-            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
-            #Previous manager become an agent
-            manager = service_obj.read(cr, uid, data['service_id'],
-                                        ['manager_id'], context)
-            if manager and manager['manager_id']:
-                self.write(cr, uid, [manager['manager_id'][0]], {
-                        'groups_id' : [(6, 0, [17])],
-                    }, context=context)
-
-            #Update service : current user is service's manager
-            service_obj.write(cr, uid, data['service_id'], {
-                     'manager_id': ids[0],
-                 }, context=context)
-
-
+            self.set_manager(cr, uid, ids, data, context)
 
         res = super(users, self).write(cr, uid, ids, data, context=context)
         return res
 
+    def set_manager(self, cr, uid, ids, data,context):
+
+        service_obj = self.pool.get('openstc.service')
+
+        group_obj = self.pool.get('res.groups')
+        group_id = group_obj.search(cr, uid, [('code','=','AGENT')])[0]
+
+        service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
+        #Previous manager become an agent
+        manager = service_obj.read(cr, uid, data['service_id'],
+                                    ['manager_id'], context)
+        if manager and manager['manager_id']:
+            self.write(cr, uid, [manager['manager_id'][0]], {
+                    'groups_id' : [(6, 0, [group_id])],
+                }, context=context)
+
+        #Update service : current user is service's manager
+        service_obj.write(cr, uid, data['service_id'], {
+                 'manager_id': ids[0],
+             }, context=context)
 
 users()
 
