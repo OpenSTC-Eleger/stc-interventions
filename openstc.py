@@ -282,6 +282,7 @@ class res_partner_address(osv.osv):
     }
 
     def create(self, cr, uid, data, context=None):
+        _logger.debug('create contact-----------------------------------------------');
         res = super(res_partner_address, self).create(cr, uid, data, context)
         _logger.debug('before create account');
         self.create_account(cr, uid, [res], data, context)
@@ -424,7 +425,7 @@ class users(osv.osv):
     }
 
     def create(self, cr, uid, data, context={}):
-
+        _logger.debug('create USER-----------------------------------------------');
         res = super(users, self).create(cr, uid, data, context)
 
         if data.has_key('isManager') and data['isManager']==True :
