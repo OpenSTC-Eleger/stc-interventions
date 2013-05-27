@@ -21,14 +21,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-import logging
+#import logging
 from datetime import datetime
 import types
 
 from osv import fields, osv
 from tools.translate import _
 
-_logger = logging.getLogger(__name__)
+#_logger = logging.getLogger(__name__)
 
 def _get_request_states(self, cursor, user_id, context=None):
     return (
@@ -282,11 +282,8 @@ class res_partner_address(osv.osv):
     }
 
     def create(self, cr, uid, data, context=None):
-        _logger.debug('create contact-----------------------------------------------');
         res = super(res_partner_address, self).create(cr, uid, data, context)
-        _logger.debug('before create account');
         self.create_account(cr, uid, [res], data, context)
-        _logger.debug('after create account');
 
         return res
 
@@ -325,9 +322,7 @@ class res_partner_address(osv.osv):
             user_obj = self.pool.get('res.users')
 
             group_obj = self.pool.get('res.groups')
-            _logger.debug('search group');
             group_id = group_obj.search(cr, uid, [('code','=','PARTNER')])[0]
-            _logger.debug('write user, group_id : %s', group_id);
             user_id = user_obj.create(cr, uid,{
                     'name': data['name'],
                     'firstname': data['name'],
@@ -336,7 +331,6 @@ class res_partner_address(osv.osv):
                     'new_password': data['password'],
                     'groups_id' : [(6, 0, [group_id])],
                     })
-            _logger.debug('write user, user_id : %s', user_id);
             self.write(cr, uid, ids, {
                     'user_id': user_id,
                 }, context=context)
@@ -425,7 +419,7 @@ class users(osv.osv):
     }
 
     def create(self, cr, uid, data, context={}):
-        _logger.debug('create USER-----------------------------------------------');
+        #_logger.debug('create USER-----------------------------------------------');
         res = super(users, self).create(cr, uid, data, context)
 
         if data.has_key('isManager') and data['isManager']==True :
