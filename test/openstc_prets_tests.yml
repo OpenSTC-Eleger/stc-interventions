@@ -7,7 +7,7 @@
 -
   user init (agent, manager will be admin)
 -
-  !record {model: res.users, id: openstc_prets_tests_user1, view: false, noupdate: true}:
+  !record {model: res.users, id: openstc_prets_tests_user1, view: false}:
     name: User1 Tests
     login: test1
     new_password: test1
@@ -324,7 +324,73 @@
       assert task.category_id != False, "Task Category is not correctly set, check put_in_use_with_intervention"
 
 -
-  Finally, i rollback data updates
+  Test on Checkout generation and, eventually, purchase and stock moves
+-
+  first, i simulate click on button generating Checkout
+-
+  !function {model: hotel.reservation, name: open_checkout}:
+    - eval: ref('openstc_prets_tests_resa2')
+      model: hotel.reservation
+-
+  i check that Checkout is created by reading m2o resa_checkout_id field
+-
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa2, severity: error, string: Checkout not created check open_checkout method}:
+    - resa_checkout_id != False
+-
+ then i check that Checkout has correct data
+-
+
+  !python {model: hotel.reservation}: |
+    from datetime import datetime
+    resa = self.browse(cr, uid, ref('openstc_prets_tests_resa2'))
+    checkout = resa.resa_checkout_id
+    assert checkout.name == resa.name, "bad Values: Checkout has not same name as resa"
+    assert checkout.partner_id.id == resa.openstc_partner_id.id, "bad Values: Checkout has not same partner_id as resa"
+    assert checkout.user_id.id == uid, "bad Values: Checkout has not same user_id as resa"
+    assert checkout.date_order[:10] == str(datetime.now())[:10], "bad Values: default_value for date order is not correct"
+    
+    resa_lines = {}
+    for line in resa.reservation_line:
+      resa_lines.update({line.reserve_product.id:line})
+    i = 0
+    for line in checkout.checkout_lines:
+      i += 1
+      assert line.product_id.id in resa_lines, "bad Values, Checkout has a product that is not in resa"
+      resa_line = resa_lines.pop(line.product_id.id)
+      assert line.qte_reservee == resa_line.qte_reserves, "bad Values: Checkout line has not product qty as resa line"
+-
+  todo, simulate user input to force exception raising controlling qty_to_repair and qty_to_purchase
+-
+  i test purchase order creation when putting qty_to_purchase at a positive value
+-
+  i begin by writting qte_to_purchase to 2 and validating the Checkout
+-
+  !python {model: hotel.reservation}: |
+    resa = self.browse(cr, uid, ref('openstc_prets_tests_resa2'))
+    line_ids = self.pool.get("openstc.pret.checkout.line").search(cr, uid, [('product_id','=',ref('openstc_prets_tests_mat02')),('checkout_id','=',resa.resa_checkout_id.id)])
+    self.pool.get("openstc.pret.checkout.line").write(cr, uid, line_ids, {'qte_to_purchase':2.0})
+    resa.resa_checkout_id.generer_actions(context = {'default_location_id':ref('stock.stock_location_stock'), 'default_location_dest_id':ref('stock.stock_location_output')})
+-
+  and i check that purchase order is created by reading purchase_id field of Checkout and correctly set
+-
+
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa2, string: Purchase order is not created as expected when validating a Checkout with product qty(ies) to purchase}:
+    - resa_checkout_id.purchase_id != False
+    - resa_checkout_id.purchase_id.order_line[0].product_id.id == ref('openstc_prets_tests_mat02')
+    - resa_checkout_id.purchase_id.order_line[0].product_qty == 2.0
+-
+  then, i check that stock qty of product mat2 is reduced by 2
+-
+  !assert {model: product.product, id: openstc_prets_tests_mat02, severity: error, string: Error during Checkout validation qty of product must be reduced by 2 after launching a purchase order}:
+    - qty_available == 10.0
+-
+  And finallay, i check that reservation i correctly set to Done
+-
+  !assert { model: hotel.reservation, id: openstc_prets_tests_resa2, severity: error, string: Error reservation must be set to done after validation of Checkout}:
+    - state == 'done'
+-
+  Finally, i rollback database updates
 -
   !python {model: hotel.reservation}: |
     cr.rollback()
+    

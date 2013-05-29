@@ -94,7 +94,7 @@ class openstc_pret_checkout_wizard(osv.osv):
                 'res_model':'purchase.order',
                 }
     
-    def generer_actions(self, cr, uid, ids, context):
+    def generer_actions(self, cr, uid, ids, context=None):
         #TODO: Gérer le cas où des produits n'ont pas le même fournisseur, groupe les produits ayant un fournisseur en commun
         default_location_id = self.pool.get("stock.location").search(cr, uid, [('name','=','Stock')])[0]
         for checkout in self.browse(cr, uid, ids):
