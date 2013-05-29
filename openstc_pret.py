@@ -33,6 +33,10 @@ import unicodedata
 import re
 import pytz
 import calendar
+import logging
+import openerp
+import os
+import tools
 
 #----------------------------------------------------------
 # Fournitures
@@ -1083,9 +1087,12 @@ class hotel_reservation(osv.osv):
 
         
     def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False):
+        email = False
         if partner_shipping_id:
             email = self.pool.get("res.partner.address").browse(cr, uid, partner_shipping_id).email
         return {'value':{'partner_mail':email}}
+    
+
 hotel_reservation()
 
 

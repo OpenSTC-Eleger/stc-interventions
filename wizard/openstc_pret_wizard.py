@@ -231,7 +231,7 @@ class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
         if isinstance(ids, list):
             ids = ids[0]
         wizard = self.browse(cr, uid, ids)
-        mail_id = self.pool.get("email.template").send_mail(cr, uid, wizard.email_template, context['active_id'], False, context)
+        mail_id = self.pool.get("email.template").send_mail(cr, uid, wizard.email_template, context['active_id'], True, context)
         self.pool.get("mail.message").write(cr, uid, mail_id, {'body_html':wizard.body_html})
         wf_service = netsvc.LocalService('workflow')
         wf_service.trg_validate(uid, 'hotel.reservation', context['active_id'], 'cancel', cr)

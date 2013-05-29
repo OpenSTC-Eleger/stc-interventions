@@ -13,6 +13,11 @@
             <field name="padding" eval="3"/>
         </record>
 
+	<!-- res partner type init for resa -->
+	<record id="openstc_prets_partner_type_asso" model="openstc.partner.type">
+	    <field name="name">Association</field>
+	    <field name="code">ASSOCIATION</field>
+	</record>
 	
 	<!-- Data for Reservation uom -->
 	<record id="openstc_pret_uom_categ_resa" model="product.uom.categ">
