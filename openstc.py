@@ -396,6 +396,19 @@ class users(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
+    #Calcultes if agent belongs to 'arg' code group
+    def _get_group(self, cr, uid, ids, fields, arg, context):
+         res = {}
+         user_obj = self.pool.get('res.users')
+         group_obj = self.pool.get('res.groups')
+
+         for id in ids:
+            user = user_obj.read(cr, uid, id,['groups_id'],context)
+            group_ids = group_obj.search(cr, uid, [('code','=', arg),('id','in',user['groups_id'])])
+            res[id] = True if len( group_ids ) != 0 else False
+         return res
+
+
     _columns = {
             'firstname': fields.char('firstname', size=128),
             'lastname': fields.char('lastname', size=128),
@@ -411,11 +424,13 @@ class users(osv.osv):
             'address_home': fields.char('Address', size=128),
             'city_home': fields.char('City', size=128),
             'phone': fields.char('Phone Number', size=12),
-            'is_manager': fields.boolean('Is manager'),
+            #'is_manager': fields.boolean('Is manager'),
             #'team_ids': fields.many2many('openstc.team', 'openstc_user_teams_rel', 'user_id', 'team_id', 'Teams'),
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
 
             'team_ids': fields.many2many('openstc.team', 'openstc_team_users_rel', 'user_id', 'team_id', 'Teams'),
+            'isDST' : fields.function(_get_group, arg="DIRECTOR", method=True,type='boolean', store=False),
+            'isManager' : fields.function(_get_group, arg="MANAGER", method=True,type='boolean', store=False),
     }
 
     def create(self, cr, uid, data, context={}):
@@ -456,6 +471,7 @@ class users(osv.osv):
                  'manager_id': ids[0],
              }, context=context)
 
+
 users()
 
 class team(osv.osv):
@@ -463,14 +479,48 @@ class team(osv.osv):
     _description = "team stc"
     _rec_name = "name"
 
+
+    #Calculates the agents can be added to the team
+    def _get_free_users(self, cr, uid, ids, fields, arg, context):
+        res = {}
+        user_obj = self.pool.get('res.users')
+        group_obj = self.pool.get('res.groups')
+
+        for id in ids:
+            #get current team object
+            team = self.browse(cr, uid, id, context=context)
+            team_users = []
+            #get list of agents already belongs to team
+            for user_record in team.user_ids:
+                team_users.append(user_record.id)
+            #get list of all agents
+            all_users = user_obj.search(cr, uid, []);
+
+            free_users = []
+            for user_id in all_users:
+                #get current agent object
+                user = user_obj.read(cr, uid, user_id,['groups_id'],context)
+                #Current agent is DST?
+                group_ids = group_obj.search(cr, uid, [('code','=','DIRECTOR'),('id','in',user['groups_id'])])
+                #Agent must not be DST and not manager of team and no already in team
+                if (len( group_ids ) == 0) and (user_id != team.manager_id.id) and (user_id not in team_users):
+                    free_users.append(user_id)
+
+            res[id] = free_users
+
+        return res
+
+
     _columns = {
             'name': fields.char('name', size=128),
             'manager_id': fields.many2one('res.users', 'Manager'),
             'service_ids': fields.many2many('openstc.service', 'openstc_team_services_rel', 'team_id', 'service_id', 'Services'),
             'user_ids': fields.many2many('res.users', 'openstc_team_users_rel', 'team_id', 'user_id', 'Users'),
+            'free_user_ids' : fields.function(_get_free_users, method=True,type='many2one', store=False),
             #'user_ids': fields.one2many('res.users', 'team_id', "Users"),
             'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
     }
+
 
 team()
 
@@ -555,9 +605,10 @@ class task(osv.osv):
         equipment_obj = self.pool.get('openstc.equipment')
 
         #Update kilometers on vehucule
-        equipment_obj.write(cr, uid, params['vehicule'], {
-                 'km': params['km'],
-             }, context=context)
+        if ((params['vehicule'] or False) and (params['km'] or False )) :
+            equipment_obj.write(cr, uid, params['vehicule'], {
+                     'km': params['km'],
+                 }, context=context)
 
         #Update intervention sate
         project_obj.write(cr, uid, task.project_id.id, {
@@ -585,13 +636,14 @@ class task(osv.osv):
             }, context=context)
 
         #update task
+        equipments_ids = params['equipment_ids'] if params['equipment_ids'][0]!=None else []
         task_obj.write(cr, uid, ids[0], {
                 'state': params['task_state'],
-                'equipment_ids': [[6, 0, params['equipment_ids']]],
+                'equipment_ids': [[6, 0, equipments_ids]],
                 'remaining_hours': params['remaining_hours'],
-                'km': params['km'],
-                'oil_qtity': params['oil_qtity'],
-                'oil_price': params['oil_price'],
+                'km': params['km']or False ,
+                'oil_qtity': params['oil_qtity'] or False,
+                'oil_price': params['oil_price'] or False,
             }, context=context)
 
         return True
