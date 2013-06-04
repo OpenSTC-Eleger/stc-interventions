@@ -21,11 +21,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+#import logging
 from datetime import datetime
 import types
 
 from osv import fields, osv
 from tools.translate import _
+
+#_logger = logging.getLogger(__name__)
 
 def _get_request_states(self, cursor, user_id, context=None):
     return (
@@ -280,28 +283,8 @@ class res_partner_address(osv.osv):
 
     def create(self, cr, uid, data, context=None):
         res = super(res_partner_address, self).create(cr, uid, data, context)
+        self.create_account(cr, uid, [res], data, context)
 
-        if data.has_key('login') and data.has_key('password'):
-
-            user_obj = self.pool.get('res.users')
-
-            user_id = user_obj.create(cr, uid,{
-                    'name': data['name'],
-                    'firstname': data['name'],
-                    'user_email': data['email'],
-                    'login': data['login'],
-                    'new_password': data['password'],
-                    'groups_id' : [(6, 0, [35])],
-                    })
-
-            self.write(cr, uid, [res], {
-                    'user_id': user_id,
-                }, context=context)
-
-#            partner_obj = self.pool.get('res.partner')
-#            partner_obj.write(cr, uid, [data['partner_id']], {
-#                        'user_ids': [(6, 0, [user_id])],
-#                     }, context=context)
         return res
 
 
@@ -325,8 +308,32 @@ class res_partner_address(osv.osv):
                                     'new_password': data['password'],
                             }, context=context)
 
+            else :
+                self.create_account(cr, uid, ids, data, context)
+
+
+
         res = super(res_partner_address, self).write(cr, uid, ids, data, context)
         return res
+
+    def create_account(self, cr, uid, ids, data, context):
+        if data.has_key('login') and data.has_key('password'):
+
+            user_obj = self.pool.get('res.users')
+
+            group_obj = self.pool.get('res.groups')
+            group_id = group_obj.search(cr, uid, [('code','=','PARTNER')])[0]
+            user_id = user_obj.create(cr, uid,{
+                    'name': data['name'],
+                    'firstname': data['name'],
+                    'user_email': data['email'],
+                    'login': data['login'],
+                    'new_password': data['password'],
+                    'groups_id' : [(6, 0, [group_id])],
+                    })
+            self.write(cr, uid, ids, {
+                    'user_id': user_id,
+                }, context=context)
 
 
 res_partner_address()
@@ -389,6 +396,19 @@ class users(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
+    #Calcultes if agent belongs to 'arg' code group
+    def _get_group(self, cr, uid, ids, fields, arg, context):
+         res = {}
+         user_obj = self.pool.get('res.users')
+         group_obj = self.pool.get('res.groups')
+
+         for id in ids:
+            user = user_obj.read(cr, uid, id,['groups_id'],context)
+            group_ids = group_obj.search(cr, uid, [('code','=', arg),('id','in',user['groups_id'])])
+            res[id] = True if len( group_ids ) != 0 else False
+         return res
+
+
     _columns = {
             'firstname': fields.char('firstname', size=128),
             'lastname': fields.char('lastname', size=128),
@@ -404,59 +424,52 @@ class users(osv.osv):
             'address_home': fields.char('Address', size=128),
             'city_home': fields.char('City', size=128),
             'phone': fields.char('Phone Number', size=12),
-            'is_manager': fields.boolean('Is manager'),
+            #'is_manager': fields.boolean('Is manager'),
             #'team_ids': fields.many2many('openstc.team', 'openstc_user_teams_rel', 'user_id', 'team_id', 'Teams'),
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
 
             'team_ids': fields.many2many('openstc.team', 'openstc_team_users_rel', 'user_id', 'team_id', 'Teams'),
+            'isDST' : fields.function(_get_group, arg="DIRECTOR", method=True,type='boolean', store=False),
+            'isManager' : fields.function(_get_group, arg="MANAGER", method=True,type='boolean', store=False),
     }
 
     def create(self, cr, uid, data, context={}):
-
+        #_logger.debug('create USER-----------------------------------------------');
         res = super(users, self).create(cr, uid, data, context)
 
         if data.has_key('isManager') and data['isManager']==True :
-            service_obj = self.pool.get('openstc.service')
-
-            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
-            #Previous manager become an agent
-            manager = service_obj.read(cr, uid, data['service_id'],
-                                        ['manager_id'], context)
-            if manager and manager['manager_id']:
-                self.write(cr, uid, [manager['manager_id'][0]], {
-                        'groups_id' : [(6, 0, [17])],
-                    }, context=context)
-
-            #Update service : this user is service's manager
-            service_obj.write(cr, uid, data['service_id'], {
-                     'manager_id': res,
-                 }, context=context)
+            self.set_manager(cr, uid, [res], data, context)
 
         return res
 
     def write(self, cr, uid, ids, data, context=None):
 
         if data.has_key('isManager') and data['isManager']==True :
-            service_obj = self.pool.get('openstc.service')
-
-            service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
-            #Previous manager become an agent
-            manager = service_obj.read(cr, uid, data['service_id'],
-                                        ['manager_id'], context)
-            if manager and manager['manager_id']:
-                self.write(cr, uid, [manager['manager_id'][0]], {
-                        'groups_id' : [(6, 0, [17])],
-                    }, context=context)
-
-            #Update service : current user is service's manager
-            service_obj.write(cr, uid, data['service_id'], {
-                     'manager_id': ids[0],
-                 }, context=context)
-
-
+            self.set_manager(cr, uid, ids, data, context)
 
         res = super(users, self).write(cr, uid, ids, data, context=context)
         return res
+
+    def set_manager(self, cr, uid, ids, data,context):
+
+        service_obj = self.pool.get('openstc.service')
+
+        group_obj = self.pool.get('res.groups')
+        group_id = group_obj.search(cr, uid, [('code','=','AGENT')])[0]
+
+        service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
+        #Previous manager become an agent
+        manager = service_obj.read(cr, uid, data['service_id'],
+                                    ['manager_id'], context)
+        if manager and manager['manager_id']:
+            self.write(cr, uid, [manager['manager_id'][0]], {
+                    'groups_id' : [(6, 0, [group_id])],
+                }, context=context)
+
+        #Update service : current user is service's manager
+        service_obj.write(cr, uid, data['service_id'], {
+                 'manager_id': ids[0],
+             }, context=context)
 
 
 users()
@@ -466,14 +479,48 @@ class team(osv.osv):
     _description = "team stc"
     _rec_name = "name"
 
+
+    #Calculates the agents can be added to the team
+    def _get_free_users(self, cr, uid, ids, fields, arg, context):
+        res = {}
+        user_obj = self.pool.get('res.users')
+        group_obj = self.pool.get('res.groups')
+
+        for id in ids:
+            #get current team object
+            team = self.browse(cr, uid, id, context=context)
+            team_users = []
+            #get list of agents already belongs to team
+            for user_record in team.user_ids:
+                team_users.append(user_record.id)
+            #get list of all agents
+            all_users = user_obj.search(cr, uid, []);
+
+            free_users = []
+            for user_id in all_users:
+                #get current agent object
+                user = user_obj.read(cr, uid, user_id,['groups_id'],context)
+                #Current agent is DST?
+                group_ids = group_obj.search(cr, uid, [('code','=','DIRECTOR'),('id','in',user['groups_id'])])
+                #Agent must not be DST and not manager of team and no already in team
+                if (len( group_ids ) == 0) and (user_id != team.manager_id.id) and (user_id not in team_users):
+                    free_users.append(user_id)
+
+            res[id] = free_users
+
+        return res
+
+
     _columns = {
             'name': fields.char('name', size=128),
             'manager_id': fields.many2one('res.users', 'Manager'),
             'service_ids': fields.many2many('openstc.service', 'openstc_team_services_rel', 'team_id', 'service_id', 'Services'),
             'user_ids': fields.many2many('res.users', 'openstc_team_users_rel', 'team_id', 'user_id', 'Users'),
+            'free_user_ids' : fields.function(_get_free_users, method=True,type='many2one', store=False),
             #'user_ids': fields.one2many('res.users', 'team_id', "Users"),
             'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
     }
+
 
 team()
 
@@ -558,9 +605,10 @@ class task(osv.osv):
         equipment_obj = self.pool.get('openstc.equipment')
 
         #Update kilometers on vehucule
-        equipment_obj.write(cr, uid, params['vehicule'], {
-                 'km': params['km'],
-             }, context=context)
+        if ((params['vehicule'] or False) and (params['km'] or False )) :
+            equipment_obj.write(cr, uid, params['vehicule'], {
+                     'km': params['km'],
+                 }, context=context)
 
         #Update intervention sate
         project_obj.write(cr, uid, task.project_id.id, {
@@ -588,13 +636,14 @@ class task(osv.osv):
             }, context=context)
 
         #update task
+        equipments_ids = params['equipment_ids'] if params['equipment_ids'][0]!=None else []
         task_obj.write(cr, uid, ids[0], {
                 'state': params['task_state'],
-                'equipment_ids': [[6, 0, params['equipment_ids']]],
+                'equipment_ids': [[6, 0, equipments_ids]],
                 'remaining_hours': params['remaining_hours'],
-                'km': params['km'],
-                'oil_qtity': params['oil_qtity'],
-                'oil_price': params['oil_price'],
+                'km': params['km']or False ,
+                'oil_qtity': params['oil_qtity'] or False,
+                'oil_price': params['oil_price'] or False,
             }, context=context)
 
         return True
