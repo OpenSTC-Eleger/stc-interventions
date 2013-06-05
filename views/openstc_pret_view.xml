@@ -63,7 +63,7 @@
 				    <field name="empruntable"/>
 				</field>
 				<page string="Information" position="after">
-				    <page string="Collectivités">
+				    <page string="Collectivities">
 						<field name="seuil_confirm" required="1"/>
 						<field name="service_technical_id"/>
 						<field name="type_prod"/>
@@ -81,7 +81,7 @@
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<page string="Suppliers" position="before">
-					<page string="Résumé des Détériorations">
+					<page string="Summup of degradations">
 				    	<field name="checkout_lines" nolabel="1">
 					        <tree string="Résumé des détériorations (Etat des Lieux)" editable="top"
 					            colors="blue:state=='draft' and qte_to_repair > 0.0;orange:state=='draft' and qte_to_purchase > 0.0;
@@ -119,14 +119,14 @@
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 			    <form position="replace">
-				    <form string="Réservation de Ressources">
+				    <form string="Products reservation">
 				        <notebook>
-					        <page string="Réservation">
-						        <group col="4" colspan="4" string="Infos Générales">
+					        <page string="Reservation">
+						        <group col="4" colspan="4" string="General Infos">
 							        <field name="reservation_no" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 							        <field name="date_order" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 						        </group>
-						        <group col="2" colspan="2" string="Coordonnées Demandeur">
+						        <group col="2" colspan="2" string="Claimer Infos">
 						            <field name="openstc_partner_id" required="1" on_change="onchange_openstc_partner_id(openstc_partner_id)"
 						                attrs="{'readonly':[('state','&lt;&gt;','remplir')]}" domain="[('customer','=',True),('technical_service_id','=',False),('technical_site_id','=',False)]"/>
 						            <field name="partner_id" invisible="1" on_change="onchange_partner_id(partner_id)"
@@ -142,7 +142,7 @@
 									</group>
    						            <field name="pricelist_id" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 						        </group>
-						        <group col="2" colspan="2" string="Infos de la Réservation">
+						        <group col="2" colspan="2" string="Reservation infos">
 						            <field name="name" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 							        <field name="site_id" required="1" attrs="{'readonly':[('state','&lt;&gt;','remplir')]}"/>
 					                <group colspan="2" col="4">
@@ -152,7 +152,7 @@
 					            	<field name="inter_id" readonly="1"/>    
 						        </group>
 						        
-						        <field name="reservation_line" string="Lignes de Réservation" required="1" colspan="4" nolabel="1"
+						        <field name="reservation_line" string="Reservation Lines" required="1" colspan="4" nolabel="1"
 						            attrs="{'readonly':[('state','not in',('remplir','waiting_confirm'))]}">
 									<tree string="Ligne de réservation" editable="top" colors="green:dispo==True;red:dispo==False">
 <!-- 										<field name="categ_id"/> -->
@@ -163,44 +163,32 @@
 										<field name="amount"/>
 										<!-- <field name="uom_qty"/>  -->
 										<field name="infos"/>
-										<!-- <field name="action" readonly="1"/>
-										<button name="plan_inter" type="object" icon="gtk-go-forward" attrs="{'invisible':[('action','&lt;&gt;','nothing')]}" help="Plannifier une intervention pour cette ressource"/>
-										<button name="unplan_inter" type="object" icon="gtk-cancel" attrs="{'invisible':[('action','&lt;&gt;','inter')]}" help="Ne plus plannifier d'intervention pour cette ressource"/>
-										<button name="dummy" icon="gtk-help" help="Une intervention sera générée pour cette ressource." attrs="{'invisible':[('action','&lt;&gt;','inter')]}"/>  
-										<button name="open_inter" type="object" icon="gtk-edit" attrs="{'invisible':[('action','&lt;&gt;','inter_ok')]}" help="Ouvrir l'intervention générée"/>
-										-->
 									</tree>
 								</field>
 								<field name="state"/>
 								<field name="all_dispo" invisible="1"/>
 								<newline />
 								<group colspan="4" col="10">
-									<button name="dummy" string="Vérifier dispo articles" icon="gtk-execute" states="remplir,draft,wait_confirm"/>
-									<button name="confirm" string="Valider la réservation" states="remplir,draft" attrs="{'readonly':[('all_dispo','=',False)]}"
-									    icon="gtk-go-forward" help="Valide les informations saisies et réserve les ressources sélectionnées aux dates indiquées. La réservation sera visible sur le planning et le demandeur sera notifié par mail (si adresse mail renseignée)."/>
-									<button name="confirm" string="Valider la réservation (responsable)" states="wait_confirm" attrs="{'readonly':[('all_dispo','=',False)]}" groups="openstc.openstc_manager,openstc.openstc_dst"
-									    icon="gtk-go-forward" help="Valide les informations saisies et réserve les ressources sélectionnées aux dates indiquées. La réservation sera visible sur le planning et le demandeur sera notifié par mail (si adresse mail renseignée)."/>
-									<button name="%(action_view_openstc_pret_create_inter_wizard)d" type="action" string="Générer Interventions restantes" attrs="{'invisible':['|',('inter_id','&lt;&gt;',False),('state','&lt;&gt;','confirm')]}"
-									    context="{'default_categ_id':%(openstc_pret_supply_categ_task)d}" icon="gtk-execute" help="Générer les interventions planifiées sur ce formulaire"/>
-								    <button name="open_checkout" string="Etat des lieux et clôture" type="object" states="confirm" icon="gtk-go-forward"
-								        help="Termine la Réservation, libérant les ressources. Un Etat des lieux sera généré pour pointer l'état des ressources après utilisation."/>
-								    <button name="%(action_openstock_view_reservation_calendar_popup)d" string="Visualiser sur le planning" icon="gtk-find"
+									<button name="dummy" string="Check dispo products" icon="gtk-execute" states="remplir,draft,wait_confirm"/>
+									<button name="confirm" string="Validate reservation" states="remplir,draft" attrs="{'readonly':[('all_dispo','=',False)]}"
+									    icon="gtk-go-forward" help="Validate infos written and reserve selected products.Reservation will be visible on calendar and claimer will be emailed (if email written)."/>
+									<button name="confirm" string="Validate la Reservation (manager)" states="wait_confirm" attrs="{'readonly':[('all_dispo','=',False)]}" groups="openstc.openstc_manager,openstc.openstc_dst"
+									    icon="gtk-go-forward" help="Validate infos written and reserve selected products.Reservation will be visible on calendar and claimer will be emailed (if email written)."/>
+									<button name="%(action_view_openstc_pret_create_inter_wizard)d" type="action" string="Generate Interventions" attrs="{'invisible':['|',('inter_id','&lt;&gt;',False),('state','&lt;&gt;','confirm')]}"
+									    context="{'default_categ_id':%(openstc_pret_supply_categ_task)d}" icon="gtk-execute" help="Generate interventions planned on this form"/>
+								    <button name="open_checkout" string="Checkout and end of resa" type="object" states="confirm" icon="gtk-go-forward"
+								        help="Terminate reservation and free products. A checkout will be generated to point products state after use."/>
+								    <button name="%(action_openstock_view_reservation_calendar_popup)d" string="See calendar" icon="gtk-find"
  									    type="action" context="{'start_calendar':checkin}" states="remplir,wait_confirm',confirm"/>
-								    <button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Annuler la réservation" type="action" states="draft,confirm" icon="gtk-cancel"/>
- 									<!-- <button name="to_draft" string="Suivant" states="remplir" icon="gtk-go-forward"/> -->
-								    <!-- <button name="put_in_use" string="Planifier" states="confirm" icon="gtk-go-forward" help="La réservation sera visible sur le planning. Si vous avez planifié des interventions, elles vont être générées."/> -->
-								    <!-- <button name="redraft" string="Recommencer la réservation" states="cancle" /> -->
-									<!-- <button name="verif_dispo" type="object" string="Vérifier Disponibilités" invisible="1" states="remplir" icon="gtk-execute"/> -->
-									<!-- <button name="%(action_view_openstc_pret_deliver_products_wizard)d" type="action" string="Mettre à Disposition les articles" states="confirm" icon="gtk-go-forward"/> -->
-									<!-- <button name="back_to_remplir" string="Modifier la réservation" icon="gtk-go-back" states="draft"/> -->
+								    <button name="%(action_view_openstc_pret_create_envoi_mail_annulation_wizard)d" string="Cancel reservation" type="action" states="draft,confirm" icon="gtk-cancel"/>
 									<group colspan="1"/>
 									<group col="2" colspan="2">
-									    <button name="compute_lines_price" type="object" string="Intégrer Facturation" states="remplir,draft,wait_confirm" icon="gtk-execute" colspan="2"/>
+									    <button name="compute_lines_price" type="object" string="Integrate Invoicing" states="remplir,draft,wait_confirm" icon="gtk-execute" colspan="2"/>
 										<field name="amount_total"/>
 									</group>
 								</group>		        
 				       		</page>
-				       		<page string="Factures associées (si onéreux)">
+				       		<page string="Sales linked (if priced)">
 	 				      		<field name="folio_id" nolabel="1"/>
 	 				   		</page>
 			       		</notebook>
@@ -217,16 +205,16 @@
 			<field name="arch" type="xml">
 				<field name="reservation_no" position="replace">
 					<field name="name" />
-					<field name="reservation_no" string="N° Réservation" />
+					<field name="reservation_no" string="reservation number" />
 				</field>
 				<field name="partner_id" select="1" position="replace">
 					<field name="partner_id" select="1" string="Demandeur" />
 				</field>
 				<field name="checkin" position="replace">
-					<field name="checkin" string="Date de début Réservation" />
+					<field name="checkin" string="End date of reservation" />
 				</field>
 				<field name="checkout" position="replace">
-					<field name="checkout" string="Date de fin Réservation" />
+					<field name="checkout" string="Start date of reservation" />
 				</field>
 			</field>
 		</record>
@@ -237,7 +225,7 @@
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 			    <field name="complete_name" readonly="1"/>
-			    <field name="line_id" string="Réservation associée" readonly="1"/>
+			    <field name="line_id" string="Linked reservation" readonly="1"/>
 			    <field name="reserve_product" readonly="1"/>
 			    <field name="qte_reserves" readonly="1"/>
 			    <field name="action"/>
@@ -250,22 +238,7 @@
 			<field name="inherit_id" ref="hotel.view_hotel_folio1_form" />
 			<field name="type">form</field>
 			<field name="arch" type="xml">
-				<!-- @TODO: Rajouter <form> parent pour que les modifs soient prises 
-					en compte <field name="checkin_date" position="replace"> <field name="checkin_date" 
-					string="Date de début de Réservation"/> </field> <field name="checkout_date" 
-					on_change="on_change_checkout(checkin_date,checkout_date)" position="replace"> 
-					<field name="checkout_date" on_change="on_change_checkout(checkin_date,checkout_date)" 
-					string="Date de fin de Réservation"/> </field> <field name="product_uom_qty" 
-					on_change="product_id_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, 
-					'lang' in context and context['lang'], False, parent.date_order)" context="{'partner_id':'parent.partner_id','quantity':'product_uom_qty','pricelist':'parent.pricelist_id','shop':'parent.shop_id','uom':'product_uom'}" 
-					invisible="1" position="replace"> <field name="product_uom_qty" on_change="product_id_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, 
-					'lang' in context and context['lang'], False, parent.date_order)" context="{'partner_id':'parent.partner_id','quantity':'product_uom_qty','pricelist':'parent.pricelist_id','shop':'parent.shop_id','uom':'product_uom'}" 
-					invisible="1" string="Quantité réservée"/> </field> <field name="product_uom" 
-					on_change="product_uom_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, 
-					'lang' in context and context['lang'], False, parent.date_order)" string="Rent(UOM)" 
-					position="replace"> <field name="product_uom" on_change="product_uom_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, 
-					'lang' in context and context['lang'], False, parent.date_order)" string="Unité 
-					de Mesure"/> </field> -->
+				
 				<field name="service_lines" colspan="4" string="Service Line"
 					nolabel="1" position="replace" />
 				<field name="room_lines" colspan="4"
@@ -274,13 +247,13 @@
 					<field name="room_lines" colspan="4"
 						default_get="{'checkin_date': checkin_date,'checkout_date':checkout_date}"
 						nolabel="1">
-						<tree string="Articles Réservés">
+						<tree string="Reserved Products">
 							<field name="name" />
-							<field name="checkin_date" string="Date de début de Réservation" />
-							<field name="checkout_date" string="Date de fin de Réservation" />
-							<field name="product_id" context="{'default_openstc_reservable':'1','default_purchase_ok':False}" string="Article Réservé" />
-							<field name="product_uom_qty" string="Quantité Réservée" />
-							<field name="price_unit" string="Prix Unitaire" />
+							<field name="checkin_date" string="Start date of reservation" />
+							<field name="checkout_date" string="End date of reservation" />
+							<field name="product_id" context="{'default_openstc_reservable':'1','default_purchase_ok':False}" string="Reserved products" />
+							<field name="product_uom_qty" string="Qty reserved" />
+							<field name="price_unit" string="Unit price" />
 							<field name="price_subtotal" />
 						</tree>
 						
@@ -289,12 +262,12 @@
 				<field name="partner_id" on_change="onchange_partner_id(partner_id)"
 					required="1" string="Guest Name" colspan="4" position="replace">
 					<field name="partner_id" on_change="onchange_partner_id(partner_id)"
-						required="1" string="Demandeur" colspan="4"/>
+						required="1" string="Claimer" colspan="4"/>
 				</field>
 				<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
 					string="Booking Contact" position="replace">
 					<field name="partner_order_id" domain="[('partner_id','=',partner_id)]"
-						string="Contact demandeur" />
+						string="Claimer infos" />
 				</field>
 				<field name="name" colspan="1" string="Folio No" position="replace">
 					<field name="name" colspan="1" string="N° Folio" />
@@ -321,22 +294,22 @@
 				</button>
 				<button name="invoice_corrected" string="Invoice Corrected"
 					states="invoice_except" position="replace">
-					<button name="invoice_corrected" string="Facture corrigée"
+					<button name="invoice_corrected" string="Invoice Corrected"
 						states="invoice_except" />
 				</button>
 				<button name="ship_recreate" string="Recreate Procurement"
 					states="shipping_except" position="replace">
-					<button name="ship_recreate" string="Recréer Approvisionnement"
+					<button name="ship_recreate" string="Recreate Procurement"
 						states="shipping_except" />
 				</button>
 				<button name="ship_corrected" string="Procurement Corrected"
 					states="shipping_except" position="replace">
-					<button name="ship_corrected" string="Approvisionnement Corrigé"
+					<button name="ship_corrected" string="Procurement Corrected"
 						states="shipping_except" />
 				</button>
 				<button name="manual_invoice" states="manual" string="Create Invoice"
 					position="replace">
-					<button name="manual_invoice" states="manual" string="Créer Facture" />
+					<button name="manual_invoice" states="manual" string="Create Invoice" />
 				</button>
 				<button name="ship_cancel" string="Cancel Folio" states="shipping_except"
 					position="replace">
@@ -417,7 +390,7 @@
 				</field>
 				<button name="action_cancel" position="replace">
 					<button name="action_cancel" attrs="{'invisible':['|',('is_emprunt','=',True),('state','not in',('approved','except_picking','except_invoice','wait'))]}" string="Cancel Purchase Order" type="object" icon="gtk-cancel"/>
-					<button name="do_terminate_emprunt" type="object" attrs="{'invisible':['|',('is_emprunt','=',False),('state','&lt;&gt;','approved')]}" string="Renvoyer articles à la collecticité" icon="gtk-ok"/>
+					<button name="do_terminate_emprunt" type="object" attrs="{'invisible':['|',('is_emprunt','=',False),('state','&lt;&gt;','approved')]}" string="Return products to collectivity" icon="gtk-ok"/>
 					<button name="purchase_cancel" attrs="{'invisible':['|',('is_emprunt','=',False),('state','&lt;&gt;','except_picking')]}" string="Annuler emprunt" icon="gtk-cancel"/>
 				</button>
 			</field>

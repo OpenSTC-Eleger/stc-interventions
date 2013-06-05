@@ -2492,12 +2492,6 @@ msgstr ""
 msgid "Date de fin de Réservation"
 msgstr ""
 
-
-#. module: openstc
-#: view:purchase.order:0
-msgid "Renvoyer articles à la collecticité"
-msgstr ""
-
 #. module: openstc
 #: view:openstc.pret.checkout:0
 #: view:openstc.pret.deliver.products.wizard:0
