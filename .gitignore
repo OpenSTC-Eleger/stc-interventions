@@ -1,3 +1,5 @@
 .settings
 *.pyc
 *~
+.idea
+*.iml
