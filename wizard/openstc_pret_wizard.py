@@ -216,38 +216,22 @@ class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
         email_tmpl_id = 0
         print("envoyer mail pour résa annulée")
         email_tmpl_id = email_obj.search(cr, uid, [('model','=','hotel.reservation'),('name','ilike','annulée')])
-        if not email_tmpl_id:
-            print("création email_template pour résa annulée")
-            ir_model = self.pool.get("ir.model").search(cr, uid, [('model','=','hotel.reservation')])
-            email_tmpl_id = email_obj.create(cr, uid, {
-                                        'name':'modèle de mail pour résa annulée', 
-                                        'name':'Réservation Annulée',
-                                        'model_id':ir_model[0],
-                                        'subject':'Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée',
-                                        'email_from':'bruno.plancher@gmail.com',
-                                        'email_to':'bruno.plancher@gmail.com',
-                                        'body_text':"Votre Réservation normalement prévue du ${object.checkin} au \
-                                        ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-                                        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx",
-                                        'body_html':"Votre Réservation normalement prévue du ${object.checkin} au \
-                                        ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,\
-                                        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
-                                       })
-        else:
-            email_tmpl_id = email_tmpl_id[0]
-        mail_values = email_obj.generate_email(cr, uid, email_tmpl_id, id, context)
-        #TODO: ajouter les attachments au mail, voir sources de email.message
-        attachments = mail_values.pop('attachments') or {}
-        ret['body_html'] = mail_values['body_html']
-        ret['email_template'] = email_tmpl_id
-        return ret
-
+        if email_tmpl_id:
+            if isinstance(email_tmpl_id, list):
+                email_tmpl_id = email_tmpl_id[0]
+            mail_values = email_obj.generate_email(cr, uid, email_tmpl_id, id, context)
+            #TODO: ajouter les attachments au mail, voir sources de email.message
+            attachments = mail_values.pop('attachments') or {}
+            ret['body_html'] = mail_values['body_html']
+            ret['email_template'] = email_tmpl_id
+            return ret
+        return {}
     #Bouton Pour Annuler Résa : Affiche le mail pré-rempli à envoyer à l'association pour signifier l'annulation
     def do_cancel(self, cr, uid, ids, context=None):
         if isinstance(ids, list):
             ids = ids[0]
         wizard = self.browse(cr, uid, ids)
-        mail_id = self.pool.get("email.template").send_mail(cr, uid, wizard.email_template, context['active_id'], False, context)
+        mail_id = self.pool.get("email.template").send_mail(cr, uid, wizard.email_template, context['active_id'], True, context)
         self.pool.get("mail.message").write(cr, uid, mail_id, {'body_html':wizard.body_html})
         wf_service = netsvc.LocalService('workflow')
         wf_service.trg_validate(uid, 'hotel.reservation', context['active_id'], 'cancel', cr)
@@ -267,6 +251,42 @@ class openstc_pret_envoie_mail_annulation_wizard(osv.osv_memory):
     
     
 openstc_pret_envoie_mail_annulation_wizard()
+
+
+
+class openstc_pret_create_inter_wizard(osv.osv_memory):
+    
+    def _default_service_id_value(self, cr, uid, context=None):
+        service_ids = self.pool.get("openstc.service").search(cr, uid, [('name','in',('Voirie','voirie'))], context=context)
+        return service_ids and service_ids[0] or False
+    
+    _name = "openstc.pret.create.inter.wizard"
+    _columns = {
+        'service_id':fields.many2one('openstc.service', 'Service concerné', required=True),
+        'time_planned':fields.float('Heures planifiées',digits=(2,1), required=True),
+        'categ_id':fields.many2one('openstc.task.category','Catégorie de la tâche', required=True),
+        }
+    
+    _defaults = {
+        'service_id':_default_service_id_value,
+        }
+    
+    def validate(self, cr, uid, ids, context=None):
+        if isinstance(ids, list):
+            ids = ids[0]
+        resa_id = context.get('active_id', False)
+        if resa_id:
+            wizard = self.browse(cr, uid, ids, context=None)
+            if wizard.time_planned <= 0.0:
+                raise osv.except_osv(_('Error'),_('You can\'t plan a task with a non-positive length'))
+            self.pool.get("hotel.reservation").put_in_use_with_intervention(cr, uid, [resa_id], task_values={'planned_hours':wizard.time_planned,
+                                                                                                             'category_id':wizard.categ_id.id},
+                                                                             service_id=wizard.service_id.id, context=context)
+        return {'type':'ir.actions.act_window.close'}
+
+openstc_pret_create_inter_wizard()
+
+
 
 #Pop-up permettant de savoir si, pour mettre à disposition les articles, on fait une livraison ou le demandeur vient les chercher
 class openstc_pret_deliver_products_wizard(osv.osv_memory):

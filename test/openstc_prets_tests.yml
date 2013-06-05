@@ -1,0 +1,396 @@
+-
+  to test Resa module, i try user input controls, onchange functions, automated data creation, workflow steps
+-
+  i delete data accidently created before
+-
+  To test Resa module, i create first data tests
+-
+  user init (agent, manager will be admin)
+-
+  !record {model: res.users, id: openstc_prets_tests_user1, view: false}:
+    name: User1 Tests
+    login: test1
+    new_password: test1
+    groups_id: 
+      - openstc.openstc_agent
+      - hotel.group_hotel_user
+
+-
+  Products init and their stock qty
+-
+
+  !record {model: product.product, id: openstc_prets_tests_mat01, forcecreate: true}:
+    name: material 01 tests
+    openstc_reservable: true
+
+-
+  creating product 2
+-
+  !record {model: product.product, id: openstc_prets_tests_mat02, forcecreate: true}:
+    name: material 02 tests
+    openstc_reservable: true
+
+-
+  Initializing stock qty of both products
+-
+
+  !python {model: stock.change.product.qty}: |
+    vals = {
+    'product_id': ref("openstc_prets_tests_mat01"),
+    'new_quantity': 30.0,
+    'location_id': ref("stock.stock_location_stock"),
+    }
+    wizard1 = self.create(cr, uid, vals)
+    vals2 = {
+    'product_id': ref("openstc_prets_tests_mat02"),
+    'new_quantity': 12.0,
+    'location_id': ref("stock.stock_location_stock"),
+    }
+    wizard2 = self.create(cr, uid, vals2)
+    self.change_product_qty(cr, uid,[wizard1],{'active_id':ref("openstc_prets_tests_mat01")})
+    self.change_product_qty(cr, uid,[wizard2],{'active_id':ref("openstc_prets_tests_mat02")})
+
+-
+  Site init (and site type associated)
+-
+  Site Type
+-
+  !record {model: openstc.site.type, id: openstc_prets_tests_site_type1, forcecreate: true}:
+    name: Type test 1
+    code: TEST1
+-
+  Site 1
+-
+  !record {model: openstc.site, id: openstc_prets_tests_site1, forcecreate: true}:
+    name: Site test 1
+    type: openstc_prets_tests_site_type1
+    
+
+-
+  Partners init and their own address
+-
+  Partner 1
+-
+  !record {model: res.partner, id: openstc_prets_tests_partner1, view: false}:
+    name: Association 1
+    type_id: openstc_prets_partner_type_asso
+    customer: True
+-
+  Partner 2
+-
+  !record {model: res.partner, id: openstc_prets_tests_partner2, view: false}:
+    name: Association 2
+    type_id: openstc_prets_partner_type_asso
+    customer: True
+-
+  Partner 1 address
+-
+  !record {model: res.partner.address, id: openstc_prets_tests_partner1_address1, view: false}:
+    name: Asso1 contact1
+    partner_id: openstc_prets_tests_partner1
+    email: bruno.plancher@siclic.fr
+-
+  Partner 2 address
+-
+  !record {model: res.partner.address, id: openstc_prets_tests_partner2_address1, view: false}:
+    name: Asso2 contact1
+    partner_id: openstc_prets_tests_partner2
+    email: bruno.plancher@siclic.fr
+
+    
+-
+  Start of the tests
+-
+  creating resa used for this test session
+-
+
+  !record {model: hotel.reservation, id: openstc_prets_tests_resa1, forcecreate: true}:
+    name: Reservation 1
+    checkin: "2013-06-01 08:00:00"
+    checkout: "2013-06-02 10:00:00"
+    site_id: openstc_prets_tests_site1
+    openstc_partner_id: openstc_prets_tests_partner2
+    partner_id: openstc_prets_tests_partner2
+    partner_shipping_id: openstc_prets_tests_partner2_address1
+    partner_order_id: openstc_prets_tests_partner2_address1
+    partner_invoice_id: openstc_prets_tests_partner2_address1
+    partner_mail: bruno.plancer@siclic.fr
+    pricelist_id: product.list0
+
+-
+  test of onchange_partner_id on first resa
+- 
+  get all data returned by onchange on cascade and apply them
+-
+  !python {model: hotel.reservation}: |
+    ret = {}
+    openstc_partner_values = self.onchange_openstc_partner_id(cr, uid, [], ref('openstc_prets_tests_partner1'))
+    assert 'partner_id' in openstc_partner_values['value'], "onchange_openstc_partner_id does not supply any partner_id"
+    ret.update(openstc_partner_values['value'])
+    
+    partner_values = self.onchange_partner_id(cr, uid, [], openstc_partner_values['value']['partner_id'])
+    assert 'partner_shipping_id' in partner_values['value'], "onchange_partner_id does not supply address id"
+    ret.update(partner_values['value'])
+    
+    address_values = self.onchange_partner_shipping_id(cr, uid, [], partner_values['value']['partner_shipping_id'])
+    assert 'partner_mail' in address_values['value'], "onchange_partner_shipping_id does not supply any partner_mail data"
+    ret.update(address_values['value'])
+    print(ret)
+    self.write(cr, uid, ref('openstc_prets_tests_resa1'), ret)
+
+-
+  Check if data are correctly set on record Reservation 1
+-
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa1, string: onchange_partner dos not work}:
+    - partner_id.id == ref('openstc_prets_tests_partner1')
+    - partner_shipping_id.id == ref('openstc_prets_tests_partner1_address1')
+    - partner_order_id.id == ref('openstc_prets_tests_partner1_address1')
+    - partner_invoice_id.id == ref('openstc_prets_tests_partner1_address1')
+
+-
+  create a second correct resa
+-
+
+  !record {model: hotel.reservation, id: openstc_prets_tests_resa2, forcecreate: true}:
+    name: Reservation 2
+    checkin: "2013-06-01 08:00:00"
+    checkout: "2013-06-02 10:00:00"
+    site_id: openstc_prets_tests_site1
+    openstc_partner_id: openstc_prets_tests_partner2
+    partner_id: openstc_prets_tests_partner2
+    partner_shipping_id: openstc_prets_tests_partner2_address1
+    partner_order_id: openstc_prets_tests_partner2_address1
+    partner_invoice_id: openstc_prets_tests_partner2_address1
+    partner_mail: bruno.plancher@siclic.fr
+    pricelist_id: product.list0
+    
+-
+  creation of resa lines for both resa correctly created
+-
+  resa 1 mat1 on qty 10.0
+-
+  !record {model: hotel_reservation.line, id: openstc_prets_resa1_line1, forcecreate: true}:
+    reserve_product: openstc_prets_tests_mat01
+    line_id: openstc_prets_tests_resa1
+    qte_reserves: 10.0
+-
+  resa 1 mat2 on qty 3.0
+-
+  !record {model: hotel_reservation.line, id: openstc_prets_resa1_line2, forcecreate: true}:
+    reserve_product: openstc_prets_tests_mat02
+    line_id: openstc_prets_tests_resa1
+    qte_reserves: 3.0
+-
+  resa 2 mat 1 on qty 25.0
+-
+  !record {model: hotel_reservation.line, id: openstc_prets_resa2_line1, forcecreate: true}:
+    reserve_product: openstc_prets_tests_mat01
+    line_id: openstc_prets_tests_resa2
+    qte_reserves: 25.0
+-
+  resa 2 mat 2 on qty 2.0
+-
+  !record {model: hotel_reservation.line, id: openstc_prets_resa2_line2, forcecreate: true}:
+    reserve_product: openstc_prets_tests_mat02
+    line_id: openstc_prets_tests_resa2
+    qte_reserves: 2.0
+
+-
+  test qte dispo without any other resa on same dates -->
+-    
+
+  !assert {model: hotel_reservation.line, id: openstc_prets_resa1_line1, string: Qty Dispo does not return correct value !}:
+    - qte_dispo == 30.0
+
+-
+  To test qte dispo, one of resa must be confirmed, so let's test confirmation step
+-    
+
+  !workflow {model: hotel.reservation, ref: openstc_prets_tests_resa1, action: confirm}
+
+-
+  i check if wkf evolved to correct state
+-
+  
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa1, string: resa validation failed}:
+    - state == 'confirm'
+
+-
+  test if mail notif is sent
+-    
+
+  !assert {model: mail.message, search: "[('model','=','hotel.reservation'),('res_id','=',ref('openstc_prets_tests_resa1')),('subject','like','%Validée%')]"}:
+    - state == 'sent'
+
+-
+  test qte dispo and dispo boolean info with the 2 resas created here
+-
+
+  !assert {model: hotel_reservation.line, string: Error with qte dispo calculation check qte_dispo calculation, id: openstc_prets_resa2_line1, resa Dispo calculation failed, return True instead of False expected}:
+    - qte_dispo == 20.0
+    - dispo is False
+
+-
+  test of cancelling a resa - wkf step and mail notif. First, i create the wizard
+-
+
+  !record {model: openstc.pret.envoie.mail.annulation.wizard, id: openstc_prets_tests_annulation1}:
+    body_html: Automated Test
+    email_template: openstc.openstc_pret_email_template_resa_cancelled
+-
+  and i validate the wizard to cancel resa
+-
+  !function {model: openstc.pret.envoie.mail.annulation.wizard, name: do_cancel}:
+    - eval: ref('openstc_prets_tests_annulation1')
+      model: openstc.pret.envoie.mail.annulation.wizard
+    - eval: "{'active_id':ref('openstc_prets_tests_resa1')}"
+
+-
+  then, i test if mail notif is sent or is outgoing concerning resa cancel
+-
+  !assert {model: mail.message, search: "[('res_id','=', ref('openstc_prets_tests_resa1')), ('model','=','hotel.reservation'),('subject','like','%Annul%')]", string: Failed to generate or send mail notif concerning resa cancel }:
+    - state in ('sent','outgoing')
+    
+-
+  and i check if resa state is cancle as excepted
+-
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa1, string: Wkf failure resa is not at cancel state}:
+     - state == 'cancle'
+    
+-  
+  test with resa2, confirmation by agent, validation by manager
+-
+  i simulate agent validation
+-
+#pb: OpenERP V6.1 does not support uid xml_id search when parsing yaml files
+#  !workflow {model: hotel.reservation, ref: openstc_prets_tests_resa2, action: confirm, uid: ref('openstc_prets_tests_user1')}
+  !python {model: hotel.reservation}: |
+    import netsvc
+    uid = ref('openstc_prets_tests_user1')
+    netsvc.LocalService('workflow').trg_validate(uid, 'hotel.reservation',ref('openstc_prets_tests_resa2'), 'confirm', cr)
+    
+-
+  i check if resa is waiting_confirm instead of being confirmed
+-
+  !assert {severity: error, model: hotel.reservation, id: openstc_prets_tests_resa2, string: resa must need a validation you have to check need_confirm method}:
+    - state == 'wait_confirm'
+-
+  i test if notif mail concerning resa validation is sent -->    
+-
+  !assert {severity: error, search: "[('model','=','hotel.reservation'),('res_id','=',ref('openstc_prets_tests_resa2')),('subject','like','%En Attente%')]", model: mail.message, string: Notif mail resa valided  failed}:
+    - state in ('sent','outgoing')
+-
+  i simulate validation of manager with admin account
+-    
+  !workflow {model: hotel.reservation, ref: openstc_prets_tests_resa2, action: confirm}
+
+-
+  and i check if resa is correctly set to confirmed
+-
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa2, string: Resa must be validated check wkf transition between wait_confirm and confirm activities}:
+    - state == 'confirm'
+
+-
+  test  generating Inter and task associated
+-
+  i simulate Wizard call to submit interventions infos
+-
+  !record {model: openstc.pret.create.inter.wizard, id: wizard_inter1}:
+    time_planned: 2.0
+    categ_id: openstc.openstc_pret_supply_categ_task
+-
+  i simulate click button simulating wizard validation that will generate intervention
+-
+  !function {model: openstc.pret.create.inter.wizard, name: validate}:
+    - eval: ref('wizard_inter1')
+      model: openstc.pret.create.inter.wizard
+    - eval: "{'active_id':ref('openstc_prets_tests_resa2')}"
+-
+  i check if inter is created by reading inter_id field of resa
+-
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa2, severity: error, string: Inter not created check put_in_use_with_intervention method}:
+    - inter_id != False
+-
+  I check that intervention and tasks have correct infos
+-
+  !python {model: hotel.reservation}: |
+    resa = self.browse(cr, uid, ref('openstc_prets_tests_resa2'))
+    inter = resa.inter_id
+    assert inter.site1 == resa.site_id, "Site of intervention is incorrect, not the same as Reservation site, check put_in_use_with_intervention"
+    assert inter.service_id != False, "Service of intervention is not set, check put_in_use_with_intervention"
+    assert inter.partner_id != False, "intervention claimer is not set, check put_in_use_with_intervention"
+    for task in inter.tasks:
+      assert task.planned_hours > 0, "Task time_planned is not correctly set, check put_in_use_with_intervention"
+      assert task.category_id != False, "Task Category is not correctly set, check put_in_use_with_intervention"
+
+-
+  Test on Checkout generation and, eventually, purchase and stock moves
+-
+  first, i simulate click on button generating Checkout
+-
+  !function {model: hotel.reservation, name: open_checkout}:
+    - eval: ref('openstc_prets_tests_resa2')
+      model: hotel.reservation
+-
+  i check that Checkout is created by reading m2o resa_checkout_id field
+-
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa2, severity: error, string: Checkout not created check open_checkout method}:
+    - resa_checkout_id != False
+-
+ then i check that Checkout has correct data
+-
+
+  !python {model: hotel.reservation}: |
+    from datetime import datetime
+    resa = self.browse(cr, uid, ref('openstc_prets_tests_resa2'))
+    checkout = resa.resa_checkout_id
+    assert checkout.name == resa.name, "bad Values: Checkout has not same name as resa"
+    assert checkout.partner_id.id == resa.openstc_partner_id.id, "bad Values: Checkout has not same partner_id as resa"
+    assert checkout.user_id.id == uid, "bad Values: Checkout has not same user_id as resa"
+    assert checkout.date_order[:10] == str(datetime.now())[:10], "bad Values: default_value for date order is not correct"
+    
+    resa_lines = {}
+    for line in resa.reservation_line:
+      resa_lines.update({line.reserve_product.id:line})
+    i = 0
+    for line in checkout.checkout_lines:
+      i += 1
+      assert line.product_id.id in resa_lines, "bad Values, Checkout has a product that is not in resa"
+      resa_line = resa_lines.pop(line.product_id.id)
+      assert line.qte_reservee == resa_line.qte_reserves, "bad Values: Checkout line has not product qty as resa line"
+-
+  todo, simulate user input to force exception raising controlling qty_to_repair and qty_to_purchase
+-
+  i test purchase order creation when putting qty_to_purchase at a positive value
+-
+  i begin by writting qte_to_purchase to 2 and validating the Checkout
+-
+  !python {model: hotel.reservation}: |
+    resa = self.browse(cr, uid, ref('openstc_prets_tests_resa2'))
+    line_ids = self.pool.get("openstc.pret.checkout.line").search(cr, uid, [('product_id','=',ref('openstc_prets_tests_mat02')),('checkout_id','=',resa.resa_checkout_id.id)])
+    self.pool.get("openstc.pret.checkout.line").write(cr, uid, line_ids, {'qte_to_purchase':2.0})
+    resa.resa_checkout_id.generer_actions(context = {'default_location_id':ref('stock.stock_location_stock'), 'default_location_dest_id':ref('stock.stock_location_output')})
+-
+  and i check that purchase order is created by reading purchase_id field of Checkout and correctly set
+-
+
+  !assert {model: hotel.reservation, id: openstc_prets_tests_resa2, string: Purchase order is not created as expected when validating a Checkout with product qty(ies) to purchase}:
+    - resa_checkout_id.purchase_id != False
+    - resa_checkout_id.purchase_id.order_line[0].product_id.id == ref('openstc_prets_tests_mat02')
+    - resa_checkout_id.purchase_id.order_line[0].product_qty == 2.0
+-
+  then, i check that stock qty of product mat2 is reduced by 2
+-
+  !assert {model: product.product, id: openstc_prets_tests_mat02, severity: error, string: Error during Checkout validation qty of product must be reduced by 2 after launching a purchase order}:
+    - qty_available == 10.0
+-
+  And finallay, i check that reservation i correctly set to Done
+-
+  !assert { model: hotel.reservation, id: openstc_prets_tests_resa2, severity: error, string: Error reservation must be set to done after validation of Checkout}:
+    - state == 'done'
+-
+  Finally, i rollback database updates
+-
+  !python {model: hotel.reservation}: |
+    cr.rollback()
+    

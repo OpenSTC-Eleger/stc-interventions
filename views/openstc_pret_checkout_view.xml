@@ -1,3 +1,22 @@
+<!--
+    OpenSTC Interventions - Openerp Module to manage Cityhall technical department
+    Copyright (C) 2013 Siclic www.siclic.fr
+
+    This file is part of OpenSTC Interventions.
+
+    OpenSTC Interventions is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    OpenSTC Interventions is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with OpenSTC Interventions.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <?xml version="1.0" ?>
 <openerp>
 	<data>
@@ -46,16 +65,17 @@
 				        <tree string="Lignes d'Etat des lieux" editable="top">
 				            <field name="product_id" context="{'default_openstc_reservable':'1','default_purchase_ok':False}"/>
 				            <field name="qte_reservee"/>
-				            <field name="etat_retour"/>
+				            <field name="qte_to_repair"/>
 				            <field name="qte_to_purchase"/>
 				            <field name="infos_supp"/>
 				        </tree>
 				    </field>
-				    <newline/>
 				    <field name="state"/>
+					<newline/>
 					<button icon="gtk-go-back" colspan="1" string="Retour" special="cancel" states="draft"/>
-					<button icon="gtk-ok" colspan="1" name="generer_actions" type="object" string="Générer les actions saisies" states="draft"/>
-					<button icon="gtk-go-forward" colspan="1" string="Ne pas générerles actions saisies" type="object" name="generer_no_actions" states="draft"/>
+					<button icon="gtk-go-forward" colspan="1" context="{'default_location_id':%(stock.stock_location_stock)d, 'default_location_dest_id':%(stock.stock_location_output)d}"
+					    name="generer_actions" type="object" string="Valider" states="draft"/>
+					
 				</form>
 			</field>
 		</record>

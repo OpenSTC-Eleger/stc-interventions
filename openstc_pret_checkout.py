@@ -67,6 +67,15 @@ class openstc_pret_checkout_wizard(osv.osv):
         self.pool.get("hotel.reservation").write(cr, uid, [vals['reservation']], {'resa_checkout_id':res}, context=context)
         return res
     
+    def remove_prods_from_stock(self, cr, uid, prod_dicts, context={}):
+        stock_obj = self.pool.get("stock.move")
+        stock_ids = []
+        for prod in self.pool.get("product.product").browse(cr, uid, prod_dicts.keys(), context=context):
+            stock_ids.append(stock_obj.create(cr, uid, {'product_id':prod.id,'product_qty':prod_dicts[prod.id],
+                                       'product_uom':prod.uom_id.id, 'name':_('Loss of product (from reservation)')}, context=context))
+        stock_obj.action_done(cr, uid, stock_ids, context=context)
+        return True
+    
     def open_purchase(self, cr, uid, ids, context=None):
         purchase = self.read(cr, uid, ids[0], ['purchase_id'])
         if purchase['purchase_id']:
@@ -85,7 +94,7 @@ class openstc_pret_checkout_wizard(osv.osv):
                 'res_model':'purchase.order',
                 }
     
-    def generer_actions(self, cr, uid, ids, context):
+    def generer_actions(self, cr, uid, ids, context=None):
         #TODO: Gérer le cas où des produits n'ont pas le même fournisseur, groupe les produits ayant un fournisseur en commun
         default_location_id = self.pool.get("stock.location").search(cr, uid, [('name','=','Stock')])[0]
         for checkout in self.browse(cr, uid, ids):
@@ -93,8 +102,10 @@ class openstc_pret_checkout_wizard(osv.osv):
             wf_service = netsvc.LocalService('workflow')
             wf_service.trg_validate(uid, 'hotel.reservation', checkout.reservation.id, 'done', cr)
             line_values = []
+            prod_dicts = {}
             for line in checkout.checkout_lines:
-                if line.etat_retour == 'to_purchase':
+                if line.qte_to_purchase >0.0:
+                    prod_dicts[line.product_id.id] = line.qte_to_purchase
                     line_values.append((0,0,{
                                         'product_id':line.product_id.id, 
                                         'product_qty':line.qte_to_purchase, 
@@ -102,7 +113,10 @@ class openstc_pret_checkout_wizard(osv.osv):
                                         'price_unit':line.product_id.product_tmpl_id.list_price,
                                         'name': line.product_id.name_template,
                                         }))
-            #Dans le cas d'une mauvaise manip, si aucun article n'est indiqué comme devant être racheté, on ne fait rien
+            #if there are prods loss during reservation, we must remove them from stock
+            if prod_dicts:
+                self.remove_prods_from_stock(cr, uid, prod_dicts, context=context)
+            #if there is at least one purchase to do
             if line_values:
                 values = {'invoice_method':'manual',
                   'location_id':default_location_id,
@@ -115,9 +129,8 @@ class openstc_pret_checkout_wizard(osv.osv):
                     values[key] = value
                 purchase_id = self.pool.get("purchase.order").create(cr, uid, values)
                 self.write(cr, uid, checkout.id, {'purchase_id':purchase_id})    
-            else:
-                self.log(cr, uid, checkout.id, _("No purchase nor invoice have been created, because there is nothing to purchase."))
-        self.write(cr, uid, ids, {'state':'done'})
+                
+            checkout.write({'state':'done'})
         return{'type':'ir.actions.act_window_close'}
     
     def generer_no_actions(self, cr, uid, ids, context):
@@ -138,9 +151,10 @@ class openstc_pret_checkout_line_wizard(osv.osv):
                 'checkout_id':fields.many2one('openstc.pret.checkout','Etat des Lieux'),
                 'product_id':fields.many2one('product.product','Article', readonly=True),
                 'qte_reservee':fields.integer('Qté prêtée', readonly=True),
-                'etat_retour':fields.selection(AVAILABLE_ETAT_SELECTION, 'Etat après utilisation'),
+                #'etat_retour':fields.selection(AVAILABLE_ETAT_SELECTION, 'Etat après utilisation'),
                 'state':fields.selection(AVAILABLE_STATE_TREATMENT_SELECTION, 'Avancement', readonly=True),
-                'qte_to_purchase':fields.integer('Qté à Racheter'),
+                'qte_to_purchase':fields.integer('Qty to purchase'),
+                'qte_to_repair':fields.integer('Qty to repair'),
                 'infos_supp':fields.char('Infos Supplémentaires',size=128),
                 'partner_id':fields.related('checkout_id','partner_id', type='many2one',relation='res.partner', string="Emprunteur concerné"),
                 'date_order':fields.related('checkout_id','date_order',type='datetime', string='Date Etat des Lieux'),
@@ -149,18 +163,13 @@ class openstc_pret_checkout_line_wizard(osv.osv):
             'state':lambda *a: 'draft',
             }
 
-
-    def _check_qte_to_purchase(self, cr, uid, ids):
-        for line in self.browse(cr, uid, ids):
-            if line.qte_to_purchase and line.qte_to_purchase > line.qte_reservee:
-                return False
-            elif line.qte_to_purchase and line.qte_to_purchase > 0 and line.etat_retour <> 'to_purchase':
+    
+    def _check_qties(self, cr, uid, ids, context=None):
+        for line in self.browse(cr, uid, ids, context=context):
+            if line.qte_reservee < line.qte_to_repair + line.qte_to_purchase:
                 return False
         return True
-    
-    _constraints = [
-                    (_check_qte_to_purchase, _("Qty to purchase must be equal or lower than qty reserved, and must be written only if a purchase is to plan"), ['qte_reservee','etat_retour','qte_to_purchase'])
-                    ]
+    _constraints = [(_check_qties,'Qty to purchase + Qty to repair is greater than qty resereved, please change them.', ['qte_to_purchase','qte_to_repair','qte_reservee'])]
     
 openstc_pret_checkout_line_wizard()
 

@@ -32,6 +32,11 @@ import base64
 import unicodedata
 import re
 import pytz
+import calendar
+import logging
+import openerp
+import os
+import tools
 
 #----------------------------------------------------------
 # Fournitures
@@ -79,6 +84,7 @@ class product_product(osv.osv):
         "empruntable":fields.boolean("Se fournir à l'extérieur", help="indique si l'on peut emprunter cette ressource à des collectivités extèrieures"),
         "checkout_lines":fields.one2many('openstc.pret.checkout.line', 'product_id', string="Lignes Etat des Lieux"),
         'need_infos_supp':fields.boolean('Nécessite Infos Supp ?', help="Indiquer si, pour une Réservation, cette ressource nécessite des infos supplémentaires A saisir par le demandeur."),
+        #TOCHECK: Is service_technical_id usefull now ?
         'service_technical_id':fields.many2one('openstc.service', 'Service Technique associé',help='Si renseigné, indique que cette ressource nécessite une manipulation technique pour être installée sur site, cette ressource est donc susceptible de générer une intervention sur ce service.'),
         'type_prod':fields.selection(_get_type_prod_values, 'Type de Produit'),
         'openstc_reservable':fields.boolean('Reservable', help='Indicates if this ressource can be reserved or not by tiers'),
@@ -143,7 +149,7 @@ class hotel_reservation_line(osv.osv):
         if not context:
             context = {}
         resa_ids = []
-        ret = {}
+        ret = {}.fromkeys(ids,{'dispo':False,'qte_dispo':0.0})
         if 'qte_dispo' in name:
             #get all resa linked with lines
             for line in self.browse(cr, uid, ids):
@@ -173,11 +179,26 @@ class hotel_reservation_line(osv.osv):
     def _get_amount(self, cr, uid, ids, name, args, context=None):
         ret = {}.fromkeys(ids, 0.0)
         for line in self.browse(cr, uid, ids, context):
-            amount = line.prix_unitaire * line.uom_qty
+            amount = line.prix_unitaire * line.uom_qty * line.qte_reserves
             ret[line.id] = amount
             #TOCHECK: is there any taxe when collectivity invoice people ?
         return ret
-
+    
+    def _get_complete_name(self, cr, uid, ids, name, args, context=None):
+        ret = {}
+        weekday_to_str = {0:'Lundi',1:'Mardi',2:'Mercredi',3:'Jeudi',4:'Vendredi',5:'Samedi',6:'Dimanche'}
+        for line in self.browse(cr, uid, ids, context=context):
+            weekday_start = calendar.weekday(int(line.checkin[:4]), int(line.checkin[5:7]), int(line.checkin[8:10]))
+            weekday_end = calendar.weekday(int(line.checkout[:4]), int(line.checkout[5:7]), int(line.checkout[8:10]))
+            date_str = ''
+            #if weekday_start == weekday_end:
+                #date_str = '%s %s-%s : ' %(weekday_to_str[weekday_start],line.checkin[11:16],line.checkout[11:16])
+                
+            if weekday_start <> weekday_end:
+                date_str = '%s %s - %s %s : ' % (weekday_to_str[weekday_start][:3],line.checkin[11:16],weekday_to_str[weekday_end][:3],line.checkout[11:16])
+            ret[line.id] = '%s %d x %s (%s)' %(date_str,line.qte_reserves, line.reserve_product.name_template, line.partner_id.name)
+        return ret
+    
     _columns = {
         'categ_id': fields.many2one('product.category','Type d\'article'),
         "reserve_product": fields.many2one("product.product", "Article réservé", domain=[('openstc_reservable','=',True)]),
@@ -195,11 +216,17 @@ class hotel_reservation_line(osv.osv):
         "name":fields.char('Libellé', size=128),
         'state':fields.related('line_id','state', type='selection',string='Etat Résa', selection=_get_state_line, readonly=True),
         'uom_qty':fields.float('Qté de Référence pour Facturation',digit=(2,1)),
-        'amount':fields.function(_get_amount, string="Prix (si onéreux)", type="float", method=True),
+        'amount':fields.function(_get_amount, string="Prix (si tarifé)", type="float", method=True),
         'qte_dispo':fields.function(_calc_qte_dispo, method=True, string='Qté Dispo', multi="dispo", type='float'),
         'action':fields.selection(_AVAILABLE_ACTION_VALUES, 'Action'),
         'inter_ask_id':fields.many2one('openstc.ask','Demande d\'intervention associée'),
-
+        'inter_id':fields.many2one('project.project','Intervention associée'),
+        'state':fields.related('line_id','state', type='char'),
+        'partner_id':fields.related('line_id','partner_id', type="many2one", relation="res.partner"),
+        'checkin':fields.related('line_id','checkin', type="datetime"),
+        'checkout':fields.related('line_id','checkout', type="datetime"),
+        'resa_name':fields.related('line_id','name',type="char"),
+        'complete_name':fields.function(_get_complete_name, type="char", string='Complete Name', size=128),
 #        store={'hotel.reservation':[_get_resa_id, ['state','checkin','checkout'], 10],
 #        'hotel_reservation.line':[lambda self,cr,uid,ids,ctx:ids, ['reserve_product'], 11],
 #        'stock.inventory.line':[_get_resa_via_prods,['product_id','product_qty','inventory_id','location_id'],12]}
@@ -257,16 +284,21 @@ class hotel_reservation(osv.osv):
         seq = self.pool.get("ir.sequence").next_by_code(cr, uid, 'resa.number',context)
         user = self.pool.get("res.users").browse(cr, uid, uid)
         prog = re.compile('[Oo]pen[a-zA-Z]{3}/[Mm]anager')
-        service = None
+        service = False
         if 'service_id' in context:
+            #get service_id in context, it takes priority to any other service
             service = context['service_id']
-        for group in user.groups_id:
-            if prog.search(group.name):
-                if isinstance(user.service_ids, list) and not service:
-                    service = user.service_ids[0]
-                else:
-                    service = self.pool.get("openstc.service").browse(cr, uid, service)
-                seq = seq.replace('-xxx-','-' + self.remove_accents(service.name[:3]).upper() + '-')
+            service = self.pool.get("openstc.service").browse(cr, uid, service)
+        else:
+            #get first service_ids of user if the user is a manager
+            for group in user.groups_id:
+                if prog.search(group.name):
+                    if isinstance(user.service_ids, list) and not service:
+                        service = user.service_ids and user.service_ids[0] or False
+                    
+        if service:
+            #If sequence is configured to have service info, we write it
+            seq = seq.replace('xxx',self.remove_accents(service.name[:3]).upper())
                 
         return seq
 
@@ -280,7 +312,7 @@ class hotel_reservation(osv.osv):
             checkin = strptime(resa.checkin, '%Y-%m-%d %H:%M:%S')
             for line in resa.reservation_line:
                 #Vérif si résa dans les délais, sinon, in_option est cochée
-                d = timedelta(days=int(line.reserve_product.sale_delay))
+                d = timedelta(days=int(line.reserve_product.sale_delay and line.reserve_product.sale_delay or 0))
                 print("now :"+str(date_crea))
                 print("checkin :" + str(checkin))
                 #Si l'un des produits est hors délai
@@ -300,6 +332,24 @@ class hotel_reservation(osv.osv):
     def _get_state_values(self, cr, uid, context=None):
         return self.return_state_values(cr, uid, context)
 
+    def _get_amount_total(self, cr, uid, ids, name, args, context=None):
+        ret = {}
+        for resa in self.browse(cr, uid, ids, context=None):
+            amount_total = 0.0
+            all_dispo = True
+            for line in resa.reservation_line:
+                if all_dispo and not line.dispo:
+                    all_dispo = False
+                amount_total += line.amount
+            ret[resa.id] = {'amount_total':amount_total,'all_dispo':all_dispo}
+        return ret
+
+    def _get_prods_reserved(self, cr, uid, ids, name, args, context=None):
+        ret = {}
+        for resa in self.browse(cr, uid, ids, context=context):
+            ret[resa.id] = [(line.reserve_product.id, line.reserve_product.name) for line in resa.reservation_line]            
+        return ret
+
     _columns = {
                 'state': fields.selection(_get_state_values, 'Etat',readonly=True),
                 'in_option':fields.function(_calc_in_option, string="En Option", selection=AVAILABLE_IN_OPTION_LIST, type="selection", method = True, store={'hotel.reservation':(get_resa_modified,['checkin','reservation_line'],10)},
@@ -314,6 +364,11 @@ class hotel_reservation(osv.osv):
                 'prod_id':fields.many2one('product.product','Ressource'),
                 'openstc_partner_id':fields.many2one('res.partner','Demandeur', help="Personne demandant la réservation."),
                 'resa_checkout_id':fields.many2one('openstc.pret.checkout','Etat des Lieux associé'),
+                'amount_total':fields.function(_get_amount_total, type='float', string='Amount Total', method=True, multi="resa",
+                                               help='Optionnal, if positive, a sale order will be created once resa validated and invoice will be created once resa done.'),
+                'all_dispo':fields.function(_get_amount_total, type="boolean", string="All Dispo", method=True, multi="resa"),
+                #'reserve_product':fields.function(_get_prods_reserved, type='many2many', relation='product.product',string='prods reserved'),
+                'inter_id':fields.many2one('project.project','Livraison associée'),
         }
     _defaults = {
                  'in_option': lambda *a :0,
@@ -380,18 +435,12 @@ class hotel_reservation(osv.osv):
         return True
 
     def waiting_confirm(self, cr, uid, ids):
-        form_amount = 0.0
-        line_ids = []
-        for resa in self.browse(cr, uid, ids):
-            for line in resa.reservation_line:
-                form_amount += line.prix_unitaire * line.qte_reserves
-            amount = self.get_amount_resa(cr, uid, ids)
-            if form_amount <> amount:
-                self.compute_lines_price(cr, uid, [resa.id])
-        self.envoyer_mail(cr, uid, ids, {'state':'waiting'})
-        self.write(cr, uid, ids, {'state':'wait_confirm'})
-        return True
-
+        if self.is_all_dispo(cr, uid, ids[0]):
+            self.envoyer_mail(cr, uid, ids, {'state':'waiting'})
+            self.write(cr, uid, ids, {'state':'wait_confirm'})
+            return True
+        raise osv.except_osv(_("""Not available"""),_("""Not all of your products are available on those quantities for this period"""))
+        return False
     #Mettre à l'état cancle et retirer les mouvements de stocks (supprimer mouvement ou faire le mouvement inverse ?)
     def cancelled_reservation(self, cr, uid, ids):
         self.write(cr, uid, ids, {'state':'cancle', 'reservation_line':self.uncheck_all_dispo(cr, uid, ids)})
@@ -476,7 +525,7 @@ class hotel_reservation(osv.osv):
     def need_confirm(self, cr, uid, ids):
         reservations = self.browse(cr, uid, ids)
         etape_validation = False
-        prog = re.compile(u'[Oo]pen(STC|[SC]TM)/[Mm]anager')
+        prog = re.compile(u'[Oo]pen(STC|[SC]TM)/([Mm]anager|[Dd][Ss][Tt])')
         groups = self.pool.get("res.users").browse(cr, uid, uid, context=None).groups_id
         #if group == "Responsable", no need confirm
         for group in groups:
@@ -523,7 +572,7 @@ class hotel_reservation(osv.osv):
                                                                                         'categ_id':produit.categ_id.id,
                                                                                         'reserve':[(4, produit.id)],
                                                                                         'prix_unitaire':produit.product_tmpl_id.list_price,
-                                                                                        'qte_reserves':10
+                                                                                        'qte_reserves':1.0
                                                                                 }))
 
             res.update({'reservation_line':reservation_lines})
@@ -531,7 +580,7 @@ class hotel_reservation(osv.osv):
         return res
 
     def get_nb_prod_reserved(self, cr, prod_list, checkin, checkout, states=['cancle','done','remplir'], where_optionnel=""):
-        print("start get_nb_prod_reserved method")
+        #print("start get_nb_prod_reserved method")
         cr.execute("select reserve_product, sum(qte_reserves) as qte_reservee \
                     from hotel_reservation as hr, \
                     hotel_reservation_line as hrl \
@@ -691,6 +740,7 @@ class hotel_reservation(osv.osv):
 
     #Renvoies actions bdd permettant de mettre toutes les dispo de la résa à False
     #Ne renvoie que les actions de mises à jours des lignes déjà enregistrées dans la réservation
+    #@TOREMOVE
     def uncheck_all_dispo(self, cr, uid, ids, context=None):
         line_ids = self.pool.get("hotel_reservation.line").search(cr, uid, [('line_id','in',ids)])
         reservation_line = []
@@ -739,16 +789,19 @@ class hotel_reservation(osv.osv):
     #param record: browse_record hotel.reservation.line
     def get_prod_price(self, cr, uid, ids, record, context=None):
         pricelist_obj = self.pool.get("product.pricelist")
-        pricelist_id = record.line_id.partner_id.property_product_pricelist.id
-        res = pricelist_obj.price_get_multi(cr, uid, [pricelist_id], [(record.reserve_product.id,record.qte_reserves,record.line_id.partner_id.id)], context=None)
+        pricelist_id = record.line_id.pricelist_id.id
+        if not pricelist_id:
+            pricelist_id = record.line_id.partner_id.property_product_pricelist.id
+        res = pricelist_obj.price_get_multi(cr, uid, [pricelist_id], [(record.reserve_product.id,record.uom_qty,record.line_id.partner_id.id)], context=None)
         return res and res[record.reserve_product.id][pricelist_id] or False
         #return record.reserve_product.product_tmpl_id.standard_price
 
     #param record: browse_record hotel.reservation.line
     #if product uom refers to a resa time, we compute uom according to checkin, checkout
     def get_prod_uom_qty(self, cr, uid, ids, record, length, context=None):
-        if re.search(u"[Rr]{1}[ée]{1}servation", record.reserve_product.uom_id.category_id.name):
-            #uom factor refers to journey, to have uom factor refering to hours, we have to adust ratio
+        #if re.search(u"[Rr]{1}[ée]{1}servation", record.reserve_product.uom_id.category_id.name):
+        if re.search(u"([Tt]emporel|[Rr][ée]servation)", record.reserve_product.uom_id.category_id.name):
+            #uom factor refers to journey, to have uom factor refering to hours, we have to adjust ratio
             factor = 24.0 / record.reserve_product.uom_id.factor
             res = length / factor
             #round to direct superior int
@@ -820,7 +873,7 @@ class hotel_reservation(osv.osv):
         #and display it
         return ret
 
-    def put_in_use_with_intervention(self, cr, uid, ids, context=None):
+    def put_in_use_with_intervention(self, cr, uid, ids, task_values={}, service_id=False, context=None):
         if not context:
             context={}
         for resa in self.browse(cr, uid, ids, context):
@@ -836,36 +889,62 @@ class hotel_reservation(osv.osv):
             partner = user.company_id.partner_id        
             inter_ask = []
             lines_grouped = {}
-            for line in resa.reservation_line:
-                if line.action == 'inter':
-                    #group resa line by service_id
-                    if not line.reserve_product.service_technical_id:
-                        raise osv.except_osv(_("Error"),_("you must specified a service for this product : %s") %(line.reserve_product.name_template))
-                    lines_grouped.setdefault(line.reserve_product.service_technical_id.id, [])
-                    lines_grouped[line.reserve_product.service_technical_id.id].append(line)
-            for service_id, lines in lines_grouped.items():
-                #generate inter for each service, and compute strings according to lines matches this service_id
-                name = ''
-                name += ','.join(['%s %s ' % (str(line.qte_reserves) ,line.reserve_product.name_template) for line in lines])
-                site_details = '\n'.join(['%s: %s ' % (line.reserve_product.name_template, line.infos) for line in lines if line.infos])
-                values = {'name':_('[Evenemential] supply of %s ont the site %s') % (name, resa.site_id and resa.site_id.name or 'inconnu'), 
-                          'site_details':site_details,
-                          'description':_('supply of %s on the site %s for the event "%s" planned from %s to %s') %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str),
-                          'partner_id':partner.id, 
-                          'partner_address':partner.address[0].id,
-                          'partner_type':partner.type_id and partner.type_id.id or False,
-                          'partner_type_code':partner.type_id and partner.type_id.code or False,
-                          'site1':resa.site_id.id,
-                          'service_id':service_id,
-                          'state':'wait',
-                          }
-                ret = self.pool.get("openstc.ask").create(cr, uid, values, context=context)
-                if ret:
-                    line_ids = [x.id for x in lines]
-                    self.pool.get("hotel_reservation.line").write(cr, uid, line_ids, {'action':'inter_ok','inter_ask_id':ret})
-                else:
-                    print("Error when creating intervention with values : ")
-                    print(values)
+#            for line in resa.reservation_line:
+#                if line.action == 'inter':
+#                    #group resa line by service_id
+#                    if not line.reserve_product.service_technical_id:
+#                        raise osv.except_osv(_("Error"),_("you must specified a service for this product : %s") %(line.reserve_product.name_template))
+#                    lines_grouped.setdefault(line.reserve_product.service_technical_id.id, [])
+#                    lines_grouped[line.reserve_product.service_technical_id.id].append(line)
+#            for serv_id, lines in lines_grouped.items():
+#                #generate inter for each service, and compute strings according to lines matches this service_id
+#                name = ''
+#                name += ','.join(['%s %s ' % (str(line.qte_reserves) ,line.reserve_product.name_template) for line in lines])
+#                site_details = '\n'.join(['%s: %s ' % (line.reserve_product.name_template, line.infos) for line in lines if line.infos])
+#                values = {'name':_('[Evenemential] supply of %s ont the site %s') % (name, resa.site_id and resa.site_id.name or 'inconnu'), 
+#                          'site_details':site_details,
+#                          'description':_('supply of %s on the site %s for the event "%s" planned from %s to %s') %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str),
+#                          #'partner_id':partner.id, 
+#                          #'partner_address':partner.address[0].id,
+#                          #'partner_type':partner.type_id and partner.type_id.id or False,
+#                          #'partner_type_code':partner.type_id and partner.type_id.code or False,
+#                          'site1':resa.site_id.id,
+#                          'service_id':service_id and service_id or serv_id,
+#                          #'state':'wait',
+#                          'state':'open',
+#                          'date_deadline':resa.checkin,
+#                          }
+            lines = resa.reservation_line
+            name = ''
+            name += ','.join(['%s %s ' % (str(line.qte_reserves) ,line.reserve_product.name_template) for line in lines])
+            site_details = '\n'.join(['%s: %s ' % (line.reserve_product.name_template, line.infos) for line in lines if line.infos])
+            values = {'name':_('[Evenemential] supply of %s ont the site %s') % (name, resa.site_id and resa.site_id.name or 'inconnu'), 
+                      'site_details':site_details,
+                      'description':_('supply of %s on the site %s for the event "%s" planned from %s to %s') %(name,resa.site_id and resa.site_id.name or 'inconnu', resa.name, checkin_str, checkout_str),
+                      #'partner_id':partner.id, 
+                      #'partner_address':partner.address[0].id,
+                      #'partner_type':partner.type_id and partner.type_id.id or False,
+                      #'partner_type_code':partner.type_id and partner.type_id.code or False,
+                      'site1':resa.site_id.id,
+                      'service_id':service_id and service_id or serv_id,
+                      #'state':'wait',
+                      'state':'open',
+                      'date_deadline':resa.checkin,
+                      }
+            #ret = self.pool.get("openstc.ask").create(cr, uid, values, context=context)
+            ret = self.pool.get("project.project").create(cr, uid, values)
+            if ret:
+                #creation of task associated
+                inter = self.pool.get("project.project").browse(cr, uid, ret)
+                if task_values:
+                    task_values.update({'name':inter.name,'state':'draft','date_deadline':inter.date_deadline})
+                    self.pool.get("project.project").write(cr, uid, [ret], {'tasks':[(0,0,task_values)]}, context=context)
+                line_ids = [x.id for x in lines]
+                #self.pool.get("hotel_reservation.line").write(cr, uid, line_ids, {'action':'inter_ok','inter_id':ret})
+                resa.write({'inter_id':ret})
+            else:
+                print("Error when creating intervention with values : ")
+                print(values)
             line_with_no_ids = []    
         return {'type':'ir.actions.act_window_close'}
 
@@ -984,7 +1063,7 @@ class hotel_reservation(osv.osv):
         #    self.trigger_reserv_modified(cr, uid, ids, context)
         return res
 
-    def unlink(self, cr, uid, ids, context):
+    def unlink(self, cr, uid, ids, context=None):
         if not isinstance(ids, list):
             ids = [ids]
         line_ids = []
@@ -1008,9 +1087,12 @@ class hotel_reservation(osv.osv):
 
         
     def onchange_partner_shipping_id(self, cr, uid, ids, partner_shipping_id=False):
+        email = False
         if partner_shipping_id:
             email = self.pool.get("res.partner.address").browse(cr, uid, partner_shipping_id).email
         return {'value':{'partner_mail':email}}
+    
+
 hotel_reservation()
 
 

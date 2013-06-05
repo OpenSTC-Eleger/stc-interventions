@@ -1,3 +1,22 @@
+<!--
+    OpenSTC Interventions - Openerp Module to manage Cityhall technical department
+    Copyright (C) 2013 Siclic www.siclic.fr
+
+    This file is part of OpenSTC Interventions.
+
+    OpenSTC Interventions is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    OpenSTC Interventions is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with OpenSTC Interventions.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <?xml version="1.0" ?>
 <openerp>
 	<data>
@@ -10,7 +29,8 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 			<field name="domain">[('openstc_reservable','=',True)]</field>
-			<field name="context">{'default_openstc_reservable':'1','default_purchase_ok':False}</field>
+			<field name="view_ids" eval="[(5,),(0,0,{'view_mode':'tree','view_id':ref('view_openstock_fournitures_tree')})]"/>
+			<field name="context" eval="{'default_openstc_reservable':'1','default_purchase_ok':False,'default_uom_id':ref('openstc_pret_uom_day')}"/>
 		</record>
 
 		<record id="action_openstock_view_reservation" model="ir.actions.act_window">
@@ -22,61 +42,7 @@
 			<field name="domain" eval="False"/>
 		</record>
 
-		<!-- <record id="action_openstock_view_reservation_confirmed" model="ir.actions.act_window">
-			<field name="name">Réservations Confirmées</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','confirm')]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_cancel" model="ir.actions.act_window">
-			<field name="name">Réservations Annulées</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','cancle')]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_a_remplir" model="ir.actions.act_window">
-			<field name="name">Réservations en Brouillon</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','remplir'),('in_option','in',('no','in_option'))]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_a_revalider" model="ir.actions.act_window">
-			<field name="name">Réservations Bloquées</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','remplir'),('in_option','=','block')]</field>
-		</record>
-
-
-		<record id="action_openstock_view_reservation_done" model="ir.actions.act_window">
-			<field name="name">Réservations Terminées</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','done')]</field>
-		</record>
-
-		<record id="action_openstock_view_reservation_in_use" model="ir.actions.act_window">
-			<field name="name">Réservations en cours d'utilisation</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-			<field name="domain">[('state','=','in_use')]</field>
-		</record>
-		-->
+	
 		<record id="action_openstock_view_reservation_new" model="ir.actions.act_window">
 			<field name="name">Créer une nouvelle réservation</field>
 			<field name="type">ir.actions.act_window</field>
@@ -88,11 +54,14 @@
 		<record id="action_openstock_view_reservation_calendar" model="ir.actions.act_window">
 			<field name="name">Planning des Réservations</field>
 			<field name="type">ir.actions.act_window</field>
-			<field name="res_model">hotel.reservation</field>
+			<field name="res_model">hotel_reservation.line</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">calendar,tree,form</field>
+			<field name="context">{}</field>
 			<field name="domain">[('state','not in',('done','cancle','remplir'))]</field>
 		</record>
+		
+
 		
 		<record id="action_openstc_pret_voir_emprunts_ext" model="ir.actions.act_window">
 			<field name="name">Emprunts aux mairies extérieures encore à retourner</field>
@@ -109,10 +78,10 @@
 		    name="Prêt - Location" sequence="10" />
 
 		<menuitem id="menu_action_view_reservations" name="Gestion des Réservations"
-			parent="base.menu_main_openstock" sequence="2" />
+			parent="base.menu_main_openstock" sequence="1" />
 
 		<menuitem id="menu_action_view_articles" name="Gestion des Ressources"
-			parent="base.menu_main_openstock" sequence="1" />
+			parent="base.menu_main_openstock" sequence="2" />
 
 		<!-- MenuItems Gestion des Ressources -->
 		<menuitem id="menu_action_view_fournitures" action="action_openstock_view_fournitures"
@@ -132,9 +101,9 @@
 			parent="menu_action_view_articles" sequence="3" />
 		
 		<!-- MenuItems Gestion des Réservations -->
-		<menuitem id="menu_action_openstc_pret_resa_semaine_view"
-			action="action_openstc_pret_resa_semaine_view" name="Réservation de la semaine a traiter"
-			parent="menu_action_view_reservations" sequence="1" />
+<!-- 		<menuitem id="menu_action_openstc_pret_resa_semaine_view" -->
+<!-- 			action="action_openstc_pret_resa_semaine_view" name="Réservation de la semaine a traiter" -->
+<!-- 			parent="menu_action_view_reservations" sequence="1" /> -->
 		
 		<menuitem id="menu_action_openstock_view_reservation" action="action_openstock_view_reservation"
 			name="Réservations" parent="menu_action_view_reservations"
@@ -144,9 +113,9 @@
 			action="action_openstock_view_reservation_calendar"
 			parent="menu_action_view_reservations" sequence="3" />
 		
-		<menuitem id="menu_action_openstock_view_reservation_new"
-			action="action_openstock_view_reservation_new" name="Créer une nouvelle réservation"
-			parent="menu_action_view_reservations" sequence="4" />
+<!-- 		<menuitem id="menu_action_openstock_view_reservation_new" -->
+<!-- 			action="action_openstock_view_reservation_new" name="Créer une nouvelle réservation" -->
+<!-- 			parent="menu_action_view_reservations" sequence="4" /> -->
 		
 <!--
 		<menuitem id="menu_action_openstock_view_reservation_a_revalider"
@@ -181,7 +150,7 @@
 		<menuitem id="hotel.hotel_management_menu" name="Hotel Management"
 			groups="group_view_all_menus" />
 		
-		<!-- <record id="account.menu_finance" model="ir.ui.menu">
+		<record id="account.menu_finance" model="ir.ui.menu">
 		    <field name="groups_id" eval="[(6,0,[ref('group_view_all_menus')])]"/>
 		</record>
 		<record id="base.menu_base_partner" model="ir.ui.menu">
@@ -192,6 +161,6 @@
 		</record>
 		<record id="base.menu_purchase_root" model="ir.ui.menu">
 		    <field name="groups_id" eval="[(6,0,[ref('group_view_all_menus')])]"/>
-		</record>-->
+		</record>
 	</data>
 </openerp>
