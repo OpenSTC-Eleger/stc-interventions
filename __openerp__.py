@@ -36,6 +36,7 @@
         "report/openstc_pret_qte_dispo_report_view.xml",
         "unit_tests/unit_tests.xml",
         #"unit_tests/openstc_prets_tests.xml",
+        "test/cr_commit.yml",
         "test/openstc_prets_tests.yml",
     ],
     #"test":"test/openstc_prets_tests.yml",
