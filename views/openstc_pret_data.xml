@@ -31,7 +31,17 @@
             <field name="prefix">R-%(year)s-%(month)s-</field>
             <field name="padding" eval="3"/>
         </record>
-
+		
+		<record id="openstc_manager" model="res.groups">
+	        <field name="implied_ids" eval="[(4,ref('hotel.group_hotel_manager')),(4,ref('base.group_sale_manager'))]"/>
+    	</record>
+    	<record id="openstc_dst" model="res.groups">
+	        <field name="implied_ids" eval="[(4,ref('hotel.group_hotel_manager')),(4,ref('base.group_sale_manager'))]"/>
+    	</record>
+    	<record id="openstc_agent" model="res.groups">
+	        <field name="implied_ids" eval="[(4,ref('hotel.group_hotel_user')),(4,ref('base.group_sale_manager'))]"/>
+    	</record>
+    	
 	<!-- res partner type init for resa -->
 	<record id="openstc_prets_partner_type_asso" model="openstc.partner.type">
 	    <field name="name">Association</field>
@@ -165,8 +175,8 @@
 			    <p>Récapitulatif de votre Réservation : </p>
 			    <ul>
 			    <li>Libellé : ${object.name or ''}</li>
-			    <%
-			    import pytz
+				<%
+				import pytz
 				from datetime import datetime
 				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
 				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
@@ -174,7 +184,7 @@
 				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
 				my_checkin_str = my_checkin_str.decode('utf-8')
 				my_checkout_str = my_checkout_str.decode('utf-8')
-			    %>
+				%>
 			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
 			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
 			    <li><u>Ressources Réservées :</u> 

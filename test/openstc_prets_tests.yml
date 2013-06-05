@@ -20,14 +20,14 @@
 -
 
   !record {model: product.product, id: openstc_prets_tests_mat01, forcecreate: true}:
-    name: matériel 01 tests
+    name: material 01 tests
     openstc_reservable: true
 
 -
   creating product 2
 -
   !record {model: product.product, id: openstc_prets_tests_mat02, forcecreate: true}:
-    name: matériel 02 tests
+    name: material 02 tests
     openstc_reservable: true
 
 -
@@ -105,7 +105,7 @@
 -
 
   !record {model: hotel.reservation, id: openstc_prets_tests_resa1, forcecreate: true}:
-    name: Réservation 1
+    name: Reservation 1
     checkin: "2013-06-01 08:00:00"
     checkout: "2013-06-02 10:00:00"
     site_id: openstc_prets_tests_site1
@@ -152,7 +152,7 @@
 -
 
   !record {model: hotel.reservation, id: openstc_prets_tests_resa2, forcecreate: true}:
-    name: Réservation 2
+    name: Reservation 2
     checkin: "2013-06-01 08:00:00"
     checkout: "2013-06-02 10:00:00"
     site_id: openstc_prets_tests_site1
@@ -199,7 +199,7 @@
   test qte dispo without any other resa on same dates -->
 -    
 
-  !assert {model: hotel_reservation.line, id: openstc_prets_resa1_line1, string: Qté dispo does not return correct value !}:
+  !assert {model: hotel_reservation.line, id: openstc_prets_resa1_line1, string: Qty Dispo does not return correct value !}:
     - qte_dispo == 30.0
 
 -
@@ -235,7 +235,7 @@
 -
 
   !record {model: openstc.pret.envoie.mail.annulation.wizard, id: openstc_prets_tests_annulation1}:
-    body_html: Test automatisé, ne pas tenir compte de ce message
+    body_html: Automated Test
     email_template: openstc.openstc_pret_email_template_resa_cancelled
 -
   and i validate the wizard to cancel resa
@@ -248,7 +248,7 @@
 -
   then, i test if mail notif is sent or is outgoing concerning resa cancel
 -
-  !assert {model: mail.message, search: "[('res_id','=', ref('openstc_prets_tests_resa1')), ('model','=','hotel.reservation'),('subject','like','%Annulée%')]", string: Failed to generate or send mail notif concerning resa cancel }:
+  !assert {model: mail.message, search: "[('res_id','=', ref('openstc_prets_tests_resa1')), ('model','=','hotel.reservation'),('subject','like','%Annul%')]", string: Failed to generate or send mail notif concerning resa cancel }:
     - state in ('sent','outgoing')
     
 -
