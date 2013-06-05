@@ -35,6 +35,16 @@ def _get_request_states(self, cursor, user_id, context=None):
                 ('wait', 'Wait'),('confirm', 'To be confirm'),('valid', 'Valid'),('refused', 'Refused'),('closed', 'Closed')
             )
 
+def _test_params(params, keys):
+    param_ok = True
+    for key in keys :
+        if params.has_key(key) == False :
+            param_ok = False
+        else :
+            if params[key]==None or params[key]=='' or params[key]==0 :
+                param_ok = False
+    return param_ok
+
 
 def send_email(self, cr, uid, ids, params, context=None):
 #def send_email( params ):
@@ -296,10 +306,10 @@ class res_partner_address(osv.osv):
                                     ['user_id'],
                                     context)
 
-        if partner_address.has_key('user_id') :
+        if partner_address.has_key('user_id')!= False :
             if partner_address['user_id'] != False :
                 user = user_obj.browse(cr, uid, partner_address['user_id'][0], context=context)
-                if user.id != 0:
+                if user.id != 0 and  _test_params(params, ['login','password','name','email'])!= False :
                     user_obj.write(cr, uid, [user.id], {
                                     'name': data['name'],
                                     'firstname': data['name'],
@@ -316,19 +326,19 @@ class res_partner_address(osv.osv):
         res = super(res_partner_address, self).write(cr, uid, ids, data, context)
         return res
 
-    def create_account(self, cr, uid, ids, data, context):
-        if data.has_key('login') and data.has_key('password'):
+    def create_account(self, cr, uid, ids, params, context):
+        if _test_params(params, ['login','password','name','email'])!= False :
 
             user_obj = self.pool.get('res.users')
 
             group_obj = self.pool.get('res.groups')
             group_id = group_obj.search(cr, uid, [('code','=','PARTNER')])[0]
             user_id = user_obj.create(cr, uid,{
-                    'name': data['name'],
-                    'firstname': data['name'],
-                    'user_email': data['email'],
-                    'login': data['login'],
-                    'new_password': data['password'],
+                    'name': params['name'],
+                    'firstname': params['name'],
+                    'user_email': params['email'],
+                    'login': params['login'],
+                    'new_password': params['password'],
                     'groups_id' : [(6, 0, [group_id])],
                     })
             self.write(cr, uid, ids, {
@@ -437,14 +447,14 @@ class users(osv.osv):
         #_logger.debug('create USER-----------------------------------------------');
         res = super(users, self).create(cr, uid, data, context)
 
-        if data.has_key('isManager') and data['isManager']==True :
+        if data.has_key('isManager')!=False and data['isManager']==True :
             self.set_manager(cr, uid, [res], data, context)
 
         return res
 
     def write(self, cr, uid, ids, data, context=None):
 
-        if data.has_key('isManager') and data['isManager']==True :
+        if data.has_key('isManager')!=False and data['isManager']==True :
             self.set_manager(cr, uid, ids, data, context)
 
         res = super(users, self).write(cr, uid, ids, data, context=context)
@@ -546,6 +556,10 @@ class task(osv.osv):
 #                res[task.id]['progress'] = 100.0
 #        return res
 
+
+
+
+
     _columns = {
         'active': fields.boolean('Active'),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
@@ -565,6 +579,8 @@ class task(osv.osv):
         'km': fields.integer('Km', select=1),
         'oil_qtity': fields.float('oil quantity', select=1),
         'oil_price': fields.float('oil price', select=1),
+
+        'cancel_reason': fields.text('Cancel reason'),
 
 
 #        'planned_hours': fields.float('Planned print_on_orderHours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
@@ -589,6 +605,21 @@ class task(osv.osv):
 #    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
 #        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
 
+    def create(self, cr, uid, params, context=None):
+
+        task_obj = self.pool.get(self._name)
+
+
+
+        self.updateEquipment(cr, uid, params, context)
+
+        res = super(task, self).create(cr, uid, params, context)
+        new_task = task_obj.browse(cr, uid, res, context)
+
+        self.createWork(cr, uid, new_task, params, context)
+
+        return res
+
     def _is_template(self, cr, uid, ids, field_name, arg, context=None):
         res = {}
         for task in self.browse(cr, uid, ids, context=context):
@@ -599,54 +630,84 @@ class task(osv.osv):
     def saveTaskDone(self, cr, uid, ids, params, context=None):
         task_obj = self.pool.get(self._name)
         task = task_obj.browse(cr, uid, ids[0], context)
-        task_work_obj = self.pool.get('project.task.work')
+
         project_obj = self.pool.get('project.project')
         ask_obj = self.pool.get('openstc.ask')
-        equipment_obj = self.pool.get('openstc.equipment')
 
-        #Update kilometers on vehucule
-        if ((params['vehicule'] or False) and (params['km'] or False )) :
-            equipment_obj.write(cr, uid, params['vehicule'], {
-                     'km': params['km'],
-                 }, context=context)
-
-        #Update intervention sate
-        project_obj.write(cr, uid, task.project_id.id, {
-                'state': params['project_state'],
-            }, context=context)
-        project = project_obj.browse(cr, uid, [task.project_id.id], context=context)
-        ask_id = project[0].ask_id.id
         #Also close ask when intevention is closing
-        if params['project_state'] == 'closed' and project[0]!=None and project[0].ask_id:
-            ask_obj.write(cr, uid, ask_id, {
+        if _test_params(params,['project_state'])!= False:
+            #Update intervention sate
+            project_obj.write(cr, uid, task.project_id.id, {
                     'state': params['project_state'],
                 }, context=context)
+            project = project_obj.browse(cr, uid, [task.project_id.id], context=context)
+            ask_id = project[0].ask_id.id
+            if params['project_state'] == 'closed' and project[0]!=None and project[0].ask_id:
+                ask_obj.write(cr, uid, ask_id, {
+                        'state': params['project_state'],
+                    }, context=context)
             #TODO uncomment
             #send_email(self, cr, uid, [ask_id], params, context=None)
 
-        #update task work
-        task_work_obj.create(cr, uid, {
-             'name': task.name,
-             'date': params['date'],
-             'task_id': task.id,
-             'hours': params['hours'],
-             'user_id': task.user_id.id or False,
-             'team_id': task.team_id.id or False,
-             'company_id': task.company_id.id or False,
-            }, context=context)
+
 
         #update task
-        equipments_ids = params['equipment_ids'] if params['equipment_ids'][0]!=None else []
-        task_obj.write(cr, uid, ids[0], {
-                'state': params['task_state'],
-                'equipment_ids': [[6, 0, equipments_ids]],
-                'remaining_hours': params['remaining_hours'],
-                'km': params['km']or False ,
-                'oil_qtity': params['oil_qtity'] or False,
-                'oil_price': params['oil_price'] or False,
-            }, context=context)
+        if params.has_key('equipment_ids') and len(params['equipment_ids'])>0 :
+            equipments_ids = params['equipment_ids']
+        else :
+            equipments_ids = []
+
+        if _test_params(params, ['task_state'])!= False :
+            task_obj.write(cr, uid, ids[0], {
+                    'state': params['task_state'],
+                    'equipment_ids': [[6, 0, equipments_ids]],
+                    'remaining_hours': 0 if params.has_key('remaining_hours')== False else params['remaining_hours'],
+                    'km': 0 if params.has_key('km')== False else params['km'],
+                    'oil_qtity': 0 if params.has_key('oil_qtity')== False else params['oil_qtity'],
+                    'oil_price': 0 if params.has_key('oil_price')== False else params['oil_price'],
+                }, context=context)
+
+            self.createWork(cr, uid, task, params, context)
+
+        if _test_params(params, ['planned_hours'])!= False :
+            task_obj.create(cr, uid, {
+                                'name'              : task.name,
+                                'parent_id'         : task.id,
+                                'project_id'        : task.project_id.id or False,
+                                'state'             : 'draft',
+                                'planned_hours'     : 0 if params.has_key('planned_hours')== False else params['planned_hours'],
+                                'remaining_hours'   : 0 if params.has_key('planned_hours')== False else params['planned_hours'],
+                                'user_id'           : None,
+                                'team_id'           : None,
+                                'date_end'          : None,
+                                'date_start'        : None,
+                            }, context);
+        self.updateEquipment(cr, uid, params, context)
 
         return True
+
+    def updateEquipment(self, cr, uid, params, context):
+        equipment_obj = self.pool.get('openstc.equipment')
+        #Update kilometers on vehucule
+        if _test_params(params,['vehicule','km'])!= False :
+            equipment_obj.write(cr, uid, params['vehicule'], {
+                     'km': 0 if params.has_key('km')== False else params['km']
+                 }, context=context)
+
+    def createWork(self, cr, uid, task, params, context):
+        task_work_obj = self.pool.get('project.task.work')
+        #update task work
+        if _test_params(params,['hours','date'])!=False:
+            task_work_obj.create(cr, uid, {
+                 'name': task.name,
+                 'date':  datetime.now().strftime('%Y-%m-%d') if params.has_key('date')== False  else params['date'],
+                 'task_id': task.id,
+                 'hours':  0 if params.has_key('hours')== False else params['hours'],
+                 'user_id': task.user_id.id or False,
+                 'team_id': task.team_id.id or False,
+                 'company_id': task.company_id.id or False,
+                }, context=context)
+
 
 task()
 
@@ -784,29 +845,30 @@ class project(osv.osv):
         ask_obj = self.pool.get('openstc.ask')
 
         #update intervention's tasks
-        for task in project.tasks:
-             task_obj.write(cr, uid, [task.id], {
-                'state' : params['state'],
-                'user_id': None,
-                'team_id': None,
-                'date_end': None,
-                'date_start': None,
-            }, context=context)
+        if _test_params(params, ['state','cancel_reason'])!= False:
+            for task in project.tasks:
+                 task_obj.write(cr, uid, [task.id], {
+                    'state' : params['state'],
+                    'user_id': None,
+                    'team_id': None,
+                    'date_end': None,
+                    'date_start': None,
+                }, context=context)
 
-        #update intervention with cancel's reason
-        project_obj.write(cr, uid, ids[0], {
-                'state' : params['state'],
-                'cancel_reason': params['cancel_reason'],
-            }, context=context)
+            #update intervention with cancel's reason
+            project_obj.write(cr, uid, ids[0], {
+                    'state' : params['state'],
+                    'cancel_reason': params['cancel_reason'],
+                }, context=context)
 
-        ask_id = project.ask_id.id
-        #update ask state of intervention
-        if ask_id :
-            ask_obj.write(cr, uid, ask_id , {
-                        'state': 'closed',
-                    }, context=context)
-        #TODO uncomment
-        #send_email(self, cr, uid, [ask_id], params, context=None)
+            ask_id = project.ask_id.id
+            #update ask state of intervention
+            if ask_id :
+                ask_obj.write(cr, uid, ask_id , {
+                            'state': 'closed',
+                        }, context=context)
+                #TODO uncomment
+                #send_email(self, cr, uid, [ask_id], params, context=None)
         return True;
 
     _defaults = {
@@ -949,7 +1011,7 @@ class ask(osv.osv):
                 isManager = True
 
             ask = asks[0] or False
-            if isManager and ask and ask.has_key('intervention_ids') and ask.has_key('service_id') and user.has_key('service_ids') :
+            if isManager and ask and ask.has_key('intervention_ids')!=False and ask.has_key('service_id') and user.has_key('service_ids')!=False :
                 if len(ask['intervention_ids'])==0 and ask['service_id'][0] in user['service_ids']:
                         if ask['state'] == 'wait' :
                             res[id] = ['valid', 'refused']
@@ -1029,7 +1091,7 @@ class ask(osv.osv):
         'manager_id': fields.many2one('res.users', 'Manager'),
         'partner_service_id': fields.related('partner_id', 'service_id', type='many2one', relation='openstc.service', string='Service du demandeur', help='...'),
         'service_id':fields.many2one('openstc.service', 'Service concerné'),
-        #'date_deadline': fields.date('Deadline',select=True),
+        'date_deadline': fields.date('Date souhaitée'),
         'state': fields.selection(_get_request_states, 'State', readonly=True,
                           help='If the task is created the state is \'Wait\'.\n If the task is started, the state becomes \'In Progress\'.\n If review is needed the task is in \'Pending\' state.\
                           \n If the task is over, the states is set to \'Done\'.'),
