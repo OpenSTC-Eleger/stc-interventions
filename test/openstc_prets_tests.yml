@@ -301,7 +301,7 @@
   !record {model: openstc.pret.create.inter.wizard, id: wizard_inter1}:
     time_planned: 2.0
     categ_id: openstc.openstc_pret_supply_categ_task
-    service: openstc_prets_tests_service_voirie
+    service_id: openstc_prets_tests_service_voirie
 -
   i simulate click button simulating wizard validation that will generate intervention
 -
