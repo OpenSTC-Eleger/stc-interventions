@@ -25,9 +25,9 @@
 ##############################################################################
 
 {
-    "name": "openstc_prets",
+    "name": "openstc",
     "version": "0.1",
-    "depends": ["web","purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
+    "depends": ["web", "web_calendar","purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
     "author": "PYF & BP",
     "shortdesc":"openstc",
     "category": "Category",
@@ -59,7 +59,7 @@
         "test/openstc_prets_tests.yml",
     ],
     #"test":"test/openstc_prets_tests.yml",
-    "js":['static/js/calendar_inherit.js'],
+    "js":['static/src/js/calendar_inherit.js'],
     "demo": [],
     "test": [],
     "installable": True,

@@ -18,7 +18,7 @@
  * along with OpenSTC Interventions.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-openerp.openstc_prets = function(openerp) {
+openerp.openstc = function(openerp) {
 	t = openerp.web._t,
     _lt = openerp.web._lt;
 	var openstc_init_dates = new Date();
