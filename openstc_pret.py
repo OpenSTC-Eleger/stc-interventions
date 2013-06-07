@@ -1097,7 +1097,7 @@ class hotel_reservation(osv.osv):
         email = False
         if partner_shipping_id:
             email = self.pool.get("res.partner.address").browse(cr, uid, partner_shipping_id).email
-        return {'value':{'partner_mail':email}}
+        return {'value':{'partner_mail':email,'partner_invoice_id':partner_shipping_id,'partner_order_id':partner_shipping_id}}
     
 
 hotel_reservation()
