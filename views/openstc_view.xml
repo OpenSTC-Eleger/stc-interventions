@@ -1050,8 +1050,10 @@
  		<!--  <record id="project.menu_project_management" model="ir.ui.menu">
       		<field name="name">Interventions Management</field>
     	</record> -->
-
-		<menuitem id="project.menu_project_management"
+		
+		<delete id="project.menu_project_management" model="ir.ui.menu"/>
+		
+		<menuitem id="menu_intervention_management"
 			groups="openstc_employee"
 			name="Gestion des interventions"
 			parent="base.menu_main_pm"
@@ -1059,7 +1061,7 @@
 
 		<menuitem action="action_openstc_view_ask"
    			id="menu_action_openstc_view_ask"
-   			parent="project.menu_project_management"
+   			parent="menu_intervention_management"
    			name="Demandes d'interventions"
    			groups="openstc_employee"
    			sequence="1"/>
@@ -1069,19 +1071,21 @@
    			id="menu_planning"
 			groups="openstc_dst,openstc_manager"
 			name="Planning"
-			parent="project.menu_project_management"
+			parent="menu_intervention_management"
 			sequence="2"/>
 
+   		<delete id="project.menu_open_view_project_all" model="ir.ui.menu"/>
+   		
 		<menuitem name="Interventions"
 				action="action_openstc_view_intervention"
 				id="project.menu_open_view_project_all"
-				parent="project.menu_project_management"
+				parent="menu_intervention_management"
 				groups="openstc_qualifier"
 				sequence="3"/>
 
 		<menuitem action="openstc_action_view_task"
 				id="openstc_menu_action_view_task"
-				parent="project.menu_project_management"
+				parent="menu_intervention_management"
 				name="Tasks"
 				groups="openstc_qualifier,openstc_agent"
 				sequence="4"/>
