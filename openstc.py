@@ -25,10 +25,11 @@
 from datetime import datetime
 import types
 
-from osv import fields, osv
+from osv.orm import browse_record, browse_null
+from osv import fields, osv, orm
 from tools.translate import _
 
-#_logger = logging.getLogger(__name__)
+#_logger = logging.getLogger(__name__
 
 def _get_request_states(self, cursor, user_id, context=None):
     return (
@@ -406,7 +407,7 @@ class users(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
-    #Calcultes if agent belongs to 'arg' code group
+    #Calculates if agent belongs to 'arg' code group
     def _get_group(self, cr, uid, ids, fields, arg, context):
          res = {}
          user_obj = self.pool.get('res.users')
@@ -556,16 +557,59 @@ class task(osv.osv):
 #                res[task.id]['progress'] = 100.0
 #        return res
 
+    #Calculates if agent belongs to 'arg' code group
+    def _get_active(self, cr, uid, ids, fields, arg, context):
+         res = {}
+         user_obj = self.pool.get('res.users')
+         task_obj = self.pool.get('project.task')
+         team_obj = self.pool.get('openstc.team')
+         project_obj = self.pool.get('project.project')
 
+         user = user_obj.browse(cr, uid, uid,context)
+
+
+         for id in ids:
+            task = task_obj.browse(cr, uid, id, context=context)
+
+            task_user_id = task_team_id = team_manager_id = task_project_id = project_service_id = False
+            if isinstance(task.user_id, browse_null)!= True :
+                task_user_id = task.user_id.id
+
+            if isinstance(task.team_id, browse_null)!= True :
+                task_team_id = task.team_id.id
+                team = team_obj.browse(cr, uid, task.team_id.id, context=context)
+
+            if task_team_id!= False :
+                if isinstance(team.manager_id, browse_null)!= True :
+                    team_manager_id = team.manager_id.id
+
+            if isinstance(task.project_id, browse_null)!= True :
+                task_project_id = task.project_id.id
+
+            if task_project_id != False :
+                project = project_obj.browse(cr, uid, task_project_id, context=context)
+                try:
+                   if isinstance(project.service_id, browse_null)!= True :
+                       project_service_id = project.service_id.id
+                except orm.except_orm, inst:
+                     project_service_id = False
+
+            belongsToOfficer = (task_user_id!=False and task_user_id == user.id) or (team_manager_id!=False and team_manager_id == task_user_id)
+            belongsToTeam = task_team_id in ( t.id for t in user.team_ids )
+            belongsToServiceManager = project_service_id in (s.id for s in user.service_ids) and user.isManager == True
+            res[id] = True if belongsToOfficer or belongsToTeam or belongsToServiceManager or user.isDST else False
+         return res
 
 
 
     _columns = {
-        'active': fields.boolean('Active'),
+        'active':fields.function(_get_active, method=True,type='boolean', store=False),
+        #'active': fields.boolean('Active'),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'equipment_ids':fields.many2many('openstc.equipment', 'openstc_equipment_task_rel', 'task_id', 'equipment_id', 'Equipments'),
         #'equipment_id':fields.many2one('openstc.equipment', 'Equipment'),
+        #'service_id': fields.related('project_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
         'parent_id': fields.many2one('project.task', 'Parent Task'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'absent_type_id':fields.many2one('openstc.absent.type', 'Type d''abscence'),
@@ -581,6 +625,8 @@ class task(osv.osv):
         'oil_price': fields.float('oil price', select=1),
 
         'cancel_reason': fields.text('Cancel reason'),
+
+
 
 
 #        'planned_hours': fields.float('Planned print_on_orderHours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
