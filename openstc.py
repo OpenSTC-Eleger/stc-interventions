@@ -1251,6 +1251,7 @@ class ask(osv.osv):
         project_id = project_obj.create(cr, uid, {
                 'ask_id': ask.id,
                 'name': ask.name,
+                'date_deadline': params['date_deadline'],
                 'description': params['description'],
                 'state': params['project_state'],
                 'site1': params['site1'],
