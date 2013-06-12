@@ -36,13 +36,6 @@ def _get_request_states(self, cursor, user_id, context=None):
                 ('wait', 'Wait'),('confirm', 'To be confirm'),('valid', 'Valid'),('refused', 'Refused'),('closed', 'Closed')
             )
 
-def _get_param(params, key):
-    if params.has_key(key) == True :
-        if params[key]!=None or params[key]!='' or params[key]>0 :
-            return params[key]
-    return False;
-
-
 def _test_params(params, keys):
     param_ok = True
     for key in keys :
@@ -658,9 +651,11 @@ class task(osv.osv):
 #    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
 #        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
 
-    def createOrphan(self, cr, uid, ids, params, context=None):
+    def create(self, cr, uid, params, context=None):
 
         task_obj = self.pool.get(self._name)
+
+
 
         self.updateEquipment(cr, uid, params, context)
 
@@ -677,103 +672,65 @@ class task(osv.osv):
             res[task.id] = True
         return res
 
-    def reportHours(self, cr, uid, ids, params, context=None):
-
-        #report_hours
-        #remaining_hours
-
+    # Method called on mark task done from swif
+    def saveTaskDone(self, cr, uid, ids, params, context=None):
         task_obj = self.pool.get(self._name)
-        #Get current task
         task = task_obj.browse(cr, uid, ids[0], context)
-        #do nothing if task no found or not report hours
-        if task==None or task == False : return False
-        if not _get_param(params, 'report_hours') : return False
 
         project_obj = self.pool.get('project.project')
         ask_obj = self.pool.get('openstc.ask')
-        #Get intervention's task
-        if task.project_id!=None and task.project_id!=False :
-            if task.project_id.id > 0 :
-                project = project_obj.browse(cr, uid, [task.project_id.id], context=context)[0]
-                #update intervention state
-                if (project.state != 'template'):
-                    #update intervention state  : pending because remaining_hours>0
-                    project_obj.write(cr, uid, project.id, {
-                        'state': 'pending',
-                    }, context=context)
 
-        #Prepare equipment list
+        #Also close ask when intevention is closing
+        if _test_params(params,['project_state'])!= False:
+            #Update intervention sate
+            project_obj.write(cr, uid, task.project_id.id, {
+                    'state': params['project_state'],
+                }, context=context)
+            project = project_obj.browse(cr, uid, [task.project_id.id], context=context)
+            ask_id = project[0].ask_id.id
+            if params['project_state'] == 'closed' and project[0]!=None and project[0].ask_id:
+                ask_obj.write(cr, uid, ask_id, {
+                        'state': params['project_state'],
+                    }, context=context)
+            #TODO uncomment
+            #send_email(self, cr, uid, [ask_id], params, context=None)
+
+
+
+        #update task
         if params.has_key('equipment_ids') and len(params['equipment_ids'])>0 :
             equipments_ids = params['equipment_ids']
         else :
             equipments_ids = []
-        #update mobile equipment kilometers
-        self.updateEquipment(cr, uid, params, context)
 
-        #Records report time
-        self.createWork(cr, uid, task, params, context)
-
-        #Update Task
-        task_obj.write(cr, uid, ids[0], {
-                'state': 'done',
-                'date_start': task.date_start or _get_param(params, 'date_start'),
-                'date_end': task.date_end or _get_param(params, 'date_end'),
-                'team_id': task.team_id.id or _get_param(params, 'team_id'),
-                'user_id': task.user_id.id or _get_param(params, 'user_id'),
-                'equipment_ids': [[6, 0, equipments_ids]],
-                'remaining_hours': 0,
-                'km': 0 if params.has_key('km')== False else params['km'],
-                'oil_qtity': 0 if params.has_key('oil_qtity')== False else params['oil_qtity'],
-                'oil_price': 0 if params.has_key('oil_price')== False else params['oil_price'],
-            }, context=context)
-
-
-
-        ask_id = 0
-        if project!=None :
-            ask_id = project.ask_id.id
-
-
-
-        if _test_params(params,['remaining_hours'])!=False:
-           #Not finnished task : Create new task for planification
-           task_obj.create(cr, uid, {
-                 'name'              : task.name,
-                 'parent_id'         : task.id,
-                 'project_id'        : task.project_id.id or False,
-                 'state'             : 'draft',
-                 'planned_hours'     : 0 if params.has_key('remaining_hours')== False else params['remaining_hours'],
-                 'remaining_hours'   : 0 if params.has_key('remaining_hours')== False else params['remaining_hours'],
-                 'user_id'           : None,
-                 'team_id'           : None,
-                 'date_end'          : None,
-                 'date_start'        : None,
-             }, context)
-        else:
-            #Finnished task
-            all_task_finnished = True
-
-            #if task is the last at ['open','pending', 'draft'] state on intervention : close intervention and ask.
-            for t in project.tasks :
-                if task.id!=t.id and t.state in ['open','pending', 'draft']:
-                    all_task_finnished = False
-                    break
-
-            if all_task_finnished == True:
-                project_obj.write(cr, uid, project.id, {
-                    'state': 'closed',
+        if _test_params(params, ['task_state'])!= False :
+            task_obj.write(cr, uid, ids[0], {
+                    'state': params['task_state'],
+                    'equipment_ids': [[6, 0, equipments_ids]],
+                    'remaining_hours': 0 if params.has_key('remaining_hours')== False else params['remaining_hours'],
+                    'km': 0 if params.has_key('km')== False else params['km'],
+                    'oil_qtity': 0 if params.has_key('oil_qtity')== False else params['oil_qtity'],
+                    'oil_price': 0 if params.has_key('oil_price')== False else params['oil_price'],
                 }, context=context)
 
-                if ask_id>0 :
-                    ask_obj.write(cr, uid, ask_id, {
-                        'state': 'closed',
-                    }, context=context)
+            self.createWork(cr, uid, task, params, context)
 
-                #TODO
-                #send email ==>  email_text: demande 'closed',
+        if _test_params(params, ['planned_hours'])!= False :
+            task_obj.create(cr, uid, {
+                                'name'              : task.name,
+                                'parent_id'         : task.id,
+                                'project_id'        : task.project_id.id or False,
+                                'state'             : 'draft',
+                                'planned_hours'     : 0 if params.has_key('planned_hours')== False else params['planned_hours'],
+                                'remaining_hours'   : 0 if params.has_key('planned_hours')== False else params['planned_hours'],
+                                'user_id'           : None,
+                                'team_id'           : None,
+                                'date_end'          : None,
+                                'date_start'        : None,
+                            }, context);
+        self.updateEquipment(cr, uid, params, context)
 
         return True
-
 
     def updateEquipment(self, cr, uid, params, context):
         equipment_obj = self.pool.get('openstc.equipment')
@@ -786,17 +743,17 @@ class task(osv.osv):
     def createWork(self, cr, uid, task, params, context):
         task_work_obj = self.pool.get('project.task.work')
         #update task work
+        if _test_params(params,['hours','date'])!=False:
+            task_work_obj.create(cr, uid, {
+                 'name': task.name,
+                 'date':  datetime.now().strftime('%Y-%m-%d') if params.has_key('date')== False  else params['date'],
+                 'task_id': task.id,
+                 'hours':  0 if params.has_key('hours')== False else params['hours'],
+                 'user_id': task.user_id.id or False,
+                 'team_id': task.team_id.id or False,
+                 'company_id': task.company_id.id or False,
+                }, context=context)
 
-        task_work_obj.create(cr, uid, {
-             'name': task.name,
-             #TODO : manque l'heure
-             'date':  datetime.now().strftime('%Y-%m-%d') if params.has_key('date')== False  else params['date'],
-             'task_id': task.id,
-             'hours':  _get_param(params, 'report_hours'),
-             'user_id': task.user_id.id or False,
-             'team_id': task.team_id.id or False,
-             'company_id': task.company_id.id or False,
-            }, context=context)
 
 task()
 
