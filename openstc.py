@@ -904,6 +904,34 @@ class project(osv.osv):
     _description = "Interventon stc"
     _inherit = "project.project"
 
+    #Overrides project : progress_rate ratio on planned_hours instead of 'total_hours'
+    def _progress_rate(self, cr, uid, ids, names, arg, context=None):
+        child_parent = self._get_project_and_children(cr, uid, ids, context)
+        # compute planned_hours, total_hours, effective_hours specific to each project
+        cr.execute("""
+            SELECT project_id, COALESCE(SUM(planned_hours), 0.0),
+                COALESCE(SUM(total_hours), 0.0), COALESCE(SUM(effective_hours), 0.0)
+            FROM project_task WHERE project_id IN %s AND state <> 'cancelled'
+            GROUP BY project_id
+            """, (tuple(child_parent.keys()),))
+        # aggregate results into res
+        res = dict([(id, {'planned_hours':0.0,'total_hours':0.0,'effective_hours':0.0}) for id in ids])
+        for id, planned, total, effective in cr.fetchall():
+            # add the values specific to id to all parent projects of id in the result
+            while id:
+                if id in ids:
+                    res[id]['planned_hours'] += planned
+                    res[id]['total_hours'] += total
+                    res[id]['effective_hours'] += effective
+                id = child_parent[id]
+        # compute progress rates
+        for id in ids:
+            if res[id]['planned_hours']:
+                res[id]['progress_rate'] = round(100.0 * res[id]['effective_hours'] / res[id]['planned_hours'], 2)
+            else:
+                res[id]['progress_rate'] = 0.0
+        return res
+
 
 
     _columns = {
