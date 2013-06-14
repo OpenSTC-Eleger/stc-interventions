@@ -525,12 +525,19 @@ class hotel_reservation(osv.osv):
     def need_confirm(self, cr, uid, ids):
         reservations = self.browse(cr, uid, ids)
         etape_validation = False
-        prog = re.compile(u'[Oo]pen(STC|[SC]TM)/([Mm]anager|[Dd][Ss][Tt])')
-        groups = self.pool.get("res.users").browse(cr, uid, uid, context=None).groups_id
         #if group == "Responsable", no need confirm
-        for group in groups:
-            if prog.search(group.name):
-                return False
+        group_manager_id = self.pool.get("ir.model.data").get_object_reference(cr, uid, 'openstc','openstc_manager')
+        #@TODO: if not found, perharps groups has been deleted, have to make an assert
+        if group_manager_id:
+            for group in self.pool.get('res.users').browse(cr, uid, uid).groups_id:
+                if group.id == group_manager_id[1]:
+                    return False
+#        prog = re.compile(u'[Oo]pen(STC|[SC]TM)/([Mm]anager|[Dd][Ss][Tt])')
+#        groups = self.pool.get("res.users").browse(cr, uid, uid, context=None).groups_id
+#        #if group == "Responsable", no need confirm
+#        for group in groups:
+#            if prog.search(group.name):
+#                return False
         #else, check each seuil confirm products
         for resa in reservations:
                 for line in resa.reservation_line:
@@ -1090,7 +1097,7 @@ class hotel_reservation(osv.osv):
         email = False
         if partner_shipping_id:
             email = self.pool.get("res.partner.address").browse(cr, uid, partner_shipping_id).email
-        return {'value':{'partner_mail':email}}
+        return {'value':{'partner_mail':email,'partner_invoice_id':partner_shipping_id,'partner_order_id':partner_shipping_id}}
     
 
 hotel_reservation()
