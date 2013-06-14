@@ -551,6 +551,17 @@ class task(osv.osv):
     _description = "Task ctm"
     _inherit = "project.task"
 
+    #Overrides search method of project module
+    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+
+    #Overrides _is_template method of project module
+    def _is_template(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        for task in self.browse(cr, uid, ids, context=context):
+            res[task.id] = True
+        return res
+
         # Compute: effective_hours, total_hours, progress
 #    def _hours_get(self, cr, uid, ids, field_names, args, context=None):
 #        res = {}
