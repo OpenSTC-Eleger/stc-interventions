@@ -25,6 +25,8 @@
 from datetime import datetime
 import types
 
+import logging
+import netsvc
 from osv.orm import browse_record, browse_null
 from osv import fields, osv, orm
 from tools.translate import _
@@ -550,6 +552,7 @@ class task(osv.osv):
     _name = "project.task"
     _description = "Task ctm"
     _inherit = "project.task"
+    __logger = logging.getLogger(_name)
 
     #Overrides search method of project module
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
@@ -561,6 +564,8 @@ class task(osv.osv):
         for task in self.browse(cr, uid, ids, context=context):
             res[task.id] = True
         return res
+
+
 
         # Compute: effective_hours, total_hours, progress
 #    def _hours_get(self, cr, uid, ids, field_names, args, context=None):
@@ -682,11 +687,6 @@ class task(osv.osv):
 
         return res
 
-    def _is_template(self, cr, uid, ids, field_name, arg, context=None):
-        res = {}
-        for task in self.browse(cr, uid, ids, context=context):
-            res[task.id] = True
-        return res
 
     def reportHours(self, cr, uid, ids, params, context=None):
 
@@ -724,6 +724,7 @@ class task(osv.osv):
         #Records report time
         self.createWork(cr, uid, task, params, context)
 
+        self.__logger.warning('----------------- Write task %s ------------------------------', ids[0])
         #Update Task
         task_obj.write(cr, uid, ids[0], {
                 'state': 'done',
@@ -903,6 +904,8 @@ class project(osv.osv):
     _description = "Interventon stc"
     _inherit = "project.project"
 
+
+
     _columns = {
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
         'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
@@ -921,6 +924,9 @@ class project(osv.osv):
         'cancel_reason': fields.text('Cancel reason'),
     }
 
+    #Overrides  set_template method of project module
+    def set_template(self, cr, uid, ids, context=None):
+        return True;
 
     def _get_active_inter(self, cr, uid, context=None):
         if context is None:
