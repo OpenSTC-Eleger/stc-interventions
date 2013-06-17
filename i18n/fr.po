@@ -1909,8 +1909,8 @@ msgstr "Ressources empruntées"
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_partner
 #: model:ir.ui.menu,name:openstc.menu_openstc_partner
-msgid "Demandeurs"
-msgstr "Demandeurs"
+msgid "Organisations"
+msgstr "Organisations"
 
 #. module: openstc
 #: code:addons/openstc/openstc_pret.py:433
@@ -2656,8 +2656,8 @@ msgstr "Commande de ventes"
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_partner_type2
 #: model:ir.ui.menu,name:openstc.menu_action_openstc_view_partner_type2
-msgid "Types de demandeur"
-msgstr "Types de demandeur"
+msgid "Types d'organisation"
+msgstr "Types d'organisation"
 
 #. module: openstc
 #: view:hotel.reservation:0
