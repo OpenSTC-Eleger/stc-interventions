@@ -572,7 +572,7 @@
 		</record>
 
 		<record id="action_openstc_view_partner" model="ir.actions.act_window">
-            <field name="name">Demandeurs</field>
+            <field name="name">Organisations</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>
             <field name="view_type">form</field>
@@ -585,7 +585,7 @@
             <field name="model">openstc.partner.type.type</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="Demandeur type">
+                <form string="Organisation type">
                 	<group colspan="2" col="2">
                 		<field name="code" />
                 		<field name="name"/>
@@ -600,7 +600,7 @@
             <field name="type">tree</field>
              <field name="priority" eval="8"/>
             <field name="arch" type="xml">
-                <tree string="Demandeur type" >
+                <tree string="Organisation type" >
                 	<field name="code"/>
                		<field name="name"/>
                 </tree>
@@ -608,7 +608,7 @@
         </record>
 
        <record id="action_openstc_view_partner_type2" model="ir.actions.act_window">
-            <field name="name">Types de demandeur</field>
+            <field name="name">Types d'organisation</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">openstc.partner.type</field>
             <field name="view_type">form</field>
@@ -626,7 +626,7 @@
                 <form string="Intervention asks">
                 	 <group col="4" colspan="4">
                 	    <group colspan="2" col="2">
-	                    	<separator string="Demandeur" colspan="2"/>
+	                    	<separator string="Organisation" colspan="2"/>
 	                    	<field name="partner_type" on_change="onChangePartnerType(partner_type)"/>
 	                	 	<field name="partner_type_code" invisible="1"/>
 	                    	<field name="partner_id"  on_change="onChangePartner(partner_id)"
@@ -1050,9 +1050,9 @@
  		<!--  <record id="project.menu_project_management" model="ir.ui.menu">
       		<field name="name">Interventions Management</field>
     	</record> -->
-		
+
 		<delete id="project.menu_project_management" model="ir.ui.menu"/>
-		
+
 		<menuitem id="menu_intervention_management"
 			groups="openstc_employee"
 			name="Gestion des interventions"
@@ -1075,7 +1075,7 @@
 			sequence="2"/>
 
    		<delete id="project.menu_open_view_project_all" model="ir.ui.menu"/>
-   		
+
 		<menuitem name="Interventions"
 				action="action_openstc_view_intervention"
 				id="project.menu_open_view_project_all"
@@ -1107,12 +1107,18 @@
 			parent="base.menu_main_pm"
 			sequence="3"/>
 
+   	    <delete id="menu_openstc_partner" model="ir.ui.menu"/>
+   	    <delete id="menu_action_openstc_view_partner_type2" model="ir.ui.menu"/>
+   	    <delete id="menu_carto" model="ir.ui.menu"/>
+
+
+
    		<!--  Configuration/Partner -->
    		<menuitem
    		    action="action_openstc_view_partner"
    			id="menu_openstc_partner"
    			groups="openstc_dst"
-   			name="Demandeurs"
+   			name="Organisations"
    			parent="menu_configuration"
    			sequence="1"/>
 
@@ -1183,8 +1189,8 @@
    		<!--  Carto -->
 
    	  <menuitem id="menu_carto"
-			groups="openstc_employee"
 			name="Cartographie"
+			groups="base.group_erp_manager"
 			parent="base.menu_main_pm"
 			sequence="4"/>
 
@@ -1193,24 +1199,24 @@
    			id="menu_action_openstc_view_carto_request"
    			parent="menu_carto"
    			name="nouvelle intervention"
-   			groups="openstc_employee"
+   			groups="base.group_erp_manager"
    			sequence="1"/>
    	 <menuitem action="action_openstc_view_carto_inter"
    			id="menu_action_openstc_view_carto_intervention"
    			parent="menu_carto"
-   			groups="openstc_employee"
+   			groups="base.group_erp_manager"
    			sequence="2"/>
    	 <menuitem action="action_openstc_view_carto_inter"
    			id="menu_action_openstc_view_carto_stat"
    			parent="menu_carto"
    			name="statistique"
-   			groups="openstc_employee"
+   			groups="base.group_erp_manager"
    			sequence="3"/>
    	 <menuitem action="action_openstc_view_carto_inter"
    			id="menu_action_openstc_view_carto_geoportail"
    			parent="menu_carto"
    			name="geoportail"
-   			groups="openstc_employee"
+   			groups="base.group_erp_manager"
    			sequence="4"/>
 
 		<!--  Dashboard -->

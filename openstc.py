@@ -25,6 +25,8 @@
 from datetime import datetime
 import types
 
+import logging
+import netsvc
 from osv.orm import browse_record, browse_null
 from osv import fields, osv, orm
 from tools.translate import _
@@ -550,6 +552,20 @@ class task(osv.osv):
     _name = "project.task"
     _description = "Task ctm"
     _inherit = "project.task"
+    __logger = logging.getLogger(_name)
+
+    #Overrides search method of project module
+    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+
+    #Overrides _is_template method of project module
+    def _is_template(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        for task in self.browse(cr, uid, ids, context=context):
+            res[task.id] = True
+        return res
+
+
 
         # Compute: effective_hours, total_hours, progress
 #    def _hours_get(self, cr, uid, ids, field_names, args, context=None):
@@ -671,11 +687,6 @@ class task(osv.osv):
 
         return res
 
-    def _is_template(self, cr, uid, ids, field_name, arg, context=None):
-        res = {}
-        for task in self.browse(cr, uid, ids, context=context):
-            res[task.id] = True
-        return res
 
     def reportHours(self, cr, uid, ids, params, context=None):
 
@@ -713,6 +724,7 @@ class task(osv.osv):
         #Records report time
         self.createWork(cr, uid, task, params, context)
 
+        self.__logger.warning('----------------- Write task %s ------------------------------', ids[0])
         #Update Task
         task_obj.write(cr, uid, ids[0], {
                 'state': 'done',
@@ -819,6 +831,10 @@ class openstc_task_category(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
+#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+#
+#        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+
     _name = "openstc.task.category"
     _description = "Task Category"
     _columns = {
@@ -830,7 +846,7 @@ class openstc_task_category(osv.osv):
         'sequence': fields.integer('Sequence', select=True, help="Gives the sequence order when displaying a list of product categories."),
         'parent_left': fields.integer('Left Parent', select=1),
         'parent_right': fields.integer('Right Parent', select=1),
-        'service_ids':fields.many2many('openstc.task.category', 'openstc_task_category_services_rel', 'task_category_id', 'service_id', 'Services'),
+        'service_ids':fields.many2many('openstc.service', 'openstc_task_category_services_rel', 'task_category_id', 'service_id', 'Services'),
         'unit': fields.char('Unit', size=32),
         'quantity': fields.integer('Quantity'),
         'tasksAssigned': fields.one2many('project.task', 'category_id', "tasks"),
@@ -892,7 +908,58 @@ class project(osv.osv):
     _description = "Interventon stc"
     _inherit = "project.project"
 
+    def _get_projects_from_tasks(self, cr, uid, task_ids, context=None):
+        tasks = self.pool.get('project.task').browse(cr, uid, task_ids, context=context)
+        project_ids = [task.project_id.id for task in tasks if task.project_id]
+        return self.pool.get('project.project')._get_project_and_parents(cr, uid, project_ids, context)
+
+    def _get_project_and_parents(self, cr, uid, ids, context=None):
+        """ return the project ids and all their parent projects """
+        res = set(ids)
+        while ids:
+            cr.execute("""
+                SELECT DISTINCT parent.id
+                FROM project_project project, project_project parent, account_analytic_account account
+                WHERE project.analytic_account_id = account.id
+                AND parent.analytic_account_id = account.parent_id
+                AND project.id IN %s
+                """, (tuple(ids),))
+            ids = [t[0] for t in cr.fetchall()]
+            res.update(ids)
+        return list(res)
+
+    #Overrides project : progress_rate ratio on planned_hours instead of 'total_hours'
+    def _progress_rate(self, cr, uid, ids, names, arg, context=None):
+        child_parent = self._get_project_and_children(cr, uid, ids, context)
+        # compute planned_hours, total_hours, effective_hours specific to each project
+        cr.execute("""
+            SELECT project_id, COALESCE(SUM(planned_hours), 0.0),
+                COALESCE(SUM(total_hours), 0.0), COALESCE(SUM(effective_hours), 0.0)
+            FROM project_task WHERE project_id IN %s AND state <> 'cancelled'
+            GROUP BY project_id
+            """, (tuple(child_parent.keys()),))
+        # aggregate results into res
+        res = dict([(id, {'planned_hours':0.0,'total_hours':0.0,'effective_hours':0.0}) for id in ids])
+        for id, planned, total, effective in cr.fetchall():
+            # add the values specific to id to all parent projects of id in the result
+            while id:
+                if id in ids:
+                    res[id]['planned_hours'] += planned
+                    res[id]['total_hours'] += total
+                    res[id]['effective_hours'] += effective
+                id = child_parent[id]
+        # compute progress rates
+        for id in ids:
+            if res[id]['planned_hours']:
+                res[id]['progress_rate'] = round(100.0 * res[id]['effective_hours'] / res[id]['planned_hours'], 2)
+            else:
+                res[id]['progress_rate'] = 0.0
+        return res
+
+
+
     _columns = {
+
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
         'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'create_date' : fields.datetime('Create Date', readonly=True),
@@ -908,8 +975,18 @@ class project(osv.osv):
         'description': fields.text('Description'),
         'site_details': fields.text('Précision sur le site'),
         'cancel_reason': fields.text('Cancel reason'),
+
+
+        'progress_rate': fields.function(_progress_rate, multi="progress", string='Progress', type='float', group_operator="avg", help="Percent of tasks closed according to the total of tasks todo.",
+            store = {
+                'project.project': (_get_project_and_parents, ['tasks', 'parent_id', 'child_ids'], 10),
+                'project.task': (_get_projects_from_tasks, ['planned_hours', 'remaining_hours', 'work_ids', 'state'], 20),
+            }),
     }
 
+    #Overrides  set_template method of project module
+    def set_template(self, cr, uid, ids, context=None):
+        return True;
 
     def _get_active_inter(self, cr, uid, context=None):
         if context is None:
