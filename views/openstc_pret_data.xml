@@ -37,16 +37,6 @@
             <field name="prefix">R-%(year)s-%(month)s-</field>
             <field name="padding" eval="3"/>
         </record>
-		
-		<record id="openstc_manager" model="res.groups">
-	        <field name="implied_ids" eval="[(4,ref('hotel.group_hotel_manager')),(4,ref('base.group_sale_manager'))]"/>
-    	</record>
-    	<record id="openstc_dst" model="res.groups">
-	        <field name="implied_ids" eval="[(4,ref('hotel.group_hotel_manager')),(4,ref('base.group_sale_manager'))]"/>
-    	</record>
-    	<record id="openstc_agent" model="res.groups">
-	        <field name="implied_ids" eval="[(4,ref('hotel.group_hotel_user')),(4,ref('base.group_sale_manager'))]"/>
-    	</record>
     	
 	<!-- res partner type init for resa -->
 	<record id="openstc_prets_partner_type_asso" model="openstc.partner.type">
