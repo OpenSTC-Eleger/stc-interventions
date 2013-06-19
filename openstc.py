@@ -342,7 +342,8 @@ class res_partner_address(osv.osv):
             user_obj = self.pool.get('res.users')
 
             group_obj = self.pool.get('res.groups')
-            group_id = group_obj.search(cr, uid, [('code','=','PARTNER')])[0]
+            #Get partner group (code group=PART)
+            group_id = group_obj.search(cr, uid, [('code','=','PART')])[0]
             user_id = user_obj.create(cr, uid,{
                     'name': params['name'],
                     'firstname': params['name'],
@@ -424,6 +425,7 @@ class users(osv.osv):
 
          for id in ids:
             user = user_obj.read(cr, uid, id,['groups_id'],context)
+            #Get 'arg' group (MANAGER or DIRECTOR)
             group_ids = group_obj.search(cr, uid, [('code','=', arg),('id','in',user['groups_id'])])
             res[id] = True if len( group_ids ) != 0 else False
          return res
@@ -449,8 +451,8 @@ class users(osv.osv):
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
 
             'team_ids': fields.many2many('openstc.team', 'openstc_team_users_rel', 'user_id', 'team_id', 'Teams'),
-            'isDST' : fields.function(_get_group, arg="DIRECTOR", method=True,type='boolean', store=False),
-            'isManager' : fields.function(_get_group, arg="MANAGER", method=True,type='boolean', store=False),
+            'isDST' : fields.function(_get_group, arg="DIRE", method=True,type='boolean', store=False), #DIRECTOR group
+            'isManager' : fields.function(_get_group, arg="MANA", method=True,type='boolean', store=False), #MANAGER group
     }
 
     def create(self, cr, uid, data, context={}):
@@ -475,7 +477,8 @@ class users(osv.osv):
         service_obj = self.pool.get('openstc.service')
 
         group_obj = self.pool.get('res.groups')
-        group_id = group_obj.search(cr, uid, [('code','=','AGENT')])[0]
+        #Get officer group (code group=OFFI)
+        group_id = group_obj.search(cr, uid, [('code','=','OFFI')])[0]
 
         service_id = service_obj.browse(cr, uid, data['service_id'], context=context)
         #Previous manager become an agent
@@ -520,8 +523,8 @@ class team(osv.osv):
             for user_id in all_users:
                 #get current agent object
                 user = user_obj.read(cr, uid, user_id,['groups_id'],context)
-                #Current agent is DST?
-                group_ids = group_obj.search(cr, uid, [('code','=','DIRECTOR'),('id','in',user['groups_id'])])
+                #Current agent is DST (DIRECTOR group)?
+                group_ids = group_obj.search(cr, uid, [('code','=','DIRE'),('id','in',user['groups_id'])])
                 #Agent must not be DST and not manager of team and no already in team
                 if (len( group_ids ) == 0) and (user_id != team.manager_id.id) and (user_id not in team_users):
                     free_users.append(user_id)
@@ -1168,11 +1171,13 @@ class ask(osv.osv):
             user = user_obj.read(cr, uid, uid,
                                         ['groups_id','service_ids'],
                                         context)
-            group_ids = group_obj.search(cr, uid, [('code','=','DIRECTOR'),('id','in',user['groups_id'])])
+            #user is DST (DIRECTOR group, code group=DIRE)?
+            group_ids = group_obj.search(cr, uid, [('code','=','DIRE'),('id','in',user['groups_id'])])
             if len( group_ids ) != 0:
                 isDST = True
 
-            group_ids = group_obj.search(cr, uid, [('code','in',('DIRECTOR','MANAGER'))])
+            #user is Manager (code group = MANA)?
+            group_ids = group_obj.search(cr, uid, [('code','in',('DIRE','MANA'))])
             if set(user['groups_id']).intersection(set(group_ids)) :
                 isManager = True
 
