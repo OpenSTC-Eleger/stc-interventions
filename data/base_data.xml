@@ -31,7 +31,7 @@
             <field name="password">dstdst</field>
             <field name="company_id" ref="stc_company"/>
             <field eval="[(4,ref('openstc_dst'))]" name="groups_id"/>
-            <!--  <field name="menu_id" ref="action_menu_admin"/> -->
+            <field name="menu_id" ref="action_menu_admin"/>
             <field name="company_ids" eval="[(4, ref('stc_company'))]"/>
         </record>
 

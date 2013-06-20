@@ -461,21 +461,21 @@ class users(osv.osv):
             'isManager' : fields.function(_get_group, arg="MANA", method=True,type='boolean', store=False), #MANAGER group
     }
 
-    def create(self, cr, uid, data, context={}):
-        #_logger.debug('create USER-----------------------------------------------');
-        res = super(users, self).create(cr, uid, data, context)
-
-        company_ids = self.pool.get('res.company').name_search(cr, uid, name='STC')
-        if len(company_ids) == 1:
-            data['company_id'] = company_ids[0][0]
-        else:
-            data['company_id'] = 1;
-        if data.has_key('isManager')!=False and data['isManager']==True :
-            self.set_manager(cr, uid, [res], data, context)
-        #TODO
-        #else
-
-        return res
+#    def create(self, cr, uid, data, context={}):
+#        #_logger.debug('create USER-----------------------------------------------');
+#        res = super(users, self).create(cr, uid, data, context)
+#
+#        company_ids = self.pool.get('res.company').name_search(cr, uid, name='STC')
+#        if len(company_ids) == 1:
+#            data['company_id'] = company_ids[0][0]
+#        else:
+#            data['company_id'] = 1;
+#        if data.has_key('isManager')!=False and data['isManager']==True :
+#            self.set_manager(cr, uid, [res], data, context)
+#        #TODO
+#        #else
+#
+#        return res
 
     def write(self, cr, uid, ids, data, context=None):
 
