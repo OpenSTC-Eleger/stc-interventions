@@ -7,7 +7,6 @@
             <!-- Address and Company ID will be set later -->
             <field name="address" eval="[]"/>
             <field name="company_id" eval="None"/>
-            <field name="type_id" eval="2"/>
             <field name="customer" eval="False"/>
         </record>
         <record id="stc_address" model="res.partner.address">

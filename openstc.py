@@ -280,7 +280,7 @@ class res_partner(osv.osv):
 #        return res
 
     _columns = {
-         'type_id': fields.many2one('openstc.partner.type', 'Type',required=True),
+         'type_id': fields.many2one('openstc.partner.type', 'Type'),
          'service_id':fields.many2one('openstc.service', 'Service du demandeur'),
          'technical_service_id':fields.many2one('openstc.service', 'Service technique concerné'),
          'technical_site_id': fields.many2one('openstc.site', 'Default Site'),
