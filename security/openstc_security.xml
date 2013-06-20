@@ -77,6 +77,9 @@
         <field name="category_id" ref="base.module_category_project_management"/>
         <field name="implied_ids" eval="[(4, ref('openstc_qualifier')),(4, ref('stock.group_stock_manager')),(4,ref('analytic.group_analytic_accounting')),(4,ref('account.group_account_user')),(4,ref('purchase.group_purchase_manager')),(4,ref('base.group_sale_manager'))]"/>
     </record>
+
+
+     <delete id="res_users_rule" model="ir.rule"/>
 </data>
     <!--  RULES -->
 
@@ -127,7 +130,7 @@
         <field eval="0" name="perm_create"/>
     </record>
 
-    <delete id="res_users_rule" model="ir.rule"/>
+
 
 
     <!--
