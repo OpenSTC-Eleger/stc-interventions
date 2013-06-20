@@ -80,12 +80,12 @@
 
 	 <record model="ir.rule" id="res_users_rule">
         <field name="name">Override base user rule</field>
-        <field name="model_id" ref="base.res_users" />
+        <field name="model_id" ref="res_users" />
         <field name="global" eval="True" />
         <field name="domain_force">[(1,"=",1)]
         </field>
 	 </record>
-     <delete id="res_users_rule" model="ir.rule"/>
+     <!--  <delete id="res_users_rule" model="ir.rule"/> -->
 </data>
     <!--  RULES -->
 
