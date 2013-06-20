@@ -78,14 +78,14 @@
         <field name="implied_ids" eval="[(4, ref('openstc_qualifier')),(4, ref('stock.group_stock_manager')),(4,ref('analytic.group_analytic_accounting')),(4,ref('account.group_account_user')),(4,ref('purchase.group_purchase_manager')),(4,ref('base.group_sale_manager'))]"/>
     </record>
 
-	 <record model="ir.rule" id="res_users_rule">
+     <!--  <delete id="res_users_rule" model="ir.rule"/> -->
+	 <record model="ir.rule" id="base.res_users_rule">
         <field name="name">Override base user rule</field>
         <field name="model_id" ref="base.model_res_users" />
         <field name="global" eval="True" />
         <field name="domain_force">[(1,"=",1)]
         </field>
 	 </record>
-     <delete id="res_users_rule" model="ir.rule"/>
 </data>
     <!--  RULES -->
 
