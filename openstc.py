@@ -339,6 +339,12 @@ class res_partner_address(osv.osv):
     def create_account(self, cr, uid, ids, params, context):
         if _test_params(params, ['login','password','name','email'])!= False :
 
+            company_ids = self.pool.get('res.company').name_search(cr, uid, name='STC')
+            if len(company_ids) == 1:
+                params['company_id'] = company_ids[0][0]
+            else :
+                params['company_id'] = 1;
+
             user_obj = self.pool.get('res.users')
 
             group_obj = self.pool.get('res.groups')
@@ -459,8 +465,15 @@ class users(osv.osv):
         #_logger.debug('create USER-----------------------------------------------');
         res = super(users, self).create(cr, uid, data, context)
 
+        company_ids = self.pool.get('res.company').name_search(cr, uid, name='STC')
+        if len(company_ids) == 1:
+            data['company_id'] = company_ids[0][0]
+        else:
+            data['company_id'] = 1;
         if data.has_key('isManager')!=False and data['isManager']==True :
             self.set_manager(cr, uid, [res], data, context)
+        #TODO
+        #else
 
         return res
 
