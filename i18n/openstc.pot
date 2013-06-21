@@ -16,20 +16,56 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:826
-#: code:addons/openstc/openstc_pret.py:827
-#, python-format
-msgid "%x at %H:%M"
-msgstr ""
-
-#. module: openstc
 #: view:openstc.ask:0
 msgid "For confirm the ask by DST"
 msgstr ""
 
 #. module: openstc
-#: field:openstc.equipment,immat:0
-msgid "Imatt"
+#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_en_attente
+msgid "\n"
+"			    <h2>Message Automatique</h2>\n"
+"			    \n"
+"			    <p>Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. </p>\n"
+"			    <p>Récapitulatif de votre Réservation : </p>\n"
+"			    <ul>\n"
+"			    <li>Libellé : ${object.name or ''}</li>\n"
+"				<%\n"
+"				import pytz\n"
+"				from datetime import datetime\n"
+"				my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"				my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"				my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"				my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"				my_checkin_str = my_checkin_str.decode('utf-8')\n"
+"				my_checkout_str = my_checkout_str.decode('utf-8')\n"
+"				%>\n"
+"			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"			    <li><u>Ressources Réservées :</u> \n"
+"			    <ul>\n"
+"			    % for line in object.reservation_line:\n"
+"			    <li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"			    % endfor\n"
+"			    </ul>\n"
+"			    </li>\n"
+"			    </ul>\n"
+"			    <br />\n"
+"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
+"			    <br />\n"
+"			    <p>Cordialement,</p>\n"
+"			    <br />\n"
+"			    <p>${object.shop_id.company_id.name or ''}</p>\n"
+"			    <br />\n"
+"			    <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"			    <br />\n"
+"			    <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"			    \n"
+"			    "
+msgstr ""
+
+#. module: openstc
+#: field:hotel_reservation.line,amount:0
+msgid "Prix (si tarifé)"
 msgstr ""
 
 #. module: openstc
@@ -49,6 +85,16 @@ msgid "Scheduled"
 msgstr ""
 
 #. module: openstc
+#: view:hotel.folio:0
+msgid "Reserved products"
+msgstr ""
+
+#. module: openstc
+#: field:openstc.equipment,immat:0
+msgid "Imatt"
+msgstr ""
+
+#. module: openstc
 #: field:openstc.pret.emprunt.line.wizard,date_expected:0
 msgid "Date de livraison"
 msgstr ""
@@ -59,14 +105,13 @@ msgid "CV"
 msgstr ""
 
 #. module: openstc
-#: model:ir.actions.act_window,name:openstc.openstc_task_category_action
-#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_task_category
-msgid "Catégories"
+#: view:hotel.reservation:0
+msgid "Generate Interventions"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Réservations validées, le demandeur a été notifié que sa demande est confirmée. Il faut ensuite la planifier."
+#: field:openstc.pret.checkout.line,qte_to_repair:0
+msgid "Qty to repair"
 msgstr ""
 
 #. module: openstc
@@ -80,8 +125,15 @@ msgid "Réservations de la semaine à traiter"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.folio:0
-msgid "Recréer Approvisionnement"
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_carto_request
+msgid "nouvelle intervention"
+msgstr ""
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:904
+#: code:addons/openstc/openstc_pret.py:921
+#, python-format
+msgid "[Evenemential] supply of %s ont the site %s"
 msgstr ""
 
 #. module: openstc
@@ -128,6 +180,11 @@ msgid "Asks wording"
 msgstr ""
 
 #. module: openstc
+#: view:hotel.folio:0
+msgid "Unit price"
+msgstr ""
+
+#. module: openstc
 #: help:openstc.create.task.wizard,inter_id:0
 msgid "Select an intervention to"
 msgstr ""
@@ -136,7 +193,13 @@ msgstr ""
 #: model:ir.model,name:openstc.model_res_partner
 #: field:openstc.ask,partner_id:0
 #: view:report.project.task.user:0
+#: field:res.users,contact_id:0
 msgid "Partner"
+msgstr ""
+
+#. module: openstc
+#: field:hotel_reservation.line,complete_name:0
+msgid "Complete Name"
 msgstr ""
 
 #. module: openstc
@@ -160,8 +223,12 @@ msgid "Non Planifié"
 msgstr ""
 
 #. module: openstc
+#: model:res.groups,name:openstc.openstc_manager
+msgid "OpenSTC/Chef de service"
+msgstr ""
+
+#. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_employees5
-#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_employees
 msgid "Employés municipaux"
 msgstr ""
 
@@ -184,19 +251,13 @@ msgid "State"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:844
-#, python-format
-msgid "[Evenemential] supply of %s ont the site %s"
+#: model:product.template,name:openstc.openstc_prets_tests_mat1_product_template
+msgid "matériel 1 tests"
 msgstr ""
 
 #. module: openstc
-#: field:openstc.pret.emprunt.wizard,origin:0
-msgid "Document d'origine"
-msgstr ""
-
-#. module: openstc
-#: code:addons/openstc/openstc_pret.py:887
-#: code:addons/openstc/openstc_pret.py:888
+#: code:addons/openstc/openstc_pret.py:973
+#: code:addons/openstc/openstc_pret.py:974
 #, python-format
 msgid "bruno.plancher@gmail.com"
 msgstr ""
@@ -212,7 +273,7 @@ msgid "Intervention asks"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc.py:679
+#: code:addons/openstc/openstc.py:1202
 #, python-format
 msgid "Suppression Impossible !"
 msgstr ""
@@ -220,6 +281,11 @@ msgstr ""
 #. module: openstc
 #: selection:openstc.pret.checkout,state:0
 msgid "Cloturé"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Validate infos written and reserve selected products.Reservation will be visible on calendar and claimer will be emailed (if email written)."
 msgstr ""
 
 #. module: openstc
@@ -233,10 +299,25 @@ msgid "Etats des Lieux dont un rachat et/ou une réparation en interne sont à g
 msgstr ""
 
 #. module: openstc
+#: view:openstc.pret.create.inter.wizard:0
+msgid "Générer l'intervention"
+msgstr ""
+
+#. module: openstc
+#: constraint:openstc.pret.checkout.line:0
+msgid "Qty to purchase + Qty to repair is greater than qty resereved, please change them."
+msgstr ""
+
+#. module: openstc
 #: field:openstc.service,category_ids:0
 #: view:openstc.task.category:0
 #: view:res.partner:0
 msgid "Categories"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Reserved Products"
 msgstr ""
 
 #. module: openstc
@@ -246,13 +327,36 @@ msgid "Help note"
 msgstr ""
 
 #. module: openstc
+#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_cancelled
+msgid "\n"
+"	<h2>Message Automatique</h2>\n"
+"	<%\n"
+"	from datetime import datetime\n"
+"	import pytz\n"
+"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"	my_checkin_str = my_checkin_str.decode('utf-8')\n"
+"	my_checkout_str = my_checkout_str.decode('utf-8')\n"
+"	%>\n"
+"	\n"
+"	<p>Votre Réservation normalement prévue du ${my_checkin_str} au ${my_checkout_str} dans le cadre de votre manifestation : ${object.name} a été annulée pour la raison suivante :</p> \n"
+"	<p<i>Saisir ici la raison de votre refus</i></p>\n"
+"	<br />\n"
+"	<p>Cordialement,</p>\n"
+"	<br />\n"
+"	<p>${object.shop_id.company_id.name or ''}</p>\n"
+"	<br />\n"
+"	<img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"	<br />\n"
+"	<p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"   \n"
+"			    "
+msgstr ""
+#. module: openstc
 #: field:openstc.task.category,parent_id:0
 msgid "Parent Category"
-msgstr ""
-
-#. module: openstc
-#: view:openstc.pret.checkout:0
-msgid "Ne pas générerles actions saisies"
 msgstr ""
 
 #. module: openstc
@@ -281,18 +385,8 @@ msgid "Saisie par"
 msgstr ""
 
 #. module: openstc
-#: view:product.product:0
-msgid "Résumé des détériorations (Etat des Lieux)"
-msgstr ""
-
-#. module: openstc
 #: field:openstc.ask,confirm_by_dst:0
 msgid "Confirm by DST"
-msgstr ""
-
-#. module: openstc
-#: selection:openstc.pret.checkout.line,etat_retour:0
-msgid "A Racheter"
 msgstr ""
 
 #. module: openstc
@@ -352,6 +446,11 @@ msgid "OpenSTC/Agent"
 msgstr ""
 
 #. module: openstc
+#: field:hotel_reservation.line,qte_reserves:0
+msgid "Qté désirée"
+msgstr ""
+
+#. module: openstc
 #: view:hotel.folio:0
 msgid "Guest Name"
 msgstr ""
@@ -362,6 +461,11 @@ msgid "\"Non disponibilité\" bloquante"
 msgstr ""Non disponibilité\" bloquante"
 
 #. module: openstc
+#: sql_constraint:res.groups:0
+msgid "The name of the group must be unique !"
+msgstr ""
+
+#. module: openstc
 #: field:openstc.pret.checkout,name:0
 #: field:openstc.pret.checkout,reservation:0
 msgid "Réservation Associée"
@@ -370,6 +474,11 @@ msgstr ""
 #. module: openstc
 #: field:res.users,cost:0
 msgid "Coût horaire"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Integrate Invoicing"
 msgstr ""
 
 #. module: openstc
@@ -386,6 +495,7 @@ msgstr ""
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_team
 #: view:openstc.team:0
+#: field:res.users,team_ids:0
 msgid "Teams"
 msgstr ""
 
@@ -426,18 +536,13 @@ msgstr ""
 " If the task is over, the states is set to 'Done'."
 
 #. module: openstc
-#: field:openstock.qte.dispo.report,jour_dispo:0
-msgid "Journée"
-msgstr ""
-
-#. module: openstc
 #: selection:hotel.reservation,in_option:0
 msgid "Réservation bloquée"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:337
-#: code:addons/openstc/openstc_pret.py:403
+#: code:addons/openstc/openstc_pret.py:396
+#: code:addons/openstc/openstc_pret.py:456
 #, python-format
 msgid "Your resa is blocked because your expected date is too early so that we can not supply your products at time"
 msgstr ""
@@ -454,18 +559,28 @@ msgid "Faisant l'objet d'une réparation"
 msgstr ""
 
 #. module: openstc
-#: field:hotel_reservation.line,amount:0
-msgid "Prix (si onéreux)"
+#: field:openstc.pret.emprunt.wizard,origin:0
+msgid "Document d'origine"
 msgstr ""
 
 #. module: openstc
-#: field:res.users,position:0
-msgid "Grade"
+#: view:hotel.reservation:0
+msgid "Ligne de réservation"
 msgstr ""
 
 #. module: openstc
-#: field:purchase.order,is_emprunt:0
-msgid "Demande d'emprunt"
+#: view:product.product:0
+msgid "Collectivities"
+msgstr ""
+
+#. module: openstc
+#: view:openstc.ask:0
+msgid "Details"
+msgstr ""
+
+#. module: openstc
+#: model:email.template,subject:openstc.openstc_pret_email_template_resa_cancelled
+msgid "Votre Réservation: ${object.name or 'inconnu'} a été annulée"
 msgstr ""
 
 #. module: openstc
@@ -481,7 +596,6 @@ msgstr ""
 
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstock_view_reservation_new
-#: model:ir.ui.menu,name:openstc.menu_action_openstock_view_reservation_new
 msgid "Créer une nouvelle réservation"
 msgstr ""
 
@@ -501,13 +615,8 @@ msgid "Avancement"
 msgstr ""
 
 #. module: openstc
-#: view:openstc.ask:0
-msgid "Details"
-msgstr ""
-
-#. module: openstc
-#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_carto_request
-msgid "nouvelle intervention"
+#: view:openstc.pret.create.inter.wizard:0
+msgid "Paramétrer la tâche"
 msgstr ""
 
 #. module: openstc
@@ -531,19 +640,18 @@ msgid "Votre Réservation: ${object.name or 'inconnu'} est validée"
 msgstr ""
 
 #. module: openstc
-#: field:openstc.pret.emprunt.line.wizard,product_id:0
-msgid "Ressource à Emprunter"
+#: view:hotel.reservation:0
+msgid "Planifiées"
 msgstr ""
 
 #. module: openstc
 #: view:openstc.ask:0
-#: selection:openstc.ask,state:0
 msgid "To be confirm"
 msgstr ""
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_hotel_reservation
-msgid "Reservation"
+#: selection:product.product,etat:0
+msgid "Moyen"
 msgstr ""
 
 #. module: openstc
@@ -557,18 +665,8 @@ msgid "firstname"
 msgstr ""
 
 #. module: openstc
-#: constraint:openstc.pret.checkout.line:0
-msgid "La Qté à Racheter doit-être inférieure à la quantité réservée et n'être renseignée que si l'article doit être racheté"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.reservation:0
-msgid "Ligne de réservation"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.folio:0
-msgid "Article Réservé"
+#: field:openstc.pret.create.inter.wizard,categ_id:0
+msgid "Catégorie de la tâche"
 msgstr ""
 
 #. module: openstc
@@ -582,24 +680,18 @@ msgid "Left Parent"
 msgstr ""
 
 #. module: openstc
-#: field:openstc.pret.envoie.mail.annulation.wizard,email_template:0
-msgid "Modèle d'Email"
+#: model:ir.actions.act_window,name:openstc.action_view_openstc_pret_create_inter_wizard
+msgid "Assistant de réservation pour générer une intervention"
+msgstr ""
+
+#. module: openstc
+#: field:res.partner,technical_site_id:0
+msgid "Default Site"
 msgstr ""
 
 #. module: openstc
 #: field:hotel.reservation,name:0
 msgid "Nom Manifestation"
-msgstr ""
-
-#. module: openstc
-#: code:addons/openstc/openstc_pret.py:846
-#, python-format
-msgid "supply of %s on the site %s for the event \"%s\" planned from %s to %s"
-msgstr ""%s\" prévue du %s au %s"
-
-#. module: openstc
-#: view:product.product:0
-msgid "Collectivités"
 msgstr ""
 
 #. module: openstc
@@ -644,8 +736,13 @@ msgid "Check in Date Should be lesser than the Check Out Date!"
 msgstr ""
 
 #. module: openstc
-#: view:openstc.pret.checkout:0
-msgid "Générer les actions saisies"
+#: model:ir.model,name:openstc.model_openstc_equipment
+msgid "openstc.equipment"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Checkout and end of resa"
 msgstr ""
 
 #. module: openstc
@@ -664,8 +761,14 @@ msgid "For valid the task"
 msgstr ""
 
 #. module: openstc
-#: view:openstc.pret.checkout:0
-msgid "Voir facture associée"
+#: code:addons/openstc/openstc_pret.py:896
+#, python-format
+msgid "you must specified a service for this product : %s"
+msgstr ""
+
+#. module: openstc
+#: model:res.groups,name:openstc.openstc_qualifier
+msgid "Qualifier"
 msgstr ""
 
 #. module: openstc
@@ -679,13 +782,13 @@ msgid "Error ! You cannot create recursive tasks."
 msgstr ""
 
 #. module: openstc
-#: field:openstc.pret.emprunt.line.wizard,qte:0
-msgid "Quantité empruntée"
+#: field:openstc.pret.emprunt.line.wizard,product_id:0
+msgid "Ressource à Emprunter"
 msgstr ""
 
 #. module: openstc
-#: model:res.groups,name:openstc.openstc_manager
-msgid "OpenSTC/Manager"
+#: field:openstc.pret.emprunt.line.wizard,qte:0
+msgid "Quantité empruntée"
 msgstr ""
 
 #. module: openstc
@@ -706,25 +809,20 @@ msgid "Prêts / Locations"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:328
+#: code:addons/openstc/openstc_pret.py:387
+#: constraint:hotel.reservation:0
 #, python-format
 msgid "Your checkin is greater than your checkout, please modify them"
 msgstr ""
 
 #. module: openstc
-#: field:hotel.reservation,resa_checkout_id:0
-msgid "Etat des Lieux associé"
+#: model:ir.actions.act_window,name:openstc.action_openstc_pret_voir_emprunts_ext
+msgid "Emprunts aux mairies extérieures encore à retourner"
 msgstr ""
 
 #. module: openstc
 #: view:openstc.ask:0
-#: selection:openstc.ask,state:0
 msgid "Wait"
-msgstr ""
-
-#. module: openstc
-#: field:product.product,qte_dispo:0
-msgid "Disponible Aujourd'hui"
 msgstr ""
 
 #. module: openstc
@@ -758,8 +856,9 @@ msgid "Task management"
 msgstr ""
 
 #. module: openstc
-#: selection:product.product,etat:0
-msgid "Moyen"
+#: view:hotel.reservation:0
+#: model:ir.model,name:openstc.model_hotel_reservation
+msgid "Reservation"
 msgstr ""
 
 #. module: openstc
@@ -775,16 +874,6 @@ msgstr ""
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_team
 msgid "team stc"
-msgstr ""
-
-#. module: openstc
-#: model:res.groups,name:openstc.openstc_qualifier
-msgid "OpenSTC/Qualifier"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.folio:0
-msgid "Quantité Réservée"
 msgstr ""
 
 #. module: openstc
@@ -821,16 +910,17 @@ msgid "Planning"
 msgstr ""
 
 #. module: openstc
-#: field:openstc.ask,date_deadline:0
 #: field:openstc.create.task.wizard,inter_date_deadline:0
 #: field:project.project,date_deadline:0
 msgid "Deadline"
 msgstr ""
 
 #. module: openstc
-#: model:ir.actions.act_window,name:openstc.action_openstc_view_partner_type
-#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_partner_type
-msgid "Types"
+#: view:hotel.reservation:0
+#: field:hotel.reservation,openstc_partner_id:0
+#: view:openstc.ask:0
+#: field:openstc.pret.checkout,partner_id:0
+msgid "Demandeur"
 msgstr ""
 
 #. module: openstc
@@ -896,7 +986,7 @@ msgid "Template"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:232
+#: code:addons/openstc/openstc_pret.py:263
 #, python-format
 msgid "Intervention associated no longer exist or have been deleted, can not open it"
 msgstr ""
@@ -909,6 +999,45 @@ msgstr ""
 #. module: openstc
 #: view:openstc.pret.envoie.mail.annulation.wizard:0
 msgid "Envoi du mail d'annulation"
+msgstr ""
+
+#. module: openstc
+#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_validee
+msgid "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    Votre Réservation a bien été enregistrée.\n"
+"			    Récapitulatif de votre Réservation :\n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"			    <%\n"
+"				from datetime import datetime\n"
+"				import pytz\n"
+"				my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"				my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"				my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"				my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"				my_checkin_str = my_checkin_str.decode('utf-8')\n"
+"				my_checkout_str = my_checkout_str.decode('utf-8')\n"
+"			   %>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    \n"
+"			    % if object.folio_id:\n"
+"			    	Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.\n"
+"			    	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.\n"
+"			    % endif\n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
 msgstr ""
 
 #. module: openstc
@@ -932,8 +1061,8 @@ msgid "Emprunter"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:889
-#: code:addons/openstc/openstc_pret.py:892
+#: code:addons/openstc/openstc_pret.py:975
+#: code:addons/openstc/openstc_pret.py:978
 #, python-format
 msgid "Votre Réservation normalement prévue du ${object.checkin} au         ${object.checkout} dans le cadre de votre manifestation : ${object.name} a été annulée,        pour plus d'informations, veuillez contacter la mairie de Pont L'abbé au : 0240xxxxxx"
 msgstr ""
@@ -955,13 +1084,28 @@ msgid "Ayant des actions à générer"
 msgstr ""
 
 #. module: openstc
+#: model:product.template,name:openstc.openstc_prets_tests_mat2_product_template
+msgid "matériel 2 tests"
+msgstr ""
+
+#. module: openstc
 #: view:hotel.reservation:0
-msgid "Coordonnées Demandeur"
+msgid "Validate la Reservation (manager)"
+msgstr ""
+
+#. module: openstc
+#: help:product.product,openstc_maintenance:0
+msgid "Indicates if this ressource can be associated to contracts for maintenance"
 msgstr ""
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_refused_ask_wizard
 msgid "ask"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Abandonnées"
 msgstr ""
 
 #. module: openstc
@@ -991,8 +1135,13 @@ msgid "Ressource concernée"
 msgstr ""
 
 #. module: openstc
-#: model:ir.ui.menu,name:openstc.menu_openstc_employees
-msgid "Employées"
+#: view:hotel.folio:0
+msgid "Claimer infos"
+msgstr ""
+
+#. module: openstc
+#: field:res.users,position:0
+msgid "Grade"
 msgstr ""
 
 #. module: openstc
@@ -1008,6 +1157,11 @@ msgstr ""
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstock_qte_dispo_graph2
 msgid "Test Vérif Dispo"
+msgstr ""
+
+#. module: openstc
+#: field:hotel.reservation,amount_total:0
+msgid "Amount Total"
 msgstr ""
 
 #. module: openstc
@@ -1031,11 +1185,6 @@ msgid "Project Task Work"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Annuler la réservation"
-msgstr ""
-
-#. module: openstc
 #: field:openstc.service,technical:0
 msgid "Technical service"
 msgstr ""
@@ -1051,9 +1200,17 @@ msgid "Modify ask"
 msgstr ""
 
 #. module: openstc
+#: field:hotel_reservation.line,checkin:0
+#: field:hotel_reservation.line,checkout:0
+#: field:hotel_reservation.line,partner_id:0
+#: field:hotel_reservation.line,resa_name:0
+#: field:hotel_reservation.line,state:0
 #: field:openstc.create.task.wizard,inter_state:0
 #: field:openstc.pret.emprunt.line.wizard,line_id:0
 #: field:openstc.refused.ask.wizard,state:0
+#: field:openstc.team,free_user_ids:0
+#: field:res.users,isDST:0
+#: field:res.users,isManager:0
 msgid "unknown"
 msgstr ""
 
@@ -1068,6 +1225,44 @@ msgid "Nos Emprunts externes à retourner"
 msgstr ""
 
 #. module: openstc
+#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_done
+msgid "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    \n"
+"			    Votre Réservation de ressources est terminée.\n"
+"			    % if object.folio_id:\n"
+"				Ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
+"				% endif\n"
+"			    Récapitulatif de votre Réservation :\n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"			    <%\n"
+"				from datetime import datetime\n"
+"				import pytz\n"
+"				my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"				my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"				my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"				my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"				my_checkin_str = my_checkin_str.decode('utf-8')\n"
+"				my_checkout_str = my_checkout_str.decode('utf-8')\n"
+"				%>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
+msgstr ""
+
+#. module: openstc
 #: view:openstc.ask:0
 #: field:project.project,ask_id:0
 #: field:project.task,ask_id:0
@@ -1075,8 +1270,8 @@ msgid "Demande"
 msgstr ""
 
 #. module: openstc
-#: selection:openstc.pret.checkout.line,etat_retour:0
-msgid "A Réparer"
+#: field:hotel.reservation,all_dispo:0
+msgid "All Dispo"
 msgstr ""
 
 #. module: openstc
@@ -1109,6 +1304,13 @@ msgstr ""
 #: selection:product.product,etat:0
 msgid "Mauvais"
 msgstr ""
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:906
+#: code:addons/openstc/openstc_pret.py:923
+#, python-format
+msgid "supply of %s on the site %s for the event \"%s\" planned from %s to %s"
+msgstr ""%s\" du %s au %s"
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_pret_deliver_products_line_wizard
@@ -1154,6 +1356,7 @@ msgstr ""
 #: field:openstc.site,code:0
 #: field:openstc.site.type,code:0
 #: field:openstc.task.category,code:0
+#: field:res.groups,code:0
 msgid "Code"
 msgstr ""
 
@@ -1173,8 +1376,8 @@ msgid "En cours de Confirmation"
 msgstr ""
 
 #. module: openstc
-#: field:res.partner,technical_site_id:0
-msgid "Default Site"
+#: view:product.product:0
+msgid "Résumé des détériorations (Etat des Lieux)"
 msgstr ""
 
 #. module: openstc
@@ -1213,8 +1416,11 @@ msgid "Information"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Lignes de Réservation"
+#: model:ir.actions.act_window,name:openstc.action_openstock_qte_dispo_calendar
+#: model:ir.actions.act_window,name:openstc.action_openstock_qte_dispo_graph
+#: view:openstock.qte.dispo.report:0
+#: view:openstock.qte.dispo.reserve.report:0
+msgid "Verif Dispo"
 msgstr ""
 
 #. module: openstc
@@ -1223,20 +1429,10 @@ msgid "Equipes"
 msgstr ""
 
 #. module: openstc
-#: field:hotel_reservation.line,state:0
-msgid "Etat Résa"
-msgstr ""
-
-#. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_site
 #: model:ir.ui.menu,name:openstc.menu_action_openstc_view_site
 #: view:openstc.site:0
 msgid "Sites"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.folio:0
-msgid "Date de début de Réservation"
 msgstr ""
 
 #. module: openstc
@@ -1251,7 +1447,7 @@ msgstr ""
 
 #. module: openstc
 #: view:hotel.folio:0
-msgid "Créer Facture"
+msgid "Qty reserved"
 msgstr ""
 
 #. module: openstc
@@ -1270,18 +1466,13 @@ msgid "Mise a dispo des produits"
 msgstr ""
 
 #. module: openstc
+#: field:openstc.service,user_ids:0
 #: field:openstc.team,user_ids:0
 msgid "Users"
 msgstr ""
 
 #. module: openstc
-#: field:openstc.pret.checkout.line,etat_retour:0
-msgid "Etat après utilisation"
-msgstr ""
-
-#. module: openstc
 #: view:openstc.ask:0
-#: selection:openstc.ask,state:0
 msgid "Refused"
 msgstr ""
 
@@ -1303,16 +1494,16 @@ msgid "Qualifier la demande"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Valider la réservation"
+#: field:openstc.ask,actions:0
+#: view:openstc.pret.checkout:0
+#: view:openstc.pret.create.inter.wizard:0
+msgid "Valider"
 msgstr ""
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_create_task_wizard
 msgid "Link task to ask"
 msgstr ""
-
-
 
 #. module: openstc
 #: field:openstc.ask,people_name:0
@@ -1348,9 +1539,19 @@ msgid "Folio No"
 msgstr ""
 
 #. module: openstc
+#: field:res.users,service_id:0
+msgid "Service    "
+msgstr ""
+
+#. module: openstc
 #: field:openstc.absent.type,code:0
 #: field:openstc.intervention.assignement,code:0
 msgid "Code affectation"
+msgstr ""
+
+#. module: openstc
+#: model:product.uom,name:openstc.openstc_pret_uom_day
+msgid "Day (Reservation)"
 msgstr ""
 
 #. module: openstc
@@ -1365,18 +1566,8 @@ msgid "Personne demandant la réservation."
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Infos de la Réservation"
-msgstr ""
-
-#. module: openstc
-#: field:res.users,is_manager:0
-msgid "Is manager"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.reservation:0
-msgid "Infos Générales"
+#: view:hotel.folio:0
+msgid "Date de fin Réservation"
 msgstr ""
 
 #. module: openstc
@@ -1385,8 +1576,9 @@ msgid "Gives the sequence order when displaying a list of product categories."
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:374
-#: code:addons/openstc/openstc_pret.py:417
+#: code:addons/openstc/openstc_pret.py:433
+#: code:addons/openstc/openstc_pret.py:442
+#: code:addons/openstc/openstc_pret.py:470
 #, python-format
 msgid "Not available"
 msgstr ""
@@ -1407,6 +1599,11 @@ msgid "Group By..."
 msgstr ""
 
 #. module: openstc
+#: view:openstc.intervention.assignement:0
+msgid "planning"
+msgstr ""
+
+#. module: openstc
 #: view:hotel.folio:0
 msgid "Recreate Invoice"
 msgstr ""
@@ -1422,7 +1619,6 @@ msgstr ""
 #: field:openstc.equipment,service:0
 #: field:openstc.modify.ask.service.wizard,service_id:0
 #: view:openstc.service:0
-#: field:openstc.site,service:0
 #: view:openstc.team:0
 #: field:project.project,service_id:0
 msgid "Service"
@@ -1440,7 +1636,7 @@ msgstr ""
 
 #. module: openstc
 #: view:hotel.reservation:0
-msgid "Réservation"
+msgid "See calendar"
 msgstr ""
 
 #. module: openstc
@@ -1456,7 +1652,9 @@ msgstr ""
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_service
 #: model:ir.ui.menu,name:openstc.menu_action_openstc_view_service
+#: field:openstc.equipment,service_ids:0
 #: view:openstc.service:0
+#: field:openstc.site,service_ids:0
 #: field:openstc.task.category,service_ids:0
 #: field:openstc.team,service_ids:0
 #: field:project.task.work,manager_id:0
@@ -1464,10 +1662,9 @@ msgstr ""
 msgid "Services"
 msgstr ""
 
-
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Confirmées mais pas Planifiées"
+#: field:openstock.qte.dispo.report,jour_dispo:0
+msgid "Journée"
 msgstr ""
 
 #. module: openstc
@@ -1481,18 +1678,13 @@ msgid "Add task"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.folio:0
-msgid "Contact demandeur"
+#: field:purchase.order,is_emprunt:0
+msgid "Demande d'emprunt"
 msgstr ""
 
 #. module: openstc
 #: field:res.users,lastname:0
 msgid "lastname"
-msgstr ""
-
-#. module: openstc
-#: view:product.product:0
-msgid "Résumé des Détériorations"
 msgstr ""
 
 #. module: openstc
@@ -1517,6 +1709,7 @@ msgstr ""
 
 #. module: openstc
 #: field:openstc.ask,service_id:0
+#: field:openstc.pret.create.inter.wizard,service_id:0
 msgid "Service concerné"
 msgstr ""
 
@@ -1531,19 +1724,30 @@ msgid "Done by"
 msgstr ""
 
 #. module: openstc
-#: model:ir.actions.act_window,name:openstc.action_openstc_view_absent_type
-#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_absent_type
+#: model:ir.model,name:openstc.model_openstc_pret_create_inter_wizard
+msgid "openstc.pret.create.inter.wizard"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.folio:0
+msgid "Claimer"
+msgstr ""
+
+#. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_absent_type2
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_absent_type2
 msgid "Types d'abscence"
 msgstr ""
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_openstc_equipment
-msgid "openstc.equipment"
+#: model:ir.actions.act_window,name:openstc.openstc_task_category_action2
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_task_category2
+msgid "Catégories des tâches"
 msgstr ""
 
 #. module: openstc
-#: sql_constraint:res.users:0
-msgid "You can not have two users with the same login !"
+#: view:product.product:0
+msgid "Summup of degradations"
 msgstr ""
 
 #. module: openstc
@@ -1552,19 +1756,14 @@ msgid "Catalogue des ressources"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Générer les interventions planifiées sur ce formulaire"
-msgstr ""
-
-#. module: openstc
-#: code:addons/openstc/openstc_pret.py:564
+#: code:addons/openstc/openstc_pret.py:617
 #, python-format
 msgid "You have to write at least one reservation line"
 msgstr ""
 
 #. module: openstc
-#: field:hotel_reservation.line,qte_reserves:0
-msgid "Qté désirée"
+#: view:openstc.pret.deliver.products.wizard:0
+msgid "Interventions pouvant être générées"
 msgstr ""
 
 #. module: openstc
@@ -1579,21 +1778,16 @@ msgstr ""
 
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_partner
-#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_partner
 #: model:ir.ui.menu,name:openstc.menu_openstc_partner
-msgid "Demandeurs"
+msgid "Organisations"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:374
-#: code:addons/openstc/openstc_pret.py:417
+#: code:addons/openstc/openstc_pret.py:433
+#: code:addons/openstc/openstc_pret.py:442
+#: code:addons/openstc/openstc_pret.py:470
 #, python-format
 msgid "Not all of your products are available on those quantities for this period"
-msgstr ""
-
-#. module: openstc
-#: model:ir.ui.menu,name:openstc.menu_action_openstc_pret_resa_semaine_view
-msgid "Réservation de la semaine a traiter"
 msgstr ""
 
 #. module: openstc
@@ -1601,12 +1795,14 @@ msgstr ""
 msgid "openstc.ask"
 msgstr ""
 
-
-
-
 #. module: openstc
 #: view:openstc.refused.ask.wizard:0
 msgid "Refuser la demande"
+msgstr ""
+
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_openstc_dico
+msgid "Dictionnaires"
 msgstr ""
 
 #. module: openstc
@@ -1620,8 +1816,8 @@ msgid "Service Technique associé"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.folio:0
-msgid "Facture corrigée"
+#: field:openstc.pret.envoie.mail.annulation.wizard,email_template:0
+msgid "Modèle d'Email"
 msgstr ""
 
 #. module: openstc
@@ -1632,11 +1828,6 @@ msgstr ""
 #. module: openstc
 #: field:openstc.equipment,commercial_vehicle:0
 msgid "Commercial vehicle"
-msgstr ""
-
-#. module: openstc
-#: model:res.groups,name:openstc.openstc_employee
-msgid "OpenSTC/Employee"
 msgstr ""
 
 #. module: openstc
@@ -1667,12 +1858,12 @@ msgid "oil quantity"
 msgstr ""
 
 #. module: openstc
-#: constraint:hotel.reservation:0
-msgid "La date de Début de votre réservation est supérieure A la date de Fin, veuillez les modifier."
+#: view:openstc.pret.checkout:0
+msgid "Voir facture associée"
 msgstr ""
 
 #. module: openstc
-#: model:ir.actions.act_window,help:openstc.openstc_task_category_action
+#: model:ir.actions.act_window,help:openstc.openstc_task_category_action2
 msgid "Here is a list of all your products classified by category. You can click a category to get the list of all products linked to this category or to a child of this category."
 msgstr ""
 
@@ -1682,9 +1873,13 @@ msgid "Numéro"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret_checkout.py:161
-#, python-format
-msgid "Qty to purchase must be equal or lower than qty reserved, and must be written only if a purchase is to plan"
+#: view:openstc.pret.deliver.products.wizard:0
+msgid "Comment mettre les articles à disposition"
+msgstr ""
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_res_partner_address
+msgid "Partner Addresses"
 msgstr ""
 
 #. module: openstc
@@ -1695,6 +1890,16 @@ msgstr ""
 #. module: openstc
 #: field:openstc.todo,completed:0
 msgid "Completed"
+msgstr ""
+
+#. module: openstc
+#: help:hotel.reservation,amount_total:0
+msgid "Optionnal, if positive, a sale order will be created once resa validated and invoice will be created once resa done."
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Réservation confirmée et visible sur le planning, les ressources sont réservées pour le demandeur."
 msgstr ""
 
 #. module: openstc
@@ -1709,13 +1914,8 @@ msgid "Wizard parent"
 msgstr ""
 
 #. module: openstc
-#: field:hotel_reservation.line,name:0
-msgid "Libellé"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.reservation:0
-msgid "Plannifier une intervention pour cette ressource"
+#: selection:openstc.pret.checkout.line,state:0
+msgid "Remis en Etat"
 msgstr ""
 
 #. module: openstc
@@ -1732,6 +1932,11 @@ msgid "Site principal"
 msgstr ""
 
 #. module: openstc
+#: field:openstc.pret.create.inter.wizard,time_planned:0
+msgid "Heures planifiées"
+msgstr ""
+
+#. module: openstc
 #: constraint:res.users:0
 msgid "The chosen company is not in the allowed companies for this user"
 msgstr ""
@@ -1742,7 +1947,6 @@ msgid "Raison de refus"
 msgstr ""
 
 #. module: openstc
-#: selection:openstc.ask,state:0
 #: selection:project.project,state:0
 msgid "Closed"
 msgstr ""
@@ -1759,26 +1963,8 @@ msgid "Pending"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Termine la Réservation, libérant les ressources. Un Etat des lieux sera généré pour pointer l'état des ressources après utilisation."
-msgstr ""
-
-#. module: openstc
-#: view:hotel.reservation:0
-msgid "Générer Interventions restantes"
-msgstr ""
-
-#. module: openstc
 #: view:openstc.pret.warning.dispo.wizard:0
 msgid "Visualiser Planning"
-msgstr ""
-
-#. module: openstc
-#: model:ir.actions.act_window,name:openstc.action_openstock_qte_dispo_calendar
-#: model:ir.actions.act_window,name:openstc.action_openstock_qte_dispo_graph
-#: view:openstock.qte.dispo.report:0
-#: view:openstock.qte.dispo.reserve.report:0
-msgid "Verif Dispo"
 msgstr ""
 
 #. module: openstc
@@ -1809,8 +1995,8 @@ msgid "Properties"
 msgstr ""
 
 #. module: openstc
-#: field:res.users,arrival_date:0
-msgid "Date d'arrivée"
+#: sql_constraint:project.project:0
+msgid "Demande déjà validée!"
 msgstr ""
 
 #. module: openstc
@@ -1819,19 +2005,19 @@ msgid "Delegations History"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:883
+#: code:addons/openstc/openstc_pret.py:969
 #, python-format
 msgid "modèle de mail pour résa annulée"
 msgstr ""
 
 #. module: openstc
 #: view:hotel.reservation:0
-msgid "Voir seulement les Salles"
+msgid "Generate interventions planned on this form"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Ouvrir l'intervention générée"
+#: model:product.uom,name:openstc.openstc_pret_uom_hour
+msgid "Hour (Reservation)"
 msgstr ""
 
 #. module: openstc
@@ -1840,13 +2026,18 @@ msgid "Action"
 msgstr ""
 
 #. module: openstc
+#: model:res.groups,name:openstc.openstc_agent_non_technique
+msgid "OpenSTC/Agent Non Technique"
+msgstr ""
+
+#. module: openstc
 #: field:project.task,intervention_assignement_id:0
 msgid "Assignement"
 msgstr ""
 
 #. module: openstc
-#: model:ir.actions.act_window,name:openstc.action_openstc_pret_voir_emprunts_ext
-msgid "Emprunts aux mairies extérieures encore à retourner"
+#: field:hotel.reservation,resa_checkout_id:0
+msgid "Etat des Lieux associé"
 msgstr ""
 
 #. module: openstc
@@ -1865,6 +2056,11 @@ msgid "Etat des Lieux"
 msgstr ""
 
 #. module: openstc
+#: view:hotel.reservation:0
+msgid "Voir seulement les Salles"
+msgstr ""
+
+#. module: openstc
 #: view:openstc.absent.type:0
 #: view:openstc.employee:0
 #: view:openstc.equipment:0
@@ -1873,6 +2069,13 @@ msgstr ""
 #: view:openstc.task.category:0
 #: view:openstc.team:0
 msgid "General"
+msgstr ""
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret.py:883
+#: code:addons/openstc/openstc_pret.py:884
+#, python-format
+msgid "%x at %H:%M"
 msgstr ""
 
 #. module: openstc
@@ -1888,6 +2091,11 @@ msgstr ""
 #. module: openstc
 #: field:openstc.pret.checkout.line,qte_reservee:0
 msgid "Qté prêtée"
+msgstr ""
+
+#. module: openstc
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_carto_geoportail
+msgid "geoportail"
 msgstr ""
 
 #. module: openstc
@@ -1933,6 +2141,7 @@ msgid " Project vs  hours"
 msgstr ""
 
 #. module: openstc
+#: view:openstc.pret.create.inter.wizard:0
 #: view:openstc.pret.warning.dispo.wizard:0
 msgid "Annuler"
 msgstr ""
@@ -1940,6 +2149,11 @@ msgstr ""
 #. module: openstc
 #: field:openstock.qte.dispo.report,qte_dispo:0
 msgid "Quantité Disponible"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Validate reservation"
 msgstr ""
 
 #. module: openstc
@@ -1954,18 +2168,8 @@ msgid "Invoice Corrected"
 msgstr ""
 
 #. module: openstc
-#: view:openstc.pret.deliver.products.wizard:0
-msgid "Comment mettre les articles à disposition"
-msgstr ""
-
-#. module: openstc
-#: field:openstc.pret.checkout.line,qte_to_purchase:0
-msgid "Qté à Racheter"
-msgstr ""
-
-#. module: openstc
-#: view:openstc.pret.deliver.products.wizard:0
-msgid "Interventions pouvant être générées"
+#: view:hotel.reservation:0
+msgid "Reservation Lines"
 msgstr ""
 
 #. module: openstc
@@ -1974,12 +2178,44 @@ msgid "Address"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.folio:0
-#: view:hotel.reservation:0
-#: field:hotel.reservation,openstc_partner_id:0
-#: view:openstc.ask:0
-#: field:openstc.pret.checkout,partner_id:0
-msgid "Demandeur"
+#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_en_attente
+msgid "\n"
+"			    Message Automatique\n"
+"			    \n"
+"			    Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. \n"
+"			    Récapitulatif de votre Réservation : \n"
+"			    \n"
+"			    Libellé : ${object.name or ''}\n"
+"				<%\n"
+"				import pytz\n"
+"				from datetime import datetime\n"
+"				my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"				my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"				my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"				my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"				my_checkin_str = my_checkin_str.decode('utf-8')\n"
+"				my_checkout_str = my_checkout_str.decode('utf-8')\n"
+"			    	%>\n"
+"			    Dates : ${my_checkin_str} - ${my_checkout_str}\n"
+"			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}\n"
+"			    % for line in object.reservation_line:\n"
+"			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}\n"
+"			    % endfor\n"
+"			    \n"
+"			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. \n"
+"			    \n"
+"			    Cordialement,\n"
+"			    \n"
+"			    ${object.shop_id.company_id.name or ''}\n"
+"			    \n"
+"			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
+msgstr ""
+
+#. module: openstc
+#: code:addons/openstc/openstc_pret_checkout.py:75
+#, python-format
+msgid "Loss of product (from reservation)"
 msgstr ""
 
 #. module: openstc
@@ -1988,28 +2224,33 @@ msgid "Demande d'intervention associée"
 msgstr ""
 
 #. module: openstc
+#: field:product.product,openstc_reservable:0
+msgid "Reservable"
+msgstr ""
+
+#. module: openstc
 #: model:ir.ui.menu,name:openstc.menu_action_view_articles
 msgid "Gestion des Ressources"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Actualiser la Page"
+#: model:ir.model,name:openstc.model_openstc_pret_checkout_line
+msgid "openstc.pret.checkout.line"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Abandonnées"
+#: field:res.users,arrival_date:0
+msgid "Date d'arrivée"
+msgstr ""
+
+#. module: openstc
+#: model:ir.model,name:openstc.model_openstock_qte_dispo_report
+msgid "Disponibilités des Produits"
 msgstr ""
 
 #. module: openstc
 #: view:openstc.modify.ask.service.wizard:0
 msgid "Modification du service"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.folio:0
-msgid "Approvisionnement Corrigé"
 msgstr ""
 
 #. module: openstc
@@ -2023,12 +2264,11 @@ msgid "Confirmer Folio"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:650
+#: code:addons/openstc/openstc_pret.py:703
 #, python-format
 msgid "An error has occured, please notify following error to your supplier : \n"
 " prod_ids paramater of get_prods_available method  has an incorrect form"
 msgstr ""
-" prod_ids paramater of get_prods_available method  has an incorrect form"
 
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_open_pret_location_reservation_create_form
@@ -2043,6 +2283,12 @@ msgstr ""
 #. module: openstc
 #: view:openstc.create.task.wizard:0
 msgid "task"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.folio:0
+#: view:hotel.reservation:0
+msgid "Start date of reservation"
 msgstr ""
 
 #. module: openstc
@@ -2091,28 +2337,18 @@ msgid "indique si l'on peut emprunter cette ressource à des collectivités ext�
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Valide les informations saisies et réserve les ressources sélectionnées aux dates indiquées. La réservation sera visible sur le planning et le demandeur sera notifié par mail (si adresse mail renseignée)."
-msgstr ""
-
-#. module: openstc
 #: view:hotel.folio:0
 msgid "N° Folio"
 msgstr ""
 
 #. module: openstc
 #: view:hotel.reservation:0
-msgid "N° Réservation"
+msgid "Reservation infos"
 msgstr ""
 
 #. module: openstc
 #: selection:hotel_reservation.line,action:0
 msgid "Intervention générée"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.reservation:0
-msgid "Calculer prix"
 msgstr ""
 
 #. module: openstc
@@ -2132,13 +2368,19 @@ msgid "For refuse the task"
 msgstr ""
 
 #. module: openstc
+#: code:addons/openstc/wizard/openstc_pret_wizard.py:281
+#, python-format
+msgid "You can't plan a task with a non-positive length"
+msgstr ""
+
+#. module: openstc
 #: view:openstc.pret.envoie.mail.annulation.wizard:0
 msgid "Envoyer le mail"
 msgstr ""
 
 #. module: openstc
-#: selection:openstc.pret.checkout.line,state:0
-msgid "Remis en Etat"
+#: field:hotel_reservation.line,name:0
+msgid "Libellé"
 msgstr ""
 
 #. module: openstc
@@ -2157,7 +2399,7 @@ msgid "Modify Service"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc.py:679
+#: code:addons/openstc/openstc.py:1202
 #, python-format
 msgid "Des interventions sont liées à la demande"
 msgstr ""
@@ -2174,8 +2416,8 @@ msgid "Phone Number"
 msgstr ""
 
 #. module: openstc
-#: model:ir.model,name:openstc.model_openstock_qte_dispo_report
-msgid "Disponibilités des Produits"
+#: field:hotel.reservation,inter_id:0
+msgid "Livraison associée"
 msgstr ""
 
 #. module: openstc
@@ -2186,6 +2428,11 @@ msgstr ""
 #. module: openstc
 #: model:ir.model,name:openstc.model_project_project
 msgid "Project"
+msgstr ""
+
+#. module: openstc
+#: view:purchase.order:0
+msgid "Return products to collectivity"
 msgstr ""
 
 #. module: openstc
@@ -2201,19 +2448,23 @@ msgid "Modify service"
 msgstr ""
 
 #. module: openstc
-#: model:res.groups,name:openstc.openstc_chef
-msgid "OpenSTC/Chef d'équipe"
-msgstr ""
-
-#. module: openstc
 #: selection:project.project,state:0
 msgid "Cancelled"
 msgstr ""
 
-
 #. module: openstc
 #: field:openstc.pret.deliver.products.line.wizard,motif:0
 msgid "Motif de l'Intervention"
+msgstr ""
+
+#. module: openstc
+#: help:product.product,openstc_reservable:0
+msgid "Indicates if this ressource can be reserved or not by tiers"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "reservation number"
 msgstr ""
 
 #. module: openstc
@@ -2242,8 +2493,14 @@ msgid "Sales Order"
 msgstr ""
 
 #. module: openstc
-#: view:openstc.pret.warning.dispo.wizard:0
-msgid "Des articles ne sont pas dispo"
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_partner_type2
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_partner_type2
+msgid "Types d'organisation"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Check dispo products"
 msgstr ""
 
 #. module: openstc
@@ -2253,7 +2510,9 @@ msgstr ""
 
 #. module: openstc
 #: view:hotel.reservation:0
+#: view:hotel_reservation.line:0
 #: model:ir.actions.act_window,name:openstc.action_openstock_view_reservation_calendar
+#: model:ir.actions.act_window,name:openstc.action_openstock_view_reservation_calendar_popup
 #: model:ir.ui.menu,name:openstc.menu_action_openstock_view_reservation_calendar
 msgid "Planning des Réservations"
 msgstr ""
@@ -2270,13 +2529,7 @@ msgstr ""
 
 #. module: openstc
 #: view:openstc.ask:0
-#: selection:openstc.ask,state:0
 msgid "Valid"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.reservation:0
-msgid "Une intervention sera générée pour cette ressource."
 msgstr ""
 
 #. module: openstc
@@ -2286,7 +2539,13 @@ msgstr ""
 
 #. module: openstc
 #: view:openstc.employee:0
+#: model:res.groups,name:openstc.openstc_employee
 msgid "Employee"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "General Infos"
 msgstr ""
 
 #. module: openstc
@@ -2296,8 +2555,8 @@ msgid "Email"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.folio:0
-msgid "Articles Réservés"
+#: model:product.uom.categ,name:openstc.openstc_pret_uom_categ_resa
+msgid "Temporel"
 msgstr ""
 
 #. module: openstc
@@ -2306,8 +2565,65 @@ msgid "Product Category"
 msgstr ""
 
 #. module: openstc
+#: model:ir.actions.act_window,name:openstc.action_openstc_view_assignement2
+#: model:ir.ui.menu,name:openstc.menu_action_openstc_view_assignement2
+msgid "Affectations des interventions"
+msgstr ""
+
+#. module: openstc
+#: field:hotel_reservation.line,inter_id:0
+msgid "Intervention associée"
+msgstr ""
+
+#. module: openstc
+#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_validee
+msgid "\n"
+"	<h2>Message Automatique</h2>\n"
+"	\n"
+"	<p>Votre Réservation a bien été enregistrée.  </p>\n"
+"	<p>Récapitulatif de votre Réservation : </p>\n"
+"	<ul>\n"
+"	<li>Libellé : ${object.name or ''}</li>\n"
+"	<%\n"
+"	from datetime import datetime\n"
+"	import pytz\n"
+"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime((\"%x %Hh%M\").encode('utf-8'))\n"
+"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime((\"%x %Hh%M\").encode('utf-8'))\n"
+"	my_checkin_str = my_checkin_str.decode('utf-8')\n"
+"	my_checkout_str = my_checkout_str.decode('utf-8')\n"
+"	%>\n"
+"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"	<li><u>Ressources Réservées :</u> \n"
+"	<ul>\n"
+"	% for line in object.reservation_line:\n"
+"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"	% endfor\n"
+"	</ul>\n"
+"	</li>\n"
+"	</ul>\n"
+"   \n"
+"   % if object.folio_id:\n"
+"   	<p>Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.<br/>\n"
+"   	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.</p>\n"
+"   % endif\n"
+"   <br />\n"
+"   <p>Cordialement,</p>\n"
+"   <br />\n"
+"   <p>${object.shop_id.company_id.name or ''}</p>\n"
+"   <br />\n"
+"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"   <br />\n"
+"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"   \n"
+"			    "
+msgstr ""
+
+#. module: openstc
 #: view:hotel.reservation:0
-msgid "Factures associées (si onéreux)"
+msgid "Sales linked (if priced)"
 msgstr ""
 
 #. module: openstc
@@ -2334,6 +2650,11 @@ msgstr ""
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_pret_checkout
 msgid "openstc.pret.checkout"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Claimer Infos"
 msgstr ""
 
 #. module: openstc
@@ -2387,8 +2708,8 @@ msgid "Indiquer si, pour une Réservation, cette ressource nécessite des infos 
 msgstr ""
 
 #. module: openstc
-#: view:hotel.reservation:0
-msgid "Ne plus plannifier d'intervention pour cette ressource"
+#: view:openstc.pret.warning.dispo.wizard:0
+msgid "Des articles ne sont pas dispo"
 msgstr ""
 
 #. module: openstc
@@ -2412,23 +2733,88 @@ msgid "Add Intervention"
 msgstr ""
 
 #. module: openstc
+#: model:product.uom,name:openstc.openstc_pret_uom_half_day
+msgid "Half-Day (Reservation)"
+msgstr ""
+
+#. module: openstc
+#: model:email.template,body_html:openstc.openstc_pret_email_template_resa_done
+msgid "\n"
+"	<h2>Message Automatique</h2>\n"
+"	\n"
+"	<p> ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''} </p>\n"
+"	\n"
+"	<p>Votre Réservation de ressources est terminée\n"
+"	% if object.folio_id:\n"
+"	, ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.\n"
+"	% endif\n"
+"	</p>\n"
+"	<p>Récapitulatif de votre Réservation : </p>\n"
+"	<ul>\n"
+"	<li>Libellé : ${object.name or ''}</li>\n"
+"	<%\n"
+"	from datetime import datetime\n"
+"	import pytz\n"
+"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"	my_checkin_str = my_checkin_str.decode('utf-8')\n"
+"	my_checkout_str = my_checkout_str.decode('utf-8')\n"
+"	%>\n"
+"	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>\n"
+"	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>\n"
+"	<li><u>Ressources Réservées :</u> \n"
+"	<ul>\n"
+"	% for line in object.reservation_line:\n"
+"	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>\n"
+"	% endfor\n"
+"	</ul>\n"
+"	</li>\n"
+"	</ul>\n"
+"	\n"
+"	Nous vous remercions d'avoir utilisé nos services de réservations en ligne.\n"
+"	\n"
+"   <br />\n"
+"   <p>Cordialement,</p>\n"
+"   <br />\n"
+"   <p>${object.shop_id.company_id.name or ''}</p>\n"
+"   <br />\n"
+"   <img src=\"data:image/png;base64,${object.shop_id.company_id.logo or ''}\"/>\n"
+"   <br />\n"
+"   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>\n"
+"   \n"
+"			    "
+msgstr ""
+
+#. module: openstc
+#: view:hotel.reservation:0
+msgid "Terminate reservation and free products. A checkout will be generated to point products state after use."
+msgstr ""
+
+#. module: openstc
+#: view:hotel_reservation.line:0
+msgid "Linked reservation"
+msgstr ""
+
+#. module: openstc
 #: field:hotel.reservation,is_recur:0
 msgid "Issue d'une Récurrence"
 msgstr ""
 
 #. module: openstc
+#: field:res.partner.address,user_id:0
+msgid "User"
+msgstr ""
+
+#. module: openstc
 #: view:hotel.reservation:0
-msgid "Terminer Réservation"
+msgid "Products reservation"
 msgstr ""
 
 #. module: openstc
 #: model:ir.model,name:openstc.model_openstc_site_type
 msgid "openstc.site.type"
-msgstr ""
-
-#. module: openstc
-#: model:ir.model,name:openstc.model_openstc_pret_checkout_line
-msgid "openstc.pret.checkout.line"
 msgstr ""
 
 #. module: openstc
@@ -2447,13 +2833,18 @@ msgid "Qté de Référence pour Facturation"
 msgstr ""
 
 #. module: openstc
-#: field:hotel.reservation,site_id:0
-msgid "Site (Lieu)"
+#: model:ir.model,name:openstc.model_res_groups
+msgid "Access Groups"
 msgstr ""
 
 #. module: openstc
 #: view:hotel.reservation:0
-msgid "Réservation de Ressources"
+msgid "Cancel reservation"
+msgstr ""
+
+#. module: openstc
+#: field:hotel.reservation,site_id:0
+msgid "Site (Lieu)"
 msgstr ""
 
 #. module: openstc
@@ -2463,11 +2854,13 @@ msgid "Matériel"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:232
-#: code:addons/openstc/openstc_pret.py:337
-#: code:addons/openstc/openstc_pret.py:403
-#: code:addons/openstc/openstc_pret.py:564
-#: code:addons/openstc/openstc_pret.py:650
+#: code:addons/openstc/openstc_pret.py:263
+#: code:addons/openstc/openstc_pret.py:396
+#: code:addons/openstc/openstc_pret.py:456
+#: code:addons/openstc/openstc_pret.py:617
+#: code:addons/openstc/openstc_pret.py:703
+#: code:addons/openstc/openstc_pret.py:896
+#: code:addons/openstc/wizard/openstc_pret_wizard.py:281
 #, python-format
 msgid "Error"
 msgstr ""
@@ -2488,8 +2881,8 @@ msgid "Message du mail notifiant l'annulation"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.folio:0
-msgid "Date de fin de Réservation"
+#: sql_constraint:res.users:0
+msgid "You can not have two users with the same login !"
 msgstr ""
 
 #. module: openstc
@@ -2520,19 +2913,12 @@ msgid "Etats des lieux"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret_checkout.py:118
-#, python-format
-msgid "No purchase nor invoice have been created, because there is nothing to purchase."
-msgstr ""
-
-#. module: openstc
 #: model:ir.ui.menu,name:openstc.menu_action_openstc_pret_view_checkout
 msgid "Voir Etats des lieux retour d'articles"
 msgstr ""
 
 #. module: openstc
 #: view:hotel.folio:0
-#: view:hotel.reservation:0
 msgid "Date de début Réservation"
 msgstr ""
 
@@ -2560,8 +2946,19 @@ msgid "partner_id"
 msgstr ""
 
 #. module: openstc
+#: field:openstc.pret.checkout.line,qte_to_purchase:0
+msgid "Qty to purchase"
+msgstr ""
+
+#. module: openstc
 #: field:project.task,equipment_ids:0
 msgid "Equipments"
+msgstr ""
+
+#. module: openstc
+#: view:hotel.folio:0
+#: view:hotel.reservation:0
+msgid "End date of reservation"
 msgstr ""
 
 #. module: openstc
@@ -2570,16 +2967,9 @@ msgid "Cancel reason"
 msgstr ""
 
 #. module: openstc
-#: view:hotel.folio:0
 #: field:hotel_reservation.line,prix_unitaire:0
 #: field:openstc.pret.emprunt.line.wizard,price_unit:0
 msgid "Prix Unitaire"
-msgstr ""
-
-#. module: openstc
-#: view:hotel.folio:0
-#: view:hotel.reservation:0
-msgid "Date de fin Réservation"
 msgstr ""
 
 #. module: openstc
@@ -2588,8 +2978,40 @@ msgid "Emprunteur concerné"
 msgstr ""
 
 #. module: openstc
-#: selection:openstc.pret.checkout.line,etat_retour:0
-msgid "Ne Rien Planifier"
+#: field:product.product,openstc_maintenance:0
+msgid "Maintenance ?"
+msgstr ""
+
+#. module: openstc
+#: model:email.template,body_text:openstc.openstc_pret_email_template_resa_cancelled
+msgid "\n"
+"	Message Automatique\n"
+"	\n"
+"	<%\n"
+"	from datetime import datetime\n"
+"	import pytz\n"
+"	my_checkin = datetime.strptime(str(object.checkin),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkout = datetime.strptime(str(object.checkout),\"%Y-%m-%d %H:%M:%S\").replace(tzinfo=pytz.utc)\n"
+"	my_checkin_str = my_checkin.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"	my_checkout_str = my_checkout.astimezone(pytz.timezone(\"Europe/Paris\")).strftime(\"%x %Hh%M\".encode('utf-8'))\n"
+"	my_checkin_str = my_checkin_str.decode('utf-8')\n"
+"	my_checkout_str = my_checkout_str.decode('utf-8')\n"
+"	%>\n"
+"	\n"
+"	Votre Réservation normalement prévue du ${my_checkin_str} au ${my_checkout_str} dans le cadre de votre manifestation : ${object.name} a été annulée pour la raison suivante : \n"
+"	<pSaisir ici la raison de votre refus\n"
+"	\n"
+"	Cordialement,\n"
+"	\n"
+"	${object.shop_id.company_id.name or ''}\n"
+"	\n"
+"	Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.\n"
+"		    "
+msgstr ""
+
+#. module: openstc
+#: field:res.groups,perm_request_confirm:0
+msgid "Demander la Confirmation"
 msgstr ""
 
 #. module: openstc
@@ -2629,7 +3051,7 @@ msgid "Site"
 msgstr ""
 
 #. module: openstc
-#: code:addons/openstc/openstc_pret.py:886
+#: code:addons/openstc/openstc_pret.py:972
 #, python-format
 msgid "Votre Réservation du ${object.checkin} au ${object.checkout} a été annulée"
 msgstr ""

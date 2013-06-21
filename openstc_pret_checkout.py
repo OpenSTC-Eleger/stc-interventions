@@ -118,7 +118,7 @@ class openstc_pret_checkout_wizard(osv.osv):
                 self.remove_prods_from_stock(cr, uid, prod_dicts, context=context)
             #if there is at least one purchase to do
             if line_values:
-                values = {'invoice_method':'manual',
+                values = {'invoice_method':'order',
                   'location_id':default_location_id,
                   'partner_id':checkout.partner_id.id,
                   'order_line':line_values,

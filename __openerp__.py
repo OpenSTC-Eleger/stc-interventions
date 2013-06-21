@@ -32,7 +32,7 @@
     "shortdesc":"openstc",
     "category": "Category",
     "description": """
-    Module STC For Prêts, temporary module to store changes specific to prets untested features on SWIF 
+    Module STC For Prêts, temporary module to store changes specific to prets untested features on SWIF
     """,
     "data": [
         'security/openstc_security.xml',
@@ -54,9 +54,10 @@
         'workflow/purchase_workflow.xml',
         "report/openstc_pret_qte_dispo_report_view.xml",
         "unit_tests/unit_tests.xml",
+
+        'data/base_data.xml',
         #"unit_tests/openstc_prets_tests.xml",
-        "test/cr_commit.yml",
-        "test/openstc_prets_tests.yml",
+        #"test/cr_commit.yml", "test/openstc_prets_tests.yml",
     ],
     #"test":"test/openstc_prets_tests.yml",
     "js":['static/src/js/calendar_inherit.js'],
