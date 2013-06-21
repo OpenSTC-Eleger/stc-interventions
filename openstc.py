@@ -319,7 +319,7 @@ class res_partner_address(osv.osv):
         if partner_address.has_key('user_id')!= False :
             if partner_address['user_id'] != False :
                 user = user_obj.browse(cr, uid, partner_address['user_id'][0], context=context)
-                if user.id != 0 and  _test_params(params, ['login','password','name','email'])!= False :
+                if user.id != 0 and  _test_params(data, ['login','password','name','email'])!= False :
                     user_obj.write(cr, uid, [user.id], {
                                     'name': data['name'],
                                     'firstname': data['name'],
