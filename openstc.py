@@ -1241,6 +1241,66 @@ class ask(osv.osv):
 #                res[id] = True;
 #        return res
 
+    def _tooltip(self, cr, uid, ids, fields, arg, context):
+        res = {}
+
+        ask_obj = self.pool.get('openstc.ask')
+        project_obj = self.pool.get('project.project')
+        task_obj = self.pool.get('project.task')
+        user_obj = self.pool.get('res.users')
+
+        for id in ids:
+            res[id] = ''
+            first_date = None
+            last_date = None
+
+            ask = ask_obj.browse(cr, uid, id, context)
+            if ask :
+                modifyBy = user_obj.browse(cr, uid, ask.write_uid.id, context).name
+                if ask.state == 'valid' or ask.state == 'closed' :
+                    for intervention_id in ask.intervention_ids :
+                         intervention = project_obj.browse(cr, uid, intervention_id.id, context)
+                         if intervention :
+                             for task_id in intervention.tasks :
+                                 task = task_obj.browse(cr, uid, task_id.id, context)
+                                 if task :
+                                     if first_date == None:
+                                        first_date = task.date_start
+                                     elif task.date_start and first_date > task.date_start :
+                                        first_date = task.date_start
+
+                                     if last_date == None:
+                                        last_date = task.date_end
+                                     elif task.date_end and last_date < task.date_end :
+                                        last_date = task.date_end
+                             user = user_obj.browse(cr, uid, intervention.create_uid.id, context)
+                             res[id] = "par "  + user.name + ". "
+
+                             if ask.state == 'closed' :
+                                 if intervention.state == 'closed':
+                                     res[id] += 'Terminée le ' + last_date
+                                 else:
+                                    res[id] += intervention.cancel_reason
+
+                             elif first_date :
+                                 if intervention.progress_rate == 100 :
+                                     res[id] += 'Terminée le ' + last_date
+                                 elif intervention.progress_rate :
+                                     res[id] += "Début prévue le " + first_date
+                                 elif last_date:
+                                     res[id] += "Fin prévue le " + last_date
+                                 else :
+                                      res[id] += "Remis en planification "
+                             else:
+                                 res[id] += "Non planifiée"
+
+                elif ask.state == 'refused' :
+                    res[id] = ask.refusal_reason  + '\n('+ modifyBy +')';
+                elif ask.state == 'confirm' :
+                    res[id] = ask.note + '\n('+ modifyBy +')';
+
+        return res
+
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True),
         'create_date' : fields.datetime('Create Date', readonly=True, select=False),
@@ -1281,6 +1341,7 @@ class ask(osv.osv):
                           \n If the task is over, the states is set to \'Done\'.'),
 
         'actions' : fields.function(_is_possible_action, method=True, string='Valider',type='selection', store=False),
+        'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
 #        'action_request_confirm' : fields.function(_is_possible_action, arg=['wait','refused'],
 #                                                   method=True, string='Demander la Confirmation',type='boolean', store=False),
 #        'action_refuse' : fields.function(_is_possible_action, arg=['wait','confirm'],
