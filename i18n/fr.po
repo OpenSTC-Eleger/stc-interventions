@@ -3386,10 +3386,10 @@ msgstr " Remis en planification "
 msgid " Not plan "
 msgstr " Non planifiée "
 
-#: code:addons/openstc/openstc.py:1298
+#: code:addons/openstc/openstc.py:1299
 #, python-format
-msgid " request refused "
-msgstr " demande refusée "
+msgid " request cancelled "
+msgstr " demande annulée "
 
 #: code:addons/openstc/openstc.py:1318
 #, python-format
