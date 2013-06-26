@@ -1280,13 +1280,13 @@ class ask(osv.osv):
 
                              if last_date :
                                  last_date = fields.datetime.context_timestamp(cr, uid,
-                                                                               datetime.strptime(last_date, '%Y-%m-%d  %H:%M:%S')
-                                                                               , context)
+                                                        datetime.strptime(last_date, '%Y-%m-%d  %H:%M:%S').replace(tzinfo=pytz.utc)
+                                                        , context)
 
                              if first_date :
                                  first_date = fields.datetime.context_timestamp(cr, uid,
-                                                                            datetime.strptime(first_date, '%Y-%m-%d  %H:%M:%S')
-                                                                           , context)
+                                                        datetime.strptime(first_date, '%Y-%m-%d  %H:%M:%S').replace(tzinfo=pytz.utc)
+                                                        , context)
 
                              if ask.state == 'closed' :
                                  if intervention.state == 'closed':
