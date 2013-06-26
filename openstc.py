@@ -1292,7 +1292,11 @@ class ask(osv.osv):
                                  if intervention.state == 'closed':
                                      res[id] += _(' Ended date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  else:
-                                    res[id] += intervention.cancel_reason
+                                      if ask.refusal_reason:
+                                          res[id] += intervention.cancel_reason
+                                      else:
+                                          res[id] = _(' request cancelled ')
+
 
                              elif first_date :
                                  if intervention.progress_rate == 100 :
