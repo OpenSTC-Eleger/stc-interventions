@@ -1275,7 +1275,7 @@ class ask(osv.osv):
                                      elif task.date_end and last_date < task.date_end :
                                         last_date = task.date_end
                              user = user_obj.browse(cr, uid, intervention.create_uid.id, context)
-                             res[id] = "par "  + user.name + ". "
+                             res[id] = _("By ")  + user.name
 
                              if last_date :
                                  last_date = fields.datetime.context_timestamp(cr, uid,
@@ -1289,21 +1289,26 @@ class ask(osv.osv):
 
                              if ask.state == 'closed' :
                                  if intervention.state == 'closed':
-                                     res[id] += 'Terminée le ' + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _('Ended date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  else:
                                     res[id] += intervention.cancel_reason
 
                              elif first_date :
                                  if intervention.progress_rate == 100 :
-                                     res[id] += 'Terminée le ' + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     #res[id] += 'Terminée le ' + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _('Ended date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  elif intervention.progress_rate :
-                                     res[id] += "Début prévue le " + first_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     #res[id] += "Début prévue le " + first_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _('Scheduled start date ') + first_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  elif last_date:
-                                     res[id] += "Fin prévue le " + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     #res[id] += "Fin prévue le " + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _('Scheduled end date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  else :
-                                      res[id] += "Remis en planification "
+                                      #res[id] += "Remis en planification "
+                                      res[id] += _("To plan ")
                              else:
-                                 res[id] += "Non planifiée"
+                                 #res[id] += "Non planifiée"
+                                 res[id] += _("Not plan ")
 
                 elif ask.state == 'refused' :
                     res[id] = ask.refusal_reason  + '\n('+ modifyBy +')';

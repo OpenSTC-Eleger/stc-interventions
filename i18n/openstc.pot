@@ -3082,3 +3082,39 @@ msgstr ""
 msgid "Tasks Stages"
 msgstr ""
 
+
+#: code:addons/openstc/openstc.py:1278
+#, python-format
+msgid "By "
+msgstr ""
+
+#: code:addons/openstc/openstc.py:1292
+#, python-format
+msgid "Ended date "
+msgstr ""
+
+#: code:addons/openstc/openstc.py:1299
+#, python-format
+msgid "Ended date "
+msgstr ""
+
+#: code:addons/openstc/openstc.py:1302
+#, python-format
+msgid "Scheduled start date "
+msgstr ""
+
+#: code:addons/openstc/openstc.py:1305
+#, python-format
+msgid "Scheduled end date "
+msgstr ""
+
+#: code:addons/openstc/openstc.py:1308
+#, python-format
+msgid "To plan "
+msgstr ""
+
+#: code:addons/openstc/openstc.py:1311
+#, python-format
+msgid "Not plan "
+msgstr ""
+
