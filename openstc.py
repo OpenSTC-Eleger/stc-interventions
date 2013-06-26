@@ -1290,7 +1290,7 @@ class ask(osv.osv):
 
                              if ask.state == 'closed' :
                                  if intervention.state == 'closed':
-                                     res[id] += _(' Ended date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _(' Ended date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p").encode('utf-8')
                                  else:
                                       if ask.refusal_reason:
                                           res[id] += intervention.cancel_reason
@@ -1301,13 +1301,13 @@ class ask(osv.osv):
                              elif first_date :
                                  if intervention.progress_rate == 100 :
                                      #res[id] += 'Terminée le ' + last_date.strftime("%A, %d. %B %Y %I:%M%p")
-                                     res[id] += _(' Ended date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _(' Ended date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p").encode('utf-8')
                                  elif intervention.progress_rate :
                                      #res[id] += "Début prévue le " + first_date.strftime("%A, %d. %B %Y %I:%M%p")
-                                     res[id] += _(' Scheduled start date ') + first_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _(' Scheduled start date ') + first_date.strftime("%A, %d. %B %Y %I:%M%p").encode('utf-8')
                                  elif last_date:
                                      #res[id] += "Fin prévue le " + last_date.strftime("%A, %d. %B %Y %I:%M%p")
-                                     res[id] += _(' Scheduled end date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _(' Scheduled end date ') + last_date.strftime("%A, %d. %B %Y %I:%M%p").encode('utf-8')
                                  else :
                                       #res[id] += "Remis en planification "
                                       res[id] += _(" To plan ")
