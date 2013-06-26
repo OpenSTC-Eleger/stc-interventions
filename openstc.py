@@ -27,6 +27,7 @@ import types
 
 import logging
 import netsvc
+import pytz
 from osv.orm import browse_record, browse_null
 from osv import fields, osv, orm
 from datetime import datetime
