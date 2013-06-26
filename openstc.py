@@ -22,13 +22,15 @@
 #
 #############################################################################
 #import logging
-from datetime import datetime
+
 import types
 
 import logging
 import netsvc
+import pytz
 from osv.orm import browse_record, browse_null
 from osv import fields, osv, orm
+from datetime import datetime
 from tools.translate import _
 
 #_logger = logging.getLogger(__name__
@@ -1241,7 +1243,7 @@ class ask(osv.osv):
 #                res[id] = True;
 #        return res
 
-    def _tooltip(self, cr, uid, ids, fields, arg, context):
+    def _tooltip(self, cr, uid, ids, myFields, arg, context):
         res = {}
 
         ask_obj = self.pool.get('openstc.ask')
@@ -1251,14 +1253,15 @@ class ask(osv.osv):
 
         for id in ids:
             res[id] = ''
-            first_date = None
-            last_date = None
+
 
             ask = ask_obj.browse(cr, uid, id, context)
             if ask :
                 modifyBy = user_obj.browse(cr, uid, ask.write_uid.id, context).name
                 if ask.state == 'valid' or ask.state == 'closed' :
                     for intervention_id in ask.intervention_ids :
+                         first_date = None
+                         last_date = None
                          intervention = project_obj.browse(cr, uid, intervention_id.id, context)
                          if intervention :
                              for task_id in intervention.tasks :
@@ -1274,30 +1277,57 @@ class ask(osv.osv):
                                      elif task.date_end and last_date < task.date_end :
                                         last_date = task.date_end
                              user = user_obj.browse(cr, uid, intervention.create_uid.id, context)
-                             res[id] = "par "  + user.name + ". "
+                             res[id] = _(" By ")  + user.name
+
+                             if last_date :
+                                 last_date = fields.datetime.context_timestamp(cr, uid,
+                                                        datetime.strptime(last_date, '%Y-%m-%d  %H:%M:%S')
+                                                        , context)
+
+                             if first_date :
+                                 first_date = fields.datetime.context_timestamp(cr, uid,
+                                                        datetime.strptime(first_date, '%Y-%m-%d  %H:%M:%S')
+                                                        , context)
 
                              if ask.state == 'closed' :
                                  if intervention.state == 'closed':
-                                     res[id] += 'Terminée le ' + last_date
+                                     res[id] += _(' Ended date ') + last_date.strftime(_("%A, %d. %B %Y %I:%M%p").encode('utf-8')).decode('utf-8')
                                  else:
-                                    res[id] += intervention.cancel_reason
+                                      if ask.refusal_reason:
+                                          res[id] += intervention.cancel_reason
+                                      else:
+                                          res[id] = _(' request cancelled ')
+
 
                              elif first_date :
                                  if intervention.progress_rate == 100 :
-                                     res[id] += 'Terminée le ' + last_date
+                                     #res[id] += 'Terminée le ' + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _(' Ended date ') + last_date.strftime(_("%A, %d. %B %Y %I:%M%p").encode('utf-8')).decode('utf-8')
                                  elif intervention.progress_rate :
-                                     res[id] += "Début prévue le " + first_date
+                                     #res[id] += "Début prévue le " + first_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _(' Scheduled start date ') + first_date.strftime(_("%A, %d. %B %Y %I:%M%p").encode('utf-8')).decode('utf-8')
                                  elif last_date:
-                                     res[id] += "Fin prévue le " + last_date
+                                     #res[id] += "Fin prévue le " + last_date.strftime("%A, %d. %B %Y %I:%M%p")
+                                     res[id] += _(' Scheduled end date ') + last_date.strftime(_("%A, %d. %B %Y %I:%M%p").encode('utf-8')).decode('utf-8')
                                  else :
-                                      res[id] += "Remis en planification "
+                                      #res[id] += "Remis en planification "
+                                      res[id] += _(" To plan ")
                              else:
-                                 res[id] += "Non planifiée"
+                                 #res[id] += "Non planifiée"
+                                 res[id] += _(" Not plan ")
 
                 elif ask.state == 'refused' :
-                    res[id] = ask.refusal_reason  + '\n('+ modifyBy +')';
+                    if ask.refusal_reason:
+                        res[id] = ask.refusal_reason  + '\n('+ modifyBy +')';
+                    else:
+                        res[id] = _(' request refused ')
+
                 elif ask.state == 'confirm' :
-                    res[id] = ask.note + '\n('+ modifyBy +')';
+                    if ask.note:
+                        res[id] = ask.note + '\n('+ modifyBy +')';
+                    else:
+                        res[id] = _(' request confirmed ')
+
 
         return res
 
