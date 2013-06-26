@@ -3118,3 +3118,13 @@ msgstr ""
 msgid "Not plan "
 msgstr ""
 
+#: code:addons/openstc/openstc.py:1318
+#, python-format
+msgid " request refused "
+msgstr ""
+
+#: code:addons/openstc/openstc.py:1324
+#, python-format
+msgid " request confirmed "
+msgstr ""
+

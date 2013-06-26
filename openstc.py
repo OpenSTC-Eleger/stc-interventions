@@ -1312,9 +1312,17 @@ class ask(osv.osv):
                                  res[id] += _(" Not plan ")
 
                 elif ask.state == 'refused' :
-                    res[id] = ask.refusal_reason  + '\n('+ modifyBy +')';
+                    if ask.refusal_reason:
+                        res[id] = ask.refusal_reason  + '\n('+ modifyBy +')';
+                    else:
+                        res[id] = _(' request refused ')
+
                 elif ask.state == 'confirm' :
-                    res[id] = ask.note + '\n('+ modifyBy +')';
+                    if ask.note:
+                        res[id] = ask.note + '\n('+ modifyBy +')';
+                    else:
+                        res[id] = _(' request confirmed ')
+
 
         return res
 
