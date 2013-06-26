@@ -22,13 +22,14 @@
 #
 #############################################################################
 #import logging
-from datetime import datetime
+
 import types
 
 import logging
 import netsvc
 from osv.orm import browse_record, browse_null
 from osv import fields, osv, orm
+from datetime import datetime
 from tools.translate import _
 
 #_logger = logging.getLogger(__name__
@@ -1241,7 +1242,7 @@ class ask(osv.osv):
 #                res[id] = True;
 #        return res
 
-    def _tooltip(self, cr, uid, ids, fields, arg, context):
+    def _tooltip(self, cr, uid, ids, myFields, arg, context):
         res = {}
 
         ask_obj = self.pool.get('openstc.ask')
@@ -1276,19 +1277,29 @@ class ask(osv.osv):
                              user = user_obj.browse(cr, uid, intervention.create_uid.id, context)
                              res[id] = "par "  + user.name + ". "
 
+                             if last_date :
+                                 last_date = fields.datetime.context_timestamp(cr, uid,
+                                                                               datetime.strptime(last_date, '%Y-%m-%d  %H:%M:%S')
+                                                                               , context)
+
+                             if first_date :
+                                 first_date = fields.datetime.context_timestamp(cr, uid,
+                                                                            datetime.strptime(first_date, '%Y-%m-%d  %H:%M:%S')
+                                                                           , context)
+
                              if ask.state == 'closed' :
                                  if intervention.state == 'closed':
-                                     res[id] += 'Terminée le ' + last_date
+                                     res[id] += 'Terminée le ' + last_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  else:
                                     res[id] += intervention.cancel_reason
 
                              elif first_date :
                                  if intervention.progress_rate == 100 :
-                                     res[id] += 'Terminée le ' + last_date
+                                     res[id] += 'Terminée le ' + last_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  elif intervention.progress_rate :
-                                     res[id] += "Début prévue le " + first_date
+                                     res[id] += "Début prévue le " + first_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  elif last_date:
-                                     res[id] += "Fin prévue le " + last_date
+                                     res[id] += "Fin prévue le " + last_date.strftime("%A, %d. %B %Y %I:%M%p")
                                  else :
                                       res[id] += "Remis en planification "
                              else:
