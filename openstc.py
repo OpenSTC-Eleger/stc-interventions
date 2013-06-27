@@ -1017,7 +1017,7 @@ class project(osv.osv):
                 if first_date :
                     if inter.progress_rate >= 100 :
                         res[id] = _(' Ended date ') + last_date.strftime(_("%A, %d %B %Y %H:%M").encode('utf-8')).decode('utf-8')
-                    if inter.progress_rate == 0 :
+                    elif inter.progress_rate == 0 :
                         res[id] = _(' Scheduled start date ') + first_date.strftime(_("%A, %d %B %Y %H:%M").encode('utf-8')).decode('utf-8')
 
                     elif last_date and allPlanned:
