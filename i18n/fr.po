@@ -3401,3 +3401,13 @@ msgstr " demande refusée "
 msgid " request confirmed "
 msgstr " demande confirmée "
 
+#: code:addons/openstc/openstc.py:1030
+#, python-format
+msgid " intervention cancelled "
+msgstr " intervention annulée "
+
+#: code:addons/openstc/openstc.py:1030
+#, python-format
+msgid " All tasks not planned "
+msgstr " Toutes les tâches ne sont pas planifiées "
+

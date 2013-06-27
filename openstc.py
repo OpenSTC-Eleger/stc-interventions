@@ -975,6 +975,78 @@ class project(osv.osv):
         return res
 
 
+    def _tooltip(self, cr, uid, ids, myFields, arg, context):
+        res = {}
+
+        project_obj = self.pool.get('project.project')
+        task_obj = self.pool.get('project.task')
+
+        for id in ids:
+            res[id] = ''
+            inter = self.browse(cr, uid, id, context)
+            if inter :
+                first_date = None
+                last_date = None
+                allPlanned = True
+                for task_id in inter.tasks :
+                    task = task_obj.browse(cr, uid, task_id.id, context)
+                    if  first_date == None :
+                        first_date = task.date_start;
+                    elif task.date_start and first_date>task.date_start :
+                        first_date=task.date_start;
+
+                    if last_date == None :
+                        last_date = task.date_end;
+                    elif task.date_end and last_date<task.date_end :
+                        last_date=task.date_end
+
+                    if task.state == 'draft' :
+                        allPlanned = False
+
+                if last_date :
+                     last_date = fields.datetime.context_timestamp(cr, uid,
+                            datetime.strptime(last_date, '%Y-%m-%d  %H:%M:%S')
+                            , context)
+
+                if first_date :
+                     first_date = fields.datetime.context_timestamp(cr, uid,
+                            datetime.strptime(first_date, '%Y-%m-%d  %H:%M:%S')
+                            , context)
+
+
+                if first_date :
+                    if inter.progress_rate == 0 :
+                        res[id] = _(' Scheduled start date ') + first_date.strftime(_("%A, %d %B %Y %H:%M").encode('utf-8')).decode('utf-8')
+
+                    elif last_date and allPlanned:
+                        res[id] = _(' Scheduled end date ') + last_date.strftime(_("%A, %d %B %Y %H:%M").encode('utf-8')).decode('utf-8')
+                    else :
+                        res[id] = _(' All tasks not planned ')
+
+                if inter.state == 'cancelled' :
+                    if intervention.cancel_reason:
+                      res[id] += intervention.cancel_reason
+                    else:
+                      res[id] = _(' intervention cancelled ')
+
+        return res
+
+
+    def _overPourcent(self, cr, uid, ids, myFields, arg, context):
+        res = {}
+
+        project_obj = self.pool.get('project.project')
+        task_obj = self.pool.get('project.task')
+
+        for id in ids:
+            res[id] = 0
+            inter = self.browse(cr, uid, id, context)
+            if inter :
+                if inter.planned_hours :
+                    res[id] = round(100.0 * inter.effective_hours / inter.planned_hours, 0);
+        return res
+
+
 
     _columns = {
 
@@ -1000,6 +1072,10 @@ class project(osv.osv):
                 'project.project': (_get_project_and_parents, ['tasks', 'parent_id', 'child_ids'], 10),
                 'project.task': (_get_projects_from_tasks, ['planned_hours', 'remaining_hours', 'work_ids', 'state'], 20),
             }),
+
+        'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
+        'overPourcent' : fields.function(_overPourcent, method=True, string='OverPourcent',type='float', store=False),
+
     }
 
     #Overrides  set_template method of project module
@@ -1291,29 +1367,24 @@ class ask(osv.osv):
 
                              if ask.state == 'closed' :
                                  if intervention.state == 'closed':
-                                     res[id] += _(' Ended date ') + last_date.strftime(_("%A, %d. %B %Y %I:%M%p").encode('utf-8')).decode('utf-8')
+                                     res[id] += _(' Ended date ') + last_date.strftime(_("%A, %d. %B %Y %H:%M").encode('utf-8')).decode('utf-8')
                                  else:
-                                      if ask.refusal_reason:
+                                      if intervention.cancel_reason:
                                           res[id] += intervention.cancel_reason
                                       else:
-                                          res[id] = _(' request cancelled ')
+                                          res[id] = _(' intervention cancelled ')
 
 
                              elif first_date :
-                                 if intervention.progress_rate == 100 :
-                                     #res[id] += 'Terminée le ' + last_date.strftime("%A, %d. %B %Y %I:%M%p")
-                                     res[id] += _(' Ended date ') + last_date.strftime(_("%A, %d. %B %Y %I:%M%p").encode('utf-8')).decode('utf-8')
-                                 elif intervention.progress_rate :
-                                     #res[id] += "Début prévue le " + first_date.strftime("%A, %d. %B %Y %I:%M%p")
-                                     res[id] += _(' Scheduled start date ') + first_date.strftime(_("%A, %d. %B %Y %I:%M%p").encode('utf-8')).decode('utf-8')
+                                 if intervention.progress_rate == 0 :
+                                     res[id] += _(' Scheduled start date ') + first_date.strftime(_("%A, %d. %B %Y %H:%M").encode('utf-8')).decode('utf-8')
+                                 elif intervention.progress_rate == 100 :
+                                     res[id] += _(' Ended date ') + last_date.strftime(_("%A, %d. %B %Y %H:%M").encode('utf-8')).decode('utf-8')
                                  elif last_date:
-                                     #res[id] += "Fin prévue le " + last_date.strftime("%A, %d. %B %Y %I:%M%p")
-                                     res[id] += _(' Scheduled end date ') + last_date.strftime(_("%A, %d. %B %Y %I:%M%p").encode('utf-8')).decode('utf-8')
+                                     res[id] += _(' Scheduled end date ') + last_date.strftime(_("%A, %d. %B %Y %H:%M").encode('utf-8')).decode('utf-8')
                                  else :
-                                      #res[id] += "Remis en planification "
                                       res[id] += _(" To plan ")
                              else:
-                                 #res[id] += "Non planifiée"
                                  res[id] += _(" Not plan ")
 
                 elif ask.state == 'refused' :
