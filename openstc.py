@@ -1024,8 +1024,8 @@ class project(osv.osv):
                         res[id] = _(' All tasks not planned ')
 
                 if inter.state == 'cancelled' :
-                    if intervention.cancel_reason:
-                      res[id] += intervention.cancel_reason
+                    if inter.cancel_reason:
+                      res[id] += inter.cancel_reason
                     else:
                       res[id] = _(' intervention cancelled ')
 
