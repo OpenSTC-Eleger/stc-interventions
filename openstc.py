@@ -439,6 +439,50 @@ class users(osv.osv):
          return res
 
 
+    #Calculates the agents can be added to the team
+    def _get_officers(self, cr, uid, ids, fields, arg, context):
+        res = {}
+        user_obj = self.pool.get('res.users')
+
+        #get list of all agents
+        all_officer_ids = user_obj.search(cr, uid, []);
+        all_officers = user_obj.browse(cr, uid, all_officer_ids, context);
+
+
+        for id in ids:
+
+            officers = []
+            managerTeamID = []
+
+
+            #get list of all teams
+            user = self.browse(cr, uid, id, context=context)
+            if user.isDST:
+                res[id] = all_officer_ids
+            elif user.isManager :
+                for service_id in user.service_ids :
+                    for officer in all_officers:
+                        if not officer.isDST :
+                        #officer = user_obj.browse(cr, uid, officer_id, context)
+                            if service_id in officer.service_ids:
+                                officers.append(officer.id)
+                res[id] = officers
+            else:
+                for team_id in user.manage_teams :
+                    managerTeamID.append(team_id.id)
+                if len(managerTeamID) > 0 :
+                    for officer in all_officers:
+                        if not officer.isDST :
+                        #officer = user_obj.browse(cr, uid, officer_id, context)
+                            for team_id in officer.team_ids :
+                                if team_id.id in managerTeamID :
+                                    officers.append(officer.id)
+                                    break
+                res[id] = officers
+
+
+        return res
+
     _columns = {
             'firstname': fields.char('firstname', size=128),
             'lastname': fields.char('lastname', size=128),
@@ -459,8 +503,11 @@ class users(osv.osv):
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
 
             'team_ids': fields.many2many('openstc.team', 'openstc_team_users_rel', 'user_id', 'team_id', 'Teams'),
+            'manage_teams': fields.one2many('openstc.team', 'manager_id', "Teams"),
             'isDST' : fields.function(_get_group, arg="DIRE", method=True,type='boolean', store=False), #DIRECTOR group
             'isManager' : fields.function(_get_group, arg="MANA", method=True,type='boolean', store=False), #MANAGER group
+
+            'officer_ids' : fields.function(_get_officers, method=True,type='many2one', store=False),
     }
 
     def create(self, cr, uid, data, context={}):
