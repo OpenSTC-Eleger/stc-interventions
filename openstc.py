@@ -507,7 +507,7 @@ class users(osv.osv):
             'isDST' : fields.function(_get_group, arg="DIRE", method=True,type='boolean', store=False), #DIRECTOR group
             'isManager' : fields.function(_get_group, arg="MANA", method=True,type='boolean', store=False), #MANAGER group
 
-            'officer_ids' : fields.function(_get_officers, method=True,type='many2one', store=False),
+            'officers' : fields.function(_get_officers, method=True,type='many2one', store=False),
     }
 
     def create(self, cr, uid, data, context={}):
