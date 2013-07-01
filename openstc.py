@@ -439,49 +439,7 @@ class users(osv.osv):
          return res
 
 
-    #Calculates the agents can be added to the team
-    def _get_officers(self, cr, uid, ids, fields, arg, context):
-        res = {}
-        user_obj = self.pool.get('res.users')
 
-        #get list of all agents
-        all_officer_ids = user_obj.search(cr, uid, []);
-        all_officers = user_obj.browse(cr, uid, all_officer_ids, context);
-
-
-        for id in ids:
-
-            officers = []
-            managerTeamID = []
-
-
-            #get list of all teams
-            user = self.browse(cr, uid, id, context=context)
-            if user.isDST:
-                res[id] = all_officer_ids
-            elif user.isManager :
-                for service_id in user.service_ids :
-                    for officer in all_officers:
-                        if not officer.isDST :
-                        #officer = user_obj.browse(cr, uid, officer_id, context)
-                            if service_id in officer.service_ids:
-                                officers.append(officer.id)
-                res[id] = officers
-            else:
-                for team_id in user.manage_teams :
-                    managerTeamID.append(team_id.id)
-                if len(managerTeamID) > 0 :
-                    for officer in all_officers:
-                        if not officer.isDST :
-                        #officer = user_obj.browse(cr, uid, officer_id, context)
-                            for team_id in officer.team_ids :
-                                if team_id.id in managerTeamID :
-                                    officers.append(officer.id)
-                                    break
-                res[id] = officers
-
-
-        return res
 
     _columns = {
             'firstname': fields.char('firstname', size=128),
@@ -507,7 +465,7 @@ class users(osv.osv):
             'isDST' : fields.function(_get_group, arg="DIRE", method=True,type='boolean', store=False), #DIRECTOR group
             'isManager' : fields.function(_get_group, arg="MANA", method=True,type='boolean', store=False), #MANAGER group
 
-            'officers' : fields.function(_get_officers, method=True,type='many2one', store=False),
+            #'officers' : fields.function(_get_officers, method=True,type='many2one', store=False),
     }
 
     def create(self, cr, uid, data, context={}):
@@ -555,6 +513,50 @@ class users(osv.osv):
         service_obj.write(cr, uid, data['service_id'], {
                  'manager_id': ids[0],
              }, context=context)
+
+            #Calculates the agents can be added to the team
+    def get_officers(self, cr, uid, ids, data, context):
+        res = {}
+        user_obj = self.pool.get('res.users')
+
+        #get list of all agents
+        all_officer_ids = user_obj.search(cr, uid, []);
+        all_officers = user_obj.browse(cr, uid, ids, context);
+
+
+        #for id in ids:
+
+        officers = []
+        managerTeamID = []
+
+
+        #get list of all teams
+        user = self.browse(cr, uid, uid, context=context)
+        if user.isDST:
+            res = ids
+        elif user.isManager :
+            for service_id in user.service_ids :
+                for officer in all_officers:
+                    if not officer.isDST :
+                    #officer = user_obj.browse(cr, uid, officer_id, context)
+                        if service_id in officer.service_ids:
+                            officers.append(officer.id)
+            res = officers
+        else:
+            for team_id in user.manage_teams :
+                managerTeamID.append(team_id.id)
+            if len(managerTeamID) > 0 :
+                for officer in all_officers:
+                    if not officer.isDST :
+                    #officer = user_obj.browse(cr, uid, officer_id, context)
+                        for team_id in officer.team_ids :
+                            if team_id.id in managerTeamID :
+                                officers.append(officer.id)
+                                break
+                res = officers
+
+
+        return res
 
 
 users()
@@ -619,9 +621,7 @@ class task(osv.osv):
     _inherit = "project.task"
     __logger = logging.getLogger(_name)
 
-    #Overrides search method of project module
-    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+
 
     #Overrides _is_template method of project module
     def _is_template(self, cr, uid, ids, field_name, arg, context=None):
@@ -738,6 +738,12 @@ class task(osv.osv):
 
 #    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
 #        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+
+        #Overrides search method of project module
+    def getOfficers(self, cr, uid, ids, params, context=None):
+        user_obj = self.pool.get('res.users')
+        all_officer_ids = user_obj.search(cr, uid, []);
+        return user_obj.get_officers(cr, uid, all_officer_ids, None,context)
 
     def createOrphan(self, cr, uid, ids, params, context=None):
 
@@ -1512,7 +1518,7 @@ class ask(osv.osv):
 
 
 #    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-#        res = super(ask, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+#        res = super(ask, self).search(cr, user, args, offset=5, limit=25, order=order, context=context, count=count)
 #        return res
 
     def create(self, cr, uid, data, context={}):
