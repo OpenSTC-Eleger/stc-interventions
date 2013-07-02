@@ -515,13 +515,15 @@ class users(osv.osv):
              }, context=context)
 
             #Calculates the agents can be added to the team
-    def get_officers(self, cr, uid, ids, data, context):
+
+
+    def getOfficers(self, cr, uid, ids, data, context=None):
         res = {}
         user_obj = self.pool.get('res.users')
 
         #get list of all agents
         all_officer_ids = user_obj.search(cr, uid, []);
-        all_officers = user_obj.browse(cr, uid, ids, context);
+        all_officers = user_obj.browse(cr, uid, all_officer_ids, context);
 
 
         #for id in ids:
@@ -533,7 +535,7 @@ class users(osv.osv):
         #get list of all teams
         user = self.browse(cr, uid, uid, context=context)
         if user.isDST:
-            res = ids
+            res = all_officer_ids
         elif user.isManager :
             for service_id in user.service_ids :
                 for officer in all_officers:
@@ -740,10 +742,10 @@ class task(osv.osv):
 #        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
 
         #Overrides search method of project module
-    def getOfficers(self, cr, uid, ids, params, context=None):
-        user_obj = self.pool.get('res.users')
-        all_officer_ids = user_obj.search(cr, uid, []);
-        return user_obj.get_officers(cr, uid, all_officer_ids, None,context)
+#    def getOfficers(self, cr, uid, ids, params, context=None):
+#        user_obj = self.pool.get('res.users')
+#        all_officer_ids = user_obj.search(cr, uid, []);
+#        return user_obj.get_officers(cr, uid, all_officer_ids, None,context)
 
     def createOrphan(self, cr, uid, ids, params, context=None):
 
