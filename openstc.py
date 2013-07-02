@@ -25,6 +25,7 @@
 
 import types
 
+import time
 import logging
 import netsvc
 import pytz
@@ -240,6 +241,10 @@ class site(osv.osv):
             'asksBelongsto': fields.one2many('openstc.ask', 'site1', "asks"),
             'intervention_ids': fields.one2many('project.project', 'site1', "Interventions", String="Interventions"),
     }
+
+    def search_count(self, cr, user, args, context=None):
+        time.sleep(50)
+        return super(site, self).search_count(cr, user, args, context)
 
 site()
 
