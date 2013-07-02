@@ -242,9 +242,9 @@ class site(osv.osv):
             'intervention_ids': fields.one2many('project.project', 'site1', "Interventions", String="Interventions"),
     }
 
-    def search_count(self, cr, user, args, context=None):
-        time.sleep(50)
-        return super(site, self).search_count(cr, user, args, context)
+#    def search_count(self, cr, user, args, context=None):
+#        time.sleep(50)
+#        return super(site, self).search_count(cr, user, args, context)
 
 site()
 
