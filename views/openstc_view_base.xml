@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    OpenSTC Interventions - Openerp Module to manage Cityhall technical department
+    Copyright (C) 2013 Siclic www.siclic.fr
+
+    This file is part of OpenSTC Interventions.
+
+    OpenSTC Interventions is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    OpenSTC Interventions is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with OpenSTC Interventions.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<openerp>
+    <data noupdate="0">
+
+        <!-- res_users  -->
+        <record id="view_users_form_inherit5" model="ir.ui.view">
+            <field name="name">res.users.form.inhert</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                 <separator string="Email Preferences"  position="before" >
+                     <field name="service_ids"/>
+                 </separator>
+            </field>
+        </record>
+        
+ 
+        <!-- team -->
+        <record model="ir.ui.view" id="view_openstc_team_form">
+            <field name="name">openstc.team.form</field>
+            <field name="model">openstc.team</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Team">
+                    <group colspan="2" col="2">
+                        <separator string="General" colspan="2"/>
+                        <field name="name"/>
+                        <field name="manager_id"/>
+                    </group>
+                    <group colspan="2" col="2">
+                        <separator string="Service" colspan="2"/>
+                        <field name="service_ids"/>
+                        <field name="user_ids" widget="many2many" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_openstc_team_tree" model="ir.ui.view">
+            <field name="name">openstc.team.tree</field>
+            <field name="model">openstc.team</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Teams" >
+                       <field name="name"/>
+                       <field name="service_ids"/>
+                       <field name="user_ids"/>
+                </tree>
+            </field>
+        </record>
+
+       <record id="action_openstc_view_team" model="ir.actions.act_window">
+            <field name="name">Teams</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">openstc.team</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <!--  equipment -->
+        <record model="ir.ui.view" id="view_openstc_equipment_form">
+            <field name="name">openstc.equipment.form</field>
+            <field name="model">openstc.equipment</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Equipment">
+                    <group colspan="2" col="2">
+                        <separator string="General" colspan="2"/>
+                        <field name="name"/>
+                        <field name="marque"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_openstc_equipment_tree" model="ir.ui.view">
+            <field name="name">openstc.equipment.tree</field>
+            <field name="model">openstc.equipment</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Equipment" >
+                       <field name="name"/>
+                       <field name="marque"/>
+                </tree>
+            </field>
+        </record>
+       
+        <!-- service -->
+        <record model="ir.ui.view" id="view_openstc_service_form">
+            <field name="name">openstc.service.form</field>
+            <field name="model">openstc.service</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Service">
+                    <group colspan="2" col="2">
+                        <separator string="General" colspan="2"/>
+                        <field name="name"/>
+                        <field name="code"/>
+                    </group>
+                    <group colspan="2" col="2">
+                        <separator string="Service" colspan="2"/>
+                        <field name="service_id"/>
+                        <field name="technical" />
+                    </group>
+                    <group colspan="2" col="2">
+                        <separator string="Organisation" colspan="2"/>
+                        <field name="manager_id"/>
+                        <field name="category_ids" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_openstc_service_tree" model="ir.ui.view">
+            <field name="name">openstc.service.tree</field>
+            <field name="model">openstc.service</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Services" >
+                       <field name="name"/>
+                       <field name="code"/>
+                       <field name="manager_id"/>
+                </tree>
+            </field>
+        </record>
+        
+        <!--  site -->
+        <record model="ir.ui.view" id="view_openstc_site_form">
+            <field name="name">openstc.site.form</field>
+            <field name="model">openstc.site</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Site">
+                    <group colspan="4" col="4">
+                        <separator string="General" colspan="6"/>
+                        <field name="name"/>
+                        <field name="type"/>
+                    </group>
+                    <group colspan="2" col="2">
+                        <separator string="Organisation" colspan="2"/>
+                        <field name="service_ids"/>
+                        <field name="site_parent_id"/>
+                    </group>
+                    <group colspan="2" col="2">
+                        <separator string="Properties" colspan="2"/>
+                        <field name="lenght"/>
+                        <field name="width"/>
+                        <field name="surface"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_openstc_site_tree" model="ir.ui.view">
+            <field name="name">openstc.site.tree</field>
+            <field name="model">openstc.site</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Sites" >
+                       <field name="name"/>
+                       <field name="service"/>
+                       <field name="type"/>
+                       <field name="site_parent_id"/>
+                       <field name="lenght"/>
+                       <field name="width"/>
+                       <field name="surface"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_openstc_partner_type_tree" model="ir.ui.view">
+            <field name="name">openstc.partner.type.tree</field>
+            <field name="model">openstc.partner.type</field>
+            <field name="type">tree</field>
+             <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <tree string="Organisation type" >
+                	<field name="code"/>
+               		<field name="name"/>
+                </tree>
+            </field>
+        </record>
+        
+                <!-- Suppliers (res.partner) -->
+		<record id="view_openbase_partner_filter" model="ir.ui.view">
+		    <field name="name">res.partner.search</field>
+		    <field name="model">res.partner</field>
+		    <field name="type">search</field>
+		    <field name="inherit_id" ref="base.view_res_partner_filter"/>
+		    <field name="arch" type="xml">
+		        <field name="name" position="after">
+		            <field name="type_id"/>
+		            
+		        </field>
+		    </field>
+		</record>
+        
+    </data>
+</openerp>
