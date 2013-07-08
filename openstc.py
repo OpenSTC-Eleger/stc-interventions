@@ -34,7 +34,7 @@ from osv import fields, osv, orm
 from datetime import datetime
 from tools.translate import _
 
-#_logger = logging.getLogger(__name__
+#_logger = logging.getLogger(__name__)
 
 def _get_request_states(self, cursor, user_id, context=None):
     return (
@@ -60,8 +60,6 @@ def _test_params(params, keys):
 
 
 def send_email(self, cr, uid, ids, params, context=None):
-#def send_email( params ):
-    #print("test"+params)
     ask_obj = self.pool.get('openstc.ask')
     ask = ask_obj.browse(cr, uid, ids[0], context)
 
@@ -121,14 +119,6 @@ class equipment(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
-#    def create(self, cr, uid, data, context={}):
-#        res = super(equipment, self).create(cr, uid, data, context)
-#        return res
-#
-#    def write(self, cr, uid, data, context={}):
-#        res = super(equipment, self).create(cr, uid, data, context)
-#        return res
-
     _columns = {
             'immat': fields.char('Imatt', size=128),
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
@@ -183,8 +173,6 @@ class service(osv.osv):
             'manager_id': fields.many2one('res.users', 'Manager'),
             'asksBelongsto': fields.one2many('openstc.ask', 'service_id', "asks"),
 
-            #'employees': fields.one2many('res.users', 'service_id', 'Employees'),
-            #'user_ids': fields.many2many('res.users', 'openstc_user_services_rel', 'service_id', 'user_id', 'Employees'),
             'user_ids': fields.one2many('res.users', 'service_id', "Users"),
     }
 service()
@@ -270,29 +258,12 @@ class res_partner(osv.osv):
     _inherit = "res.partner"
     _rec_name = "name"
 
-#    def _get_services_list(self, cr, uid, context=None):
-#        user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
-#        list = []
-#        for service_id in user.service_ids:
-#            list.append(service_id.id)
-#        return list
-#
-#
-#    def fields_get(self, cr, uid, fields=None, context=None):
-#        res = super(res_partner, self).fields_get(cr, uid, fields, context)
-#        list = self._get_services_list(cr, uid,context)
-#        for field in res:
-#            if field == "service_id":
-#                res[field]['domain']=[('id','in',list)]
-#        return res
 
     _columns = {
          'type_id': fields.many2one('openstc.partner.type', 'Type'),
          'service_id':fields.many2one('openstc.service', 'Service du demandeur'),
          'technical_service_id':fields.many2one('openstc.service', 'Service technique concerné'),
          'technical_site_id': fields.many2one('openstc.site', 'Default Site'),
-         #'user_ids': fields.many2many('res.users', 'openstc_partner_users_rel', 'partner_id', 'user_id', 'Users'),
-
     }
 res_partner()
 
@@ -376,25 +347,6 @@ res_partner_address()
 # Employees
 #----------------------------------------------------------
 
-#class openstc_groups(osv.osv):
-#    """
-#        A portal is a group of users with specific menu, widgets, and typically
-#        restricted access rights.
-#    """
-#    _name = 'openstc.group'
-#    _description = 'OpenSTC groups'
-#    _inherits = {'res.groups': 'group_id'}
-#
-#    _columns = {
-#        'group_id': fields.many2one('res.groups', required=True, ondelete='cascade',
-#            string='Group',
-#            help='The group corresponding to this portal'),
-#        'code': fields.char('Code', size=128),
-#        'perm_request_confirm' : fields.boolean('Demander la Confirmation'),
-#    }
-#
-#openstc_groups()
-
 class groups(osv.osv):
     _name = "res.groups"
     _description = "Access Groups"
@@ -461,8 +413,6 @@ class users(osv.osv):
             'address_home': fields.char('Address', size=128),
             'city_home': fields.char('City', size=128),
             'phone': fields.char('Phone Number', size=12),
-            #'is_manager': fields.boolean('Is manager'),
-            #'team_ids': fields.many2many('openstc.team', 'openstc_user_teams_rel', 'user_id', 'team_id', 'Teams'),
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
 
             'team_ids': fields.many2many('openstc.team', 'openstc_team_users_rel', 'user_id', 'team_id', 'Teams'),
@@ -470,7 +420,6 @@ class users(osv.osv):
             'isDST' : fields.function(_get_group, arg="DIRE", method=True,type='boolean', store=False), #DIRECTOR group
             'isManager' : fields.function(_get_group, arg="MANA", method=True,type='boolean', store=False), #MANAGER group
 
-            #'officers' : fields.function(_get_officers, method=True,type='many2one', store=False),
     }
 
     def create(self, cr, uid, data, context={}):
@@ -521,47 +470,97 @@ class users(osv.osv):
 
             #Calculates the agents can be added to the team
 
-
-    def getOfficers(self, cr, uid, ids, data, context=None):
+    #Get lists officers/teams where user is the referent on
+    def getTeamsAndOfficers(self, cr, uid, ids, data, context=None):
         res = {}
         user_obj = self.pool.get('res.users')
+        team_obj = self.pool.get('openstc.team')
+
 
         #get list of all agents
         all_officer_ids = user_obj.search(cr, uid, []);
-        all_officers = user_obj.browse(cr, uid, all_officer_ids, context);
-
-
-        #for id in ids:
-
-        officers = []
-        managerTeamID = []
-
+        all_team_ids = team_obj.search(cr, uid, []);
 
         #get list of all teams
+        all_officers = user_obj.browse(cr, uid, all_officer_ids, context);
+        all_teams = team_obj.browse(cr, uid, all_team_ids, context);
+
+        officers = []
+        teams = []
+        managerTeamID = []
+
+        res['officers'] = []
+        res['teams'] = []
+        newOfficer = {}
+        newTeam = {}
+        #get user
         user = self.browse(cr, uid, uid, context=context)
+        #If users connected is the DST get all teams and all officers
         if user.isDST:
-            res = all_officer_ids
+            #Serialize each officer with name and firstname
+            for officer in user_obj.read(cr, uid, all_officer_ids, ['id','name','firstname']):
+                newOfficer = { 'id'  : officer['id'],
+                               'name' : officer['name'],
+                               'firstname' : officer['firstname']
+                            }
+                officers.append(newOfficer)
+            res['officers'] =  officers
+
+            #Serialize each team with name, manager and officers (with name and firstname)
+            for team in team_obj.read(cr, uid, all_team_ids, ['id','name','manager_id','members']):
+                newTeam = { 'id'   : team['id'] ,
+                            'name' : team['name'],
+                            'manager_id' : team['manager_id'],
+                            'members' :  team_obj._get_members(cr, uid, [team['id']],None,None,context)
+                            }
+                teams.append(newTeam)
+            res['teams'] = teams
+        #If user connected is Manager get all teams and all officers where he is the referent
         elif user.isManager :
+            #For each services authorized for user
             for service_id in user.service_ids :
+                #For each officer
                 for officer in all_officers:
                     if not officer.isDST :
-                    #officer = user_obj.browse(cr, uid, officer_id, context)
-                        if service_id in officer.service_ids:
-                            officers.append(officer.id)
-            res = officers
+                        #Check if officer's services list is in user's services list
+                        if (service_id in officer.service_ids) and (officer.id not in officers):
+                            newOfficer = { 'id'  : officer.id,
+                                          'name' : officer.name,
+                                          'firstname' : officer.firstname
+                                          }
+                            officers.append(newOfficer)
+                res['officers'] = officers
+                for team in all_teams:
+                    if (service_id in team.service_ids) and (team.id not in teams):
+                        manager_id = False
+                        if isinstance(team.manager_id, browse_null)!= True :
+                            manager_id = team.manager_id.id
+                        newTeam = { 'id'   : team.id ,
+                            'name' : team.name,
+                            'manager_id' : manager_id,
+                            'members' : team_obj._get_members(cr, uid, [team.id],None,None,context)
+                            }
+                        teams.append(newTeam)
+                res['teams'] = teams
+        #If user connected is an officer
         else:
+            #Get all teams where officer is manager on it
             for team_id in user.manage_teams :
                 managerTeamID.append(team_id.id)
             if len(managerTeamID) > 0 :
+                #For each officer
                 for officer in all_officers:
                     if not officer.isDST :
-                    #officer = user_obj.browse(cr, uid, officer_id, context)
+                        #Check if user is the manager on officer's teams
                         for team_id in officer.team_ids :
-                            if team_id.id in managerTeamID :
-                                officers.append(officer.id)
+                            if (team_id.id in managerTeamID) and (officer.id not in officers) :
+                                newOfficer = { 'id'  : officer.id,
+                                              'name' : officer.name,
+                                              'firstname' : officer.firstname
+                                          }
+                                officers.append(newOfficer)
                                 break
-                res = officers
-
+                res['officers'] = officers
 
         return res
 
@@ -604,6 +603,24 @@ class team(osv.osv):
 
         return res
 
+        #Calculates the agents can be added to the team
+    def _get_members(self, cr, uid, ids, fields, arg, context):
+        res = {}
+        user_obj = self.pool.get('res.users')
+        #for id in ids:
+        team = self.browse(cr, uid, ids[0], context=context)
+        team_users = []
+        #get list of agents already belongs to team
+        for user_record in team.user_ids:
+             officer = user_obj.read(cr, uid, user_record.id,['id','name','firstname'],context)
+             officerSerialized = { 'id'  : officer['id'],
+                               'name' : officer['name'],
+                               'firstname' : officer['firstname']
+                               }
+             team_users.append(officerSerialized)
+            #res[id] = team_users
+        return team_users
+
 
     _columns = {
             'name': fields.char('name', size=128),
@@ -611,7 +628,6 @@ class team(osv.osv):
             'service_ids': fields.many2many('openstc.service', 'openstc_team_services_rel', 'team_id', 'service_id', 'Services'),
             'user_ids': fields.many2many('res.users', 'openstc_team_users_rel', 'team_id', 'user_id', 'Users'),
             'free_user_ids' : fields.function(_get_free_users, method=True,type='many2one', store=False),
-            #'user_ids': fields.one2many('res.users', 'team_id', "Users"),
             'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
     }
 
@@ -637,20 +653,6 @@ class task(osv.osv):
             res[task.id] = True
         return res
 
-
-
-        # Compute: effective_hours, total_hours, progress
-#    def _hours_get(self, cr, uid, ids, field_names, args, context=None):
-#        res = {}
-#        for task in self.browse(cr, uid, ids, context=context):
-#            res[task.id] = {'effective_hours': task.effective_hours, 'total_hours': (task.remaining_hours or 0.0) + task.effective_hours}
-#            res[task.id]['delay_hours'] = res[task.id]['total_hours'] - task.planned_hours
-#            res[task.id]['progress'] = 0.0
-#            if (task.remaining_hours + task.effective_hours):
-#                res[task.id]['progress'] = round(min(100.0 * task.effective_hours/ res[task.id]['total_hours'], 99.99),2)
-#            if task.state in ('done','cancelled'):
-#                res[task.id]['progress'] = 100.0
-#        return res
 
     #Calculates if agent belongs to 'arg' code group
     def _get_active(self, cr, uid, ids, fields, arg, context):
@@ -699,12 +701,9 @@ class task(osv.osv):
 
     _columns = {
         'active':fields.function(_get_active, method=True,type='boolean', store=False),
-        #'active': fields.boolean('Active'),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'equipment_ids':fields.many2many('openstc.equipment', 'openstc_equipment_task_rel', 'task_id', 'equipment_id', 'Equipments'),
-        #'equipment_id':fields.many2one('openstc.equipment', 'Equipment'),
-        #'service_id': fields.related('project_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
         'parent_id': fields.many2one('project.task', 'Parent Task'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'absent_type_id':fields.many2one('openstc.absent.type', 'Type d''abscence'),
@@ -712,7 +711,6 @@ class task(osv.osv):
         'state': fields.selection([('absent', 'Absent'),('draft', 'New'),('open', 'In Progress'),('pending', 'Pending'), ('done', 'Done'), ('cancelled', 'Cancelled')], 'State', readonly=True, required=True,
                                   help='If the task is created the state is \'Draft\'.\n If the task is started, the state becomes \'In Progress\'.\n If review is needed the task is in \'Pending\' state.\
                                   \n If the task is over, the states is set to \'Done\'.'),
-        #'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
         'team_id': fields.many2one('openstc.team', 'Team'),
 
         'km': fields.integer('Km', select=1),
@@ -721,36 +719,10 @@ class task(osv.osv):
 
         'cancel_reason': fields.text('Cancel reason'),
 
-
-
-
-#        'planned_hours': fields.float('Planned print_on_orderHours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
-#        'effective_hours': fields.float('Effective Hours', help='Time spent'),
-#        'remaining_hours': fields.float('Remaining Hours', digits=(16,2), help="Total remaining time, can be re-estimated periodically by the assignee of the task."),
-#        'total_hours': fields.function(_hours_get, string='Total Hours', multi='hours', help="Computed as: Time Spent + Remaining Time.",
-#            store = {
-#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
-#            }),
-#        'progress': fields.function(_hours_get, string='Progress (%)', multi='hours', group_operator="avg", help="If the task has a progress of 99.99% you should close the task if it's finished or reevaluate the time",
-#            store = {
-#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours','state'], 10),
-#            }),
-#        'delay_hours': fields.function(_hours_get, string='Delay Hours', multi='hours', help="Computed as difference between planned hours by the project manager and the total hours of the task.",
-#            store = {
-#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
-#            }),
     }
 
     _defaults = {'active': lambda *a: True, 'user_id':None}
 
-#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-#        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
-
-        #Overrides search method of project module
-#    def getOfficers(self, cr, uid, ids, params, context=None):
-#        user_obj = self.pool.get('res.users')
-#        all_officer_ids = user_obj.search(cr, uid, []);
-#        return user_obj.get_officers(cr, uid, all_officer_ids, None,context)
 
     def createOrphan(self, cr, uid, ids, params, context=None):
 
@@ -909,10 +881,6 @@ class openstc_task_category(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
-#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-#
-#        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
-
     _name = "openstc.task.category"
     _description = "Task Category"
     _columns = {
@@ -973,13 +941,6 @@ openstc_absent_type()
 #----------------------------------------------------------
 # Interventions
 #----------------------------------------------------------
-
-#class account_analytic_account(osv.osv):
-#    _inherit = "account.analytic.account"
-#    _columns = {
-#        'service_id':fields.many2one('openstc.service', 'Service'),
-#        }
-#account_analytic_account()
 
 class project(osv.osv):
     _name = "project.project"
@@ -1115,11 +1076,9 @@ class project(osv.osv):
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
         'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'create_date' : fields.datetime('Create Date', readonly=True),
-        #'service_id': fields.related('ask_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'date_deadline': fields.date('Deadline',select=True),
         'site1': fields.many2one('openstc.site', 'Site principal'),
-        #'analytic_account_id': fields.many2one('account.analytic.account', 'Analytic Account', help="Link this project to an analytic account if you need financial management on projects. It enables you to connect projects with budgets, planning, cost and revenue analysis, timesheets on projects, etc.", ondelete="cascade", required=False),
         'state': fields.selection([('closed', 'Closed'),('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
                                   'State', readonly=True, required=True, help=''),
 
@@ -1268,30 +1227,6 @@ project_vs_hours()
 #----------------------------------------------------------
 # Demandes
 #----------------------------------------------------------
-#class ir_rule(osv.osv):
-#    _name = 'ir.rule'
-#    _description = 'ir rule STC'
-#    _inherit = 'ir.rule'
-#    _MODES = ['read', 'write', 'create', 'unlink','confirm','valid','refuse']
-#
-#    _columns = {
-#        'perm_confirm': fields.boolean('Apply For Confirm'),
-#        'perm_valid': fields.boolean('Apply For Valid'),
-#        'perm_refuse': fields.boolean('Apply For Refuse'),
-#    }
-#
-#    _defaults = {
-#        'perm_read': True,
-#        'perm_write': True,
-#        'perm_create': True,
-#        'perm_unlink': True,
-#        'perm_confirm': True,
-#        'perm_valid': True,
-#        'perm_refuse': True,
-#        'global': True,
-#    }
-#
-#ir_rule()
 
 
 class ask(osv.osv):
@@ -1351,35 +1286,6 @@ class ask(osv.osv):
                                 res[id] = ['valid', 'confirm']
 
         return res
-
-#    def _is_valid_action(self, cr, uid, ids, fields, arg, context):
-#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
-#        for id in res:
-#            asks = self.read(cr, uid, [id], ['state'], context=context)
-#            ask = asks[0] or False
-#            if ask['state'] in arg:
-#                res[id] = True;
-#        return res
-#
-#    def _is_request_confirm_action(self, cr, uid, ids, fields, arg, context):
-#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
-#        for id in res:
-#            asks = self.read(cr, uid, [id], ['state'], context=context)
-#            group_obj = self.pool.get('res.groups')
-#            group_ids = group_obj.search(cr, uid, [('code','=','DIRECTOR')])
-#            ask = asks[0] or False
-#            if ask['state'] in arg and len(group_ids)>0 :
-#                res[id] = True;
-#        return res
-#
-#    def _is_refuse_action(self, cr, uid, ids, fields, arg, context):
-#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
-#        for id in res:
-#            asks = self.read(cr, uid, [id], ['state'], context=context)
-#            ask = asks[0] or False
-#            if ask['state'] in arg:
-#                res[id] = True;
-#        return res
 
     def _tooltip(self, cr, uid, ids, myFields, arg, context):
         res = {}
@@ -1505,10 +1411,6 @@ class ask(osv.osv):
 
         'actions' : fields.function(_is_possible_action, method=True, string='Valider',type='selection', store=False),
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
-#        'action_request_confirm' : fields.function(_is_possible_action, arg=['wait','refused'],
-#                                                   method=True, string='Demander la Confirmation',type='boolean', store=False),
-#        'action_refuse' : fields.function(_is_possible_action, arg=['wait','confirm'],
-#                                          method=True, string='Refuser',type='boolean', store=False),
 
     }
 
@@ -1518,15 +1420,7 @@ class ask(osv.osv):
         'state': '',
         'current_date': lambda *a: datetime.now().strftime('%Y-%m-%d'),
         'actions': [],
-#        'action_valid' : False,
-#        'action_request_confirm' : False,
-#        'action_refuse' : False,
     }
-
-
-#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-#        res = super(ask, self).search(cr, user, args, offset=5, limit=25, order=order, context=context, count=count)
-#        return res
 
     def create(self, cr, uid, data, context={}):
         data['state'] = 'wait'
