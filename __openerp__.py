@@ -61,7 +61,7 @@
 
         'data/base_data.xml',
         #"unit_tests/openstc_prets_tests.xml",
-        #"test/cr_commit.yml", "test/openstc_prets_tests.yml",
+        "test/cr_commit.yml", "test/openstc_prets_tests.yml",
     ],
     #"test":"test/openstc_prets_tests.yml",
     "js":['static/src/js/calendar_inherit.js'],

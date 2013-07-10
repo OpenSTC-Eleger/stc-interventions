@@ -96,24 +96,24 @@ def send_email(self, cr, uid, ids, params, context=None):
     return True
 
 
-class service():
+class service(osv.osv):
     _inherit = "openstc.service"
     
     _columns = {
         'asksBelongsto': fields.one2many('openstc.ask', 'service_id', "asks"),
         'category_ids':fields.many2many('openstc.task.category', 'openstc_task_category_services_rel', 'service_id', 'task_category_id', 'Categories'),
     }
-service()      
+service()
 
 
-class site():
+class site(osv.osv):
     _inherit = "openstc.site"
     _columns = {
         'asksBelongsto': fields.one2many('openstc.ask', 'site1', "asks"),
         'intervention_ids': fields.one2many('project.project', 'site1', "Interventions", String="Interventions"),
         }
 
-class users():
+class users(osv.osv):
     _inherit = "res.users"
     _columns = {
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
@@ -121,7 +121,7 @@ class users():
 
     }
     
-class team():
+class team(osv.osv):
     _inherit = "openstc.team"
     _columns = {
         'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
