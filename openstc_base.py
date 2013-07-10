@@ -50,14 +50,6 @@ class equipment(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
-#    def create(self, cr, uid, data, context={}):
-#        res = super(equipment, self).create(cr, uid, data, context)
-#        return res
-#
-#    def write(self, cr, uid, data, context={}):
-#        res = super(equipment, self).create(cr, uid, data, context)
-#        return res
-
     _columns = {
             'immat': fields.char('Imatt', size=128),
             'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
@@ -109,9 +101,6 @@ class service(osv.osv):
             'service_id':fields.many2one('openstc.service', 'Service Parent'),
             'technical': fields.boolean('Technical service'),
             'manager_id': fields.many2one('res.users', 'Manager'),
-
-            #'employees': fields.one2many('res.users', 'service_id', 'Employees'),
-            #'user_ids': fields.many2many('res.users', 'openstc_user_services_rel', 'service_id', 'user_id', 'Employees'),
             'user_ids': fields.one2many('res.users', 'service_id', "Users"),
     }
 service()
@@ -263,15 +252,12 @@ class users(osv.osv):
             'address_home': fields.char('Address', size=128),
             'city_home': fields.char('City', size=128),
             'phone': fields.char('Phone Number', size=12),
-            #'is_manager': fields.boolean('Is manager'),
-            #'team_ids': fields.many2many('openstc.team', 'openstc_user_teams_rel', 'user_id', 'team_id', 'Teams'),
 
             'team_ids': fields.many2many('openstc.team', 'openstc_team_users_rel', 'user_id', 'team_id', 'Teams'),
             'manage_teams': fields.one2many('openstc.team', 'manager_id', "Teams"),
             'isDST' : fields.function(_get_group, arg="DIRE", method=True,type='boolean', store=False), #DIRECTOR group
             'isManager' : fields.function(_get_group, arg="MANA", method=True,type='boolean', store=False), #MANAGER group
 
-            #'officers' : fields.function(_get_officers, method=True,type='many2one', store=False),
     }
 
     def create(self, cr, uid, data, context={}):
@@ -323,46 +309,97 @@ class users(osv.osv):
             #Calculates the agents can be added to the team
 
 
-    def getOfficers(self, cr, uid, ids, data, context=None):
+    #Get lists officers/teams where user is the referent on
+    def getTeamsAndOfficers(self, cr, uid, ids, data, context=None):
         res = {}
         user_obj = self.pool.get('res.users')
+        team_obj = self.pool.get('openstc.team')
+
 
         #get list of all agents
         all_officer_ids = user_obj.search(cr, uid, []);
-        all_officers = user_obj.browse(cr, uid, all_officer_ids, context);
-
-
-        #for id in ids:
-
-        officers = []
-        managerTeamID = []
-
+        all_team_ids = team_obj.search(cr, uid, []);
 
         #get list of all teams
+        all_officers = user_obj.browse(cr, uid, all_officer_ids, context);
+        all_teams = team_obj.browse(cr, uid, all_team_ids, context);
+
+        officers = []
+        teams = []
+        managerTeamID = []
+
+        res['officers'] = []
+        res['teams'] = []
+        newOfficer = {}
+        newTeam = {}
+        #get user
         user = self.browse(cr, uid, uid, context=context)
+        #If users connected is the DST get all teams and all officers
         if user.isDST:
-            res = all_officer_ids
+            #Serialize each officer with name and firstname
+            for officer in user_obj.read(cr, uid, all_officer_ids, ['id','name','firstname']):
+                newOfficer = { 'id'  : officer['id'],
+                               'name' : officer['name'],
+                               'firstname' : officer['firstname']
+                            }
+                officers.append(newOfficer)
+            res['officers'] =  officers
+
+            #Serialize each team with name, manager and officers (with name and firstname)
+            for team in team_obj.read(cr, uid, all_team_ids, ['id','name','manager_id','members']):
+                newTeam = { 'id'   : team['id'] ,
+                            'name' : team['name'],
+                            'manager_id' : team['manager_id'],
+                            'members' :  team_obj._get_members(cr, uid, [team['id']],None,None,context)
+                            }
+                teams.append(newTeam)
+            res['teams'] = teams
+        #If user connected is Manager get all teams and all officers where he is the referent
         elif user.isManager :
+            #For each services authorized for user
             for service_id in user.service_ids :
+                #For each officer
                 for officer in all_officers:
                     if not officer.isDST :
-                    #officer = user_obj.browse(cr, uid, officer_id, context)
-                        if service_id in officer.service_ids:
-                            officers.append(officer.id)
-            res = officers
+                        #Check if officer's services list is in user's services list
+                        if (service_id in officer.service_ids) and (officer.id not in officers):
+                            newOfficer = { 'id'  : officer.id,
+                                          'name' : officer.name,
+                                          'firstname' : officer.firstname
+                                          }
+                            officers.append(newOfficer)
+                res['officers'] = officers
+                for team in all_teams:
+                    if (service_id in team.service_ids) and (team.id not in teams):
+                        manager_id = False
+                        if isinstance(team.manager_id, browse_null)!= True :
+                            manager_id = team.manager_id.id
+                        newTeam = { 'id'   : team.id ,
+                            'name' : team.name,
+                            'manager_id' : manager_id,
+                            'members' : team_obj._get_members(cr, uid, [team.id],None,None,context)
+                            }
+                        teams.append(newTeam)
+                res['teams'] = teams
+        #If user connected is an officer
         else:
+            #Get all teams where officer is manager on it
             for team_id in user.manage_teams :
                 managerTeamID.append(team_id.id)
             if len(managerTeamID) > 0 :
+                #For each officer
                 for officer in all_officers:
                     if not officer.isDST :
-                    #officer = user_obj.browse(cr, uid, officer_id, context)
+                        #Check if user is the manager on officer's teams
                         for team_id in officer.team_ids :
-                            if team_id.id in managerTeamID :
-                                officers.append(officer.id)
+                            if (team_id.id in managerTeamID) and (officer.id not in officers) :
+                                newOfficer = { 'id'  : officer.id,
+                                              'name' : officer.name,
+                                              'firstname' : officer.firstname
+                                          }
+                                officers.append(newOfficer)
                                 break
-                res = officers
-
+                res['officers'] = officers
 
         return res
 
@@ -412,9 +449,24 @@ class team(osv.osv):
             'service_ids': fields.many2many('openstc.service', 'openstc_team_services_rel', 'team_id', 'service_id', 'Services'),
             'user_ids': fields.many2many('res.users', 'openstc_team_users_rel', 'team_id', 'user_id', 'Users'),
             'free_user_ids' : fields.function(_get_free_users, method=True,type='many2one', store=False),
-            #'user_ids': fields.one2many('res.users', 'team_id', "Users"),
     }
-
+    #Calculates the agents can be added to the team
+    def _get_members(self, cr, uid, ids, fields, arg, context):
+        res = {}
+        user_obj = self.pool.get('res.users')
+        #for id in ids:
+        team = self.browse(cr, uid, ids[0], context=context)
+        team_users = []
+        #get list of agents already belongs to team
+        for user_record in team.user_ids:
+             officer = user_obj.read(cr, uid, user_record.id,['id','name','firstname'],context)
+             officerSerialized = { 'id'  : officer['id'],
+                               'name' : officer['name'],
+                               'firstname' : officer['firstname']
+                               }
+             team_users.append(officerSerialized)
+            #res[id] = team_users
+        return team_users
 
 team()
  

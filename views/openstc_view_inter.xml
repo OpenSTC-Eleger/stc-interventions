@@ -639,7 +639,7 @@
             	<!-- <field name="partner_id" position="progress_rate"/>  -->
             	<!--  <field name="state" position="replace" invisible="1"/> -->
             	<xpath expr="//field[@name='state']" position="after">
-               	    <button name="%(action_openstc_create_task_view)d"   string="Add Intervention"
+               	    <button name="%(action_openstc_create_task_view)d" string="Add Intervention"
                    		type="action" icon="gtk-go-forward"/>
                    	<field name="ask_id" invisible="1"/>
             	</xpath>

@@ -34,7 +34,7 @@ from osv import fields, osv, orm
 from datetime import datetime
 from tools.translate import _
 
-#_logger = logging.getLogger(__name__
+#_logger = logging.getLogger(__name__)
 
 def _get_request_states(self, cursor, user_id, context=None):
     return (
@@ -60,8 +60,7 @@ def _test_params(params, keys):
 
 
 def send_email(self, cr, uid, ids, params, context=None):
-#def send_email( params ):
-    #print("test"+params)
+
     ask_obj = self.pool.get('openstc.ask')
     ask = ask_obj.browse(cr, uid, ids[0], context)
 
@@ -134,28 +133,12 @@ class res_partner(osv.osv):
     _inherit = "res.partner"
     _rec_name = "name"
 
-#    def _get_services_list(self, cr, uid, context=None):
-#        user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
-#        list = []
-#        for service_id in user.service_ids:
-#            list.append(service_id.id)
-#        return list
-#
-#
-#    def fields_get(self, cr, uid, fields=None, context=None):
-#        res = super(res_partner, self).fields_get(cr, uid, fields, context)
-#        list = self._get_services_list(cr, uid,context)
-#        for field in res:
-#            if field == "service_id":
-#                res[field]['domain']=[('id','in',list)]
-#        return res
+
 
     _columns = {
-         #'type_id': fields.many2one('openstc.partner.type', 'Type'),
          'service_id':fields.many2one('openstc.service', 'Service du demandeur'),
          'technical_service_id':fields.many2one('openstc.service', 'Service technique concerné'),
          'technical_site_id': fields.many2one('openstc.site', 'Default Site'),
-         #'user_ids': fields.many2many('res.users', 'openstc_partner_users_rel', 'partner_id', 'user_id', 'Users'),
 
     }
 res_partner()
@@ -240,25 +223,6 @@ res_partner_address()
 # Employees
 #----------------------------------------------------------
 
-#class openstc_groups(osv.osv):
-#    """
-#        A portal is a group of users with specific menu, widgets, and typically
-#        restricted access rights.
-#    """
-#    _name = 'openstc.group'
-#    _description = 'OpenSTC groups'
-#    _inherits = {'res.groups': 'group_id'}
-#
-#    _columns = {
-#        'group_id': fields.many2one('res.groups', required=True, ondelete='cascade',
-#            string='Group',
-#            help='The group corresponding to this portal'),
-#        'code': fields.char('Code', size=128),
-#        'perm_request_confirm' : fields.boolean('Demander la Confirmation'),
-#    }
-#
-#openstc_groups()
-
 
 #----------------------------------------------------------
 # Tâches
@@ -281,18 +245,6 @@ class task(osv.osv):
 
 
 
-        # Compute: effective_hours, total_hours, progress
-#    def _hours_get(self, cr, uid, ids, field_names, args, context=None):
-#        res = {}
-#        for task in self.browse(cr, uid, ids, context=context):
-#            res[task.id] = {'effective_hours': task.effective_hours, 'total_hours': (task.remaining_hours or 0.0) + task.effective_hours}
-#            res[task.id]['delay_hours'] = res[task.id]['total_hours'] - task.planned_hours
-#            res[task.id]['progress'] = 0.0
-#            if (task.remaining_hours + task.effective_hours):
-#                res[task.id]['progress'] = round(min(100.0 * task.effective_hours/ res[task.id]['total_hours'], 99.99),2)
-#            if task.state in ('done','cancelled'):
-#                res[task.id]['progress'] = 100.0
-#        return res
 
     #Calculates if agent belongs to 'arg' code group
     def _get_active(self, cr, uid, ids, fields, arg, context):
@@ -341,12 +293,9 @@ class task(osv.osv):
 
     _columns = {
         'active':fields.function(_get_active, method=True,type='boolean', store=False),
-        #'active': fields.boolean('Active'),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'equipment_ids':fields.many2many('openstc.equipment', 'openstc_equipment_task_rel', 'task_id', 'equipment_id', 'Equipments'),
-        #'equipment_id':fields.many2one('openstc.equipment', 'Equipment'),
-        #'service_id': fields.related('project_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
         'parent_id': fields.many2one('project.task', 'Parent Task'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'absent_type_id':fields.many2one('openstc.absent.type', 'Type d''abscence'),
@@ -354,7 +303,6 @@ class task(osv.osv):
         'state': fields.selection([('absent', 'Absent'),('draft', 'New'),('open', 'In Progress'),('pending', 'Pending'), ('done', 'Done'), ('cancelled', 'Cancelled')], 'State', readonly=True, required=True,
                                   help='If the task is created the state is \'Draft\'.\n If the task is started, the state becomes \'In Progress\'.\n If review is needed the task is in \'Pending\' state.\
                                   \n If the task is over, the states is set to \'Done\'.'),
-        #'dst_group_id': fields.many2one('res.groups', string='DST Group', help='The group corresponding to DST'),
         'team_id': fields.many2one('openstc.team', 'Team'),
 
         'km': fields.integer('Km', select=1),
@@ -364,35 +312,10 @@ class task(osv.osv):
         'cancel_reason': fields.text('Cancel reason'),
 
 
-
-
-#        'planned_hours': fields.float('Planned print_on_orderHours', help='Estimated time to do the task, usually set by the project manager when the task is in draft state.'),
-#        'effective_hours': fields.float('Effective Hours', help='Time spent'),
-#        'remaining_hours': fields.float('Remaining Hours', digits=(16,2), help="Total remaining time, can be re-estimated periodically by the assignee of the task."),
-#        'total_hours': fields.function(_hours_get, string='Total Hours', multi='hours', help="Computed as: Time Spent + Remaining Time.",
-#            store = {
-#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
-#            }),
-#        'progress': fields.function(_hours_get, string='Progress (%)', multi='hours', group_operator="avg", help="If the task has a progress of 99.99% you should close the task if it's finished or reevaluate the time",
-#            store = {
-#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours','state'], 10),
-#            }),
-#        'delay_hours': fields.function(_hours_get, string='Delay Hours', multi='hours', help="Computed as difference between planned hours by the project manager and the total hours of the task.",
-#            store = {
-#                'project.task': (lambda self, cr, uid, ids, c={}: ids, ['effective_hours','remaining_hours', 'planned_hours'], 10),
-#            }),
     }
 
     _defaults = {'active': lambda *a: True, 'user_id':None}
 
-#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-#        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
-
-        #Overrides search method of project module
-#    def getOfficers(self, cr, uid, ids, params, context=None):
-#        user_obj = self.pool.get('res.users')
-#        all_officer_ids = user_obj.search(cr, uid, []);
-#        return user_obj.get_officers(cr, uid, all_officer_ids, None,context)
 
     def createOrphan(self, cr, uid, ids, params, context=None):
 
@@ -551,9 +474,6 @@ class openstc_task_category(osv.osv):
         res = self.name_get(cr, uid, ids, context=context)
         return dict(res)
 
-#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-#
-#        return super(task, self).search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
 
     _name = "openstc.task.category"
     _description = "Task Category"
@@ -616,12 +536,6 @@ openstc_absent_type()
 # Interventions
 #----------------------------------------------------------
 
-#class account_analytic_account(osv.osv):
-#    _inherit = "account.analytic.account"
-#    _columns = {
-#        'service_id':fields.many2one('openstc.service', 'Service'),
-#        }
-#account_analytic_account()
 
 class project(osv.osv):
     _name = "project.project"
@@ -757,11 +671,9 @@ class project(osv.osv):
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
         'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'create_date' : fields.datetime('Create Date', readonly=True),
-        #'service_id': fields.related('ask_id', 'service_id', type='many2one', string='Service', relation='openstc.service'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'date_deadline': fields.date('Deadline',select=True),
         'site1': fields.many2one('openstc.site', 'Site principal'),
-        #'analytic_account_id': fields.many2one('account.analytic.account', 'Analytic Account', help="Link this project to an analytic account if you need financial management on projects. It enables you to connect projects with budgets, planning, cost and revenue analysis, timesheets on projects, etc.", ondelete="cascade", required=False),
         'state': fields.selection([('closed', 'Closed'),('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
                                   'State', readonly=True, required=True, help=''),
 
@@ -904,36 +816,6 @@ class project_vs_hours(osv.osv):
     }
 
 project_vs_hours()
-
-
-
-#----------------------------------------------------------
-# Demandes
-#----------------------------------------------------------
-#class ir_rule(osv.osv):
-#    _name = 'ir.rule'
-#    _description = 'ir rule STC'
-#    _inherit = 'ir.rule'
-#    _MODES = ['read', 'write', 'create', 'unlink','confirm','valid','refuse']
-#
-#    _columns = {
-#        'perm_confirm': fields.boolean('Apply For Confirm'),
-#        'perm_valid': fields.boolean('Apply For Valid'),
-#        'perm_refuse': fields.boolean('Apply For Refuse'),
-#    }
-#
-#    _defaults = {
-#        'perm_read': True,
-#        'perm_write': True,
-#        'perm_create': True,
-#        'perm_unlink': True,
-#        'perm_confirm': True,
-#        'perm_valid': True,
-#        'perm_refuse': True,
-#        'global': True,
-#    }
-#
-#ir_rule()
 
 
 class ask(osv.osv):
@@ -1147,10 +1029,6 @@ class ask(osv.osv):
 
         'actions' : fields.function(_is_possible_action, method=True, string='Valider',type='selection', store=False),
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
-#        'action_request_confirm' : fields.function(_is_possible_action, arg=['wait','refused'],
-#                                                   method=True, string='Demander la Confirmation',type='boolean', store=False),
-#        'action_refuse' : fields.function(_is_possible_action, arg=['wait','confirm'],
-#                                          method=True, string='Refuser',type='boolean', store=False),
 
     }
 
@@ -1160,15 +1038,8 @@ class ask(osv.osv):
         'state': '',
         'current_date': lambda *a: datetime.now().strftime('%Y-%m-%d'),
         'actions': [],
-#        'action_valid' : False,
-#        'action_request_confirm' : False,
-#        'action_refuse' : False,
     }
 
-
-#    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-#        res = super(ask, self).search(cr, user, args, offset=5, limit=25, order=order, context=context, count=count)
-#        return res
 
     def create(self, cr, uid, data, context={}):
         data['state'] = 'wait'
