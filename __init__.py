@@ -22,8 +22,9 @@
 ##############################################################################
 
 import hotel
-import openstc
-import openstc_pret
+import openstc_base
+import openstc_inter
+import openstc_pret_resa
 import openstc_pret_checkout
 import wizard
 import report

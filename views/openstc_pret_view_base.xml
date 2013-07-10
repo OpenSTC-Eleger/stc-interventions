@@ -62,13 +62,14 @@
 			<field name="model">product.product</field>
 			<field name="inherit_id" ref="stock.view_normal_stock_property_form" />
 			<field name="type">form</field>
+			<field name="arch" type="xml">
 				<page string="Information" position="after">
 				    <page string="Collectivities">
 						<field name="type_prod"/>
 						<field name="openstc_reservable"/>
 						<field name="openstc_maintenance"/>
 					</page>
-			</page>
+				</page>
 			</field>
 		</record>
 		

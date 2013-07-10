@@ -40,7 +40,7 @@
 		<record model="ir.ui.view" id="view_openstock_fournitures_form">
 			<field name="name">fourniture.product.form</field>
 			<field name="model">product.product</field>
-			<field name="inherit_id" ref="openbase.view_openbase_prod_view" />
+			<field name="inherit_id" ref="openstc.view_openbase_prod_view" />
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<field name="type_prod" position="before">
@@ -60,6 +60,7 @@
 				    <field name="bloquant"/>
 				    <field name="empruntable"/>
 				</field>
+			</field>
 		</record>
 		
 		<record model="ir.ui.view" id="view_openstock_fournitures_checkout_form">

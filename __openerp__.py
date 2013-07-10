@@ -27,16 +27,18 @@
 {
     "name": "openstc",
     "version": "0.1",
-    "depends": ["web", "web_calendar","purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
+    "depends": ["web", "web_calendar","base","purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
     "author": "PYF & BP",
     "shortdesc":"openstc",
-    "category": "Category",
+    "category": "SICLIC",
     "description": """
     Module STC For Prêts, temporary module to store changes specific to prets untested features on SWIF
     """,
     "data": [
-        'security/openstc_security.xml',
-        'views/openstc_pret_data.xml',
+        'security/openstc_security_base.xml',
+        'security/openstc_security_inter.xml',
+        'views/openstc_pret_data_base.xml',
+        'views/openstc_pret_data_resa.xml',
         'security/ir.model.access.csv',
 
         'wizard/create_task_view.xml',
@@ -44,9 +46,11 @@
         'wizard/ask_modify_service.xml',
         "wizard/openstc_pret_view_wizard.xml",
 
-        'views/openstc_view.xml',
+        'views/openstc_view_base.xml',
+        'views/openstc_view_inter.xml',
         "views/openstc_pret_checkout_view.xml",
-        "views/openstc_pret_view.xml",
+        "views/openstc_pret_view_base.xml",
+        "views/openstc_pret_view_resa.xml",
         'views/openstc_pret_menus_view.xml',
 
         'workflow/ask.xml',

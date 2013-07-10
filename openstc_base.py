@@ -22,6 +22,8 @@
 #
 #############################################################################
 
+from osv import osv, fields
+
 #----------------------------------------------------------
 # Equipments
 #----------------------------------------------------------
@@ -188,13 +190,13 @@ class openstc_partner_type(osv.osv):
 openstc_partner_type()
  
 class res_partner(osv.osv):
-     _name = "res.partner"
+     _inherit = "res.partner"
 
      _columns = {
          'type_id': fields.many2one('openstc.partner.type', 'Type'),
  
  }
-     res_partner()
+res_partner()
  
 class groups(osv.osv):
     _name = "res.groups"
@@ -422,7 +424,7 @@ class product_product(osv.osv):
     _description = "Produit"
 
     _columns = {
-        'type_prod':fields.selection(_get_type_prod_values, 'Type de Produit'),
+        'type_prod':fields.selection([('materiel','Matériel'),('fourniture','Fourniture Achetable'),('site','Site')], 'Type de Produit'),
         'openstc_reservable':fields.boolean('Reservable', help='Indicates if this ressource can be reserved or not by tiers'),
         'openstc_maintenance':fields.boolean('Maintenance ?', help='Indicates if this ressource can be associated to contracts for maintenance'),
          }
