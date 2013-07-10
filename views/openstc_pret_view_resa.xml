@@ -40,7 +40,7 @@
 		<record model="ir.ui.view" id="view_openstock_fournitures_form">
 			<field name="name">fourniture.product.form</field>
 			<field name="model">product.product</field>
-			<field name="inherit_id" ref="openstc.view_openbase_prod_view" />
+			<field name="inherit_id" ref="openbase.view_openbase_prod_view" />
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<field name="type_prod" position="before">
@@ -161,7 +161,7 @@
 									<button name="dummy" string="Check dispo products" icon="gtk-execute" states="remplir,draft,wait_confirm"/>
 									<button name="confirm" string="Validate reservation" states="remplir,draft" attrs="{'readonly':[('all_dispo','=',False)]}"
 									    icon="gtk-go-forward" help="Validate infos written and reserve selected products.Reservation will be visible on calendar and claimer will be emailed (if email written)."/>
-									<button name="confirm" string="Validate la Reservation (manager)" states="wait_confirm" attrs="{'readonly':[('all_dispo','=',False)]}" groups="openstc.openstc_manager,openstc.openstc_dst"
+									<button name="confirm" string="Validate la Reservation (manager)" states="wait_confirm" attrs="{'readonly':[('all_dispo','=',False)]}" groups="openbase.openstc_manager,openbase.openstc_dst"
 									    icon="gtk-go-forward" help="Validate infos written and reserve selected products.Reservation will be visible on calendar and claimer will be emailed (if email written)."/>
 									<button name="%(action_view_openstc_pret_create_inter_wizard)d" type="action" string="Generate Interventions" attrs="{'invisible':['|',('inter_id','&lt;&gt;',False),('state','&lt;&gt;','confirm')]}"
 									    context="{'default_categ_id':%(openstc_pret_supply_categ_task)d}" icon="gtk-execute" help="Generate interventions planned on this form"/>

@@ -359,7 +359,7 @@
 		    <field name="name">res.partner.search</field>
 		    <field name="model">res.partner</field>
 		    <field name="type">search</field>
-		    <field name="inherit_id" ref="openstc.view_openbase_partner_filter"/>
+		    <field name="inherit_id" ref="openbase.view_openbase_partner_filter"/>
 		    <field name="arch" type="xml">
 		        <field name="type_id" position="after">
 		            <newline />
@@ -548,21 +548,21 @@
                 	<field name="site1"  />
                 	<field name="service_id" select="1"/>
                 	<field name="partner_id" />
-                	<field name="manager_id" groups="openstc.openstc_dst"/>
+                	<field name="manager_id" groups="openbase.openstc_dst"/>
                 	<field name="current_date" />
                 	<field name="confirm_by_dst" invisible="1" />
                    	<field name="state" widget="statusbar" statusbar_visible="wait,confirm,valid,refused,closed" />
 					<button name="action_valid" states="wait" string="Valid" type="object" icon="gtk-yes" help="For valid the task"
-                    	context="{'state':'valid'}" groups="openstc.openstc_qualifier" />
+                    	context="{'state':'valid'}" groups="openbase.openstc_qualifier" />
                     <button name="action_refused" states="wait" string="Cancel" type="object" icon="gtk-cancel" help="For refuse the task"
-                    	context="{'state':'refused'}" groups="openstc.openstc_dst"/>
+                    	context="{'state':'refused'}" groups="openbase.openstc_dst"/>
                     <button name="%(action_ask_modify_service)d" string="Modify Service" type="action" icon="gtk-convert" help="Modify service"
-                    	groups="openstc.openstc_manager,openstc.openstc_dst" attrs="{'invisible':[('state', '!=', 'valid')]}"/>
+                    	groups="openbase.openstc_manager,openbase.openstc_dst" attrs="{'invisible':[('state', '!=', 'valid')]}"/>
                     <button name="action_to_be_confirm" string="To be confirm" type="object" icon="gtk-info" help="For confirm the ask by DST"
-                    	context="{'state':'confirm'}" groups="openstc.openstc_manager"
+                    	context="{'state':'confirm'}" groups="openbase.openstc_manager"
                     	attrs="{'invisible':['|','|',('confirm_by_dst', '=', True),('state', '!=', 'wait')]}"  />
                     <button name="action_confirm" string="Confirm" type="object" icon="gtk-info" help="For confirm the ask by DST"
-                    	context="{'state':'wait'}" groups="openstc.openstc_dst" attrs="{'invisible':['|',('confirm_by_dst', '=', True),('state', '!=', 'confirm')]}"/>
+                    	context="{'state':'wait'}" groups="openbase.openstc_dst" attrs="{'invisible':['|',('confirm_by_dst', '=', True),('state', '!=', 'confirm')]}"/>
                 </tree>
             </field>
         </record>
@@ -703,7 +703,7 @@
             src_model="project.project"
             view_mode="tree,form,calendar,graph"
             view_type="form"
-            groups="openstc.openstc_qualifier"
+            groups="openbase.openstc_qualifier"
             key2="client_action_multi"/> -->
 
 		<!--  task -->
@@ -866,7 +866,7 @@
     	<menuitem
             icon="terp-project" id="base.menu_main_pm"
             name="Interventions" sequence="10"
-            groups="openstc_employee"/>
+            groups="openbase.openstc_employee"/>
 
  		<!--  <record id="project.menu_project_management" model="ir.ui.menu">
       		<field name="name">Interventions Management</field>
@@ -875,7 +875,7 @@
 		<delete id="project.menu_project_management" model="ir.ui.menu"/>
 
 		<menuitem id="menu_intervention_management"
-			groups="openstc_employee"
+			groups="openbase.openstc_employee"
 			name="Gestion des interventions"
 			parent="base.menu_main_pm"
 			sequence="1"/>
@@ -884,13 +884,13 @@
    			id="menu_action_openstc_view_ask"
    			parent="menu_intervention_management"
    			name="Demandes d'interventions"
-   			groups="openstc_employee"
+   			groups="openbase.openstc_employee"
    			sequence="1"/>
 
 		<!--  planning -->
    		<menuitem action="openstc_action_view_planning"
    			id="menu_planning"
-			groups="openstc_dst,openstc_manager"
+			groups="openbase.openstc_dst,openbase.openstc_manager"
 			name="Planning"
 			parent="menu_intervention_management"
 			sequence="2"/>
@@ -901,14 +901,14 @@
 				action="action_openstc_view_intervention"
 				id="project.menu_open_view_project_all"
 				parent="menu_intervention_management"
-				groups="openstc_qualifier"
+				groups="openbase.openstc_qualifier"
 				sequence="3"/>
 
 		<menuitem action="openstc_action_view_task"
 				id="openstc_menu_action_view_task"
 				parent="menu_intervention_management"
 				name="Tasks"
-				groups="openstc_qualifier,openstc_agent"
+				groups="openbase.openstc_qualifier,openbase.openstc_agent"
 				sequence="4"/>
 
 
@@ -917,13 +917,13 @@
    		<!--  <menuitem action="action_openstc_task_work"
    			id="menu_action_openstc_view_task_work"
    			parent="project.menu_project_management"
-   			groups="openstc_employee"
+   			groups="openbase.openstc_employee"
    			sequence="4"/>
    		-->
 
    		<!-- Configuration -->
    	    <menuitem id="menu_configuration"
-			groups="openstc_dst"
+			groups="openbase.openstc_dst"
 			name="Configuration"
 			parent="base.menu_main_pm"
 			sequence="3"/>
@@ -938,7 +938,7 @@
    		<menuitem
    		    action="action_openstc_view_partner"
    			id="menu_openstc_partner"
-   			groups="openstc_dst"
+   			groups="openbase.openstc_dst"
    			name="Organisations"
    			parent="menu_configuration"
    			sequence="1"/>
@@ -948,35 +948,35 @@
    		<menuitem action="action_openstc_view_service"
    			id="menu_action_openstc_view_service"
    			parent="menu_configuration"
-   			groups="openstc_dst"
+   			groups="openbase.openstc_dst"
    			sequence="2"/>
 
    		<!--  Configuration/Site -->
 		<menuitem action="action_openstc_view_site"
    			id="menu_action_openstc_view_site"
    			parent="menu_configuration"
-   			groups="openstc_dst,openstc_manager"
+   			groups="openbase.openstc_dst,openbase.openstc_manager"
    			sequence="3"/>
 
 		<!--  Configuration/Team -->
-		<menuitem action="action_openstc_view_team"
+		<menuitem action="openbase.action_openbase_view_team"
    			id="menu_action_openstc_view_teams"
    			parent="menu_configuration"
    			name="Equipes"
-   			groups="openstc_dst"
+   			groups="openbase.openstc_dst"
    			sequence="4"/>
 
 		<!--  Configuration/Material -->
 		<menuitem action="action_openstc_view_equipment"
    			id="menu_action_openstc_view_equipment"
    			parent="menu_configuration"
-   			groups="openstc_dst,openstc_manager"
+   			groups="openbase.openstc_dst,openbase.openstc_manager"
    			sequence="5"/>
 
 		<!--  Configuration/Dictionnaires -->
    		<menuitem
    			id="menu_openstc_dico"
-   			groups="openstc_dst"
+   			groups="openbase.openstc_dst"
    			name="Dictionnaires"
    			parent="menu_configuration"
    			sequence="6"/>
@@ -984,26 +984,26 @@
    	 	<menuitem action="action_openstc_view_assignement2"
    			id="menu_action_openstc_view_assignement2"
    			parent="menu_openstc_dico"
-   			groups="openstc_dst"
+   			groups="openbase.openstc_dst"
    			sequence="1"/>
 
    		<menuitem action="openstc_task_category_action2"
    			id="menu_action_openstc_view_task_category2"
    			parent="menu_openstc_dico"
-   			groups="openstc_dst"
+   			groups="openbase.openstc_dst"
    			name="Catégories des tâches"
    			sequence="2"/>
 
    	 	<menuitem action="action_openstc_view_absent_type2"
    			id="menu_action_openstc_view_absent_type2"
    			parent="menu_openstc_dico"
-   			groups="openstc_dst"
+   			groups="openbase.openstc_dst"
    			sequence="3"/>
 
    		<menuitem action="action_openstc_view_partner_type2"
    			id="menu_action_openstc_view_partner_type2"
    			parent="menu_openstc_dico"
-   			groups="openstc_dst"
+   			groups="openbase.openstc_dst"
    			sequence="4"/>
 
 
@@ -1043,34 +1043,34 @@
 		<!--  Dashboard -->
    		<!--  <menuitem id="base.menu_project_report"
    			name="Reporting"
-            groups="openstc_dst"
+            groups="openbase.openstc_dst"
             parent="base.menu_main_pm" sequence="2"/> -->
 
         <!-- Dashboard Task -->
         <!--  <menuitem id="project.project_report_task"
         	name="Tasks"
-        	groups="openstc_dst"
+        	groups="openbase.openstc_dst"
             parent="base.menu_project_report"/> -->
 
         <!--  <menuitem action="project.action_view_task_history_burndown"
-        	groups="openstc_dst"
+        	groups="openbase.openstc_dst"
             id="project.menu_action_view_task_history_burndown"
             parent="project.project_report_task" />
 
         <menuitem action="project.action_view_task_history_cumulative"
-        	groups="openstc_dst"
+        	groups="openbase.openstc_dst"
             id="project.menu_action_view_task_history_cumulative"
             parent="project.project_report_task" />
          -->
 
         <!-- <menuitem action="project.action_project_task_user_tree"
-            groups="openstc_dst" id="project.menu_project_task_user_tree"
+            groups="openbase.openstc_dst" id="project.menu_project_task_user_tree"
             parent="project.project_report_task"/>-->
 
    		<!-- <menuitem
             id="project.next_id_86"
             name="Dashboard"
-            groups="openstc_dst"
+            groups="openbase.openstc_dst"
             sequence="0"
             parent="base.menu_project_report"/>-->
 
@@ -1080,7 +1080,7 @@
             icon="terp-graph"
             id="project.menu_board_project"
             parent="project.next_id_86"
-            groups="openstc_dst"
+            groups="openbase.openstc_dst"
             sequence="1"/>-->
 
 

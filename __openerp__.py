@@ -27,7 +27,7 @@
 {
     "name": "openstc",
     "version": "0.1",
-    "depends": ["web", "web_calendar","base","purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
+    "depends": ["web", "web_calendar","base","openbase","purchase", "project", "board","product", "stock", "hotel_reservation", "email_template"],
     "author": "PYF & BP",
     "shortdesc":"openstc",
     "category": "SICLIC",
@@ -35,9 +35,9 @@
     Module STC For Prêts, temporary module to store changes specific to prets untested features on SWIF
     """,
     "data": [
-        'security/openstc_security_base.xml',
+        #'security/openstc_security_base.xml',
         'security/openstc_security_inter.xml',
-        'views/openstc_pret_data_base.xml',
+        #'views/openstc_pret_data_base.xml',
         'views/openstc_pret_data_resa.xml',
         'security/ir.model.access.csv',
 
@@ -46,10 +46,10 @@
         'wizard/ask_modify_service.xml',
         "wizard/openstc_pret_view_wizard.xml",
 
-        'views/openstc_view_base.xml',
+        #'views/openstc_view_base.xml',
         'views/openstc_view_inter.xml',
         "views/openstc_pret_checkout_view.xml",
-        "views/openstc_pret_view_base.xml",
+        #"views/openstc_pret_view_base.xml",
         "views/openstc_pret_view_resa.xml",
         'views/openstc_pret_menus_view.xml',
 
@@ -59,7 +59,7 @@
         "report/openstc_pret_qte_dispo_report_view.xml",
         "unit_tests/unit_tests.xml",
 
-        'data/base_data.xml',
+        #'data/base_data.xml',
         #"unit_tests/openstc_prets_tests.xml",
         "test/cr_commit.yml", "test/openstc_prets_tests.yml",
     ],
