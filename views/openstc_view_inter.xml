@@ -377,10 +377,10 @@
 		    <field name="inherit_id" ref="base.view_partner_form"/>
 		    <field name="arch" type="xml">
 		    	<field name="ref" position="replace"/>
-		    	<field name="customer" position="replace"/>
-                <field name="supplier" position="replace"/>
-                <field name="title" position="replace"/>
-                <field name="lang" position="replace"/>
+		    	<field name="customer" invisible="1"/>
+                <field name="supplier" invisible="1"/>
+                <field name="title" invisible="1"/>
+                <field name="lang" invisible="1"/>
                 <separator string="Categories" position="replace"/>
                 <field name="category_id" position="replace"/>
 		        <xpath expr="/form/group/group/field[@name='name']" position="after" >
