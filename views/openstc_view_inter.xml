@@ -377,17 +377,19 @@
 		    <field name="inherit_id" ref="base.view_partner_form"/>
 		    <field name="arch" type="xml">
 		    	<field name="ref" position="replace"/>
-		    	<field name="customer" invisible="1"/>
-                <field name="supplier" invisible="1"/>
-                <field name="title" invisible="1"/>
-                <field name="lang" invisible="1"/>
+                <field name="title" position="attributes">
+                	<attribute name="invisible">1</attribute>
+                </field>
+                <field name="lang" position="attributes">
+                	<attribute name="invisible">1</attribute>
+                </field>
                 <separator string="Categories" position="replace"/>
                 <field name="category_id" position="replace"/>
 		        <xpath expr="/form/group/group/field[@name='name']" position="after" >
 		        	<field name="type_id"/>
-		        	<field name="service_id" />
-		            <field name="technical_service_id" domain="[('technical', '=', True)]"/>
-		            <field name="technical_site_id" domain="[('service', '=', technical_service_id)]"/>
+		        	<field name="service_id" attrs="{'invisible':[('customer','=',False)]}"/>
+		            <field name="technical_service_id" domain="[('technical', '=', True)]" attrs="{'invisible':[('customer','=',False)]}"/>
+		            <field name="technical_site_id" domain="[('service', '=', technical_service_id)]" attrs="{'invisible':[('customer','=',False)]}"/>
 		        </xpath>
 		        <!--  <page string="Sales &amp; Purchases" position="replace"/> -->
 		        <!--
