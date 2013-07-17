@@ -422,6 +422,10 @@ class users(osv.osv):
 
     }
 
+    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+
+        return self._search(cr, user, args, offset=offset, limit=limit, order=order, context=context, count=count)
+
     def create(self, cr, uid, data, context={}):
         #_logger.debug('create USER-----------------------------------------------');
         res = super(users, self).create(cr, uid, data, context)
@@ -477,8 +481,8 @@ class users(osv.osv):
         team_obj = self.pool.get('openstc.team')
 
 
-        #get list of all agents
-        all_officer_ids = user_obj.search(cr, uid, []);
+        #get list of all agents expect administrator
+        all_officer_ids = user_obj.search(cr, uid, [('id','<>','1')]);
         all_team_ids = team_obj.search(cr, uid, []);
 
         #get list of all teams
