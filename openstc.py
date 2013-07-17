@@ -501,7 +501,8 @@ class users(osv.osv):
             for officer in user_obj.read(cr, uid, all_officer_ids, ['id','name','firstname']):
                 newOfficer = { 'id'  : officer['id'],
                                'name' : officer['name'],
-                               'firstname' : officer['firstname']
+                               'firstname' : officer['firstname'],
+                               'complete_name' : (officer['firstname'] or '')  + '  ' +  (officer['name'] or '')
                             }
                 officers.append(newOfficer)
             res['officers'] =  officers
@@ -526,7 +527,8 @@ class users(osv.osv):
                         if (service_id in officer.service_ids) and (officer.id not in officers):
                             newOfficer = { 'id'  : officer.id,
                                           'name' : officer.name,
-                                          'firstname' : officer.firstname
+                                          'firstname' : officer.firstname,
+                                          'complete_name' : (officer['firstname'] or '')  + '  ' +  (officer['name'] or '')
                                           }
                             officers.append(newOfficer)
                 res['officers'] = officers
@@ -556,7 +558,8 @@ class users(osv.osv):
                             if (team_id.id in managerTeamID) and (officer.id not in officers) :
                                 newOfficer = { 'id'  : officer.id,
                                               'name' : officer.name,
-                                              'firstname' : officer.firstname
+                                              'firstname' : officer.firstname,
+                                              'complete_name' : (officer['firstname'] or '')  + '  ' +  (officer['name'] or '')
                                           }
                                 officers.append(newOfficer)
                                 break
@@ -859,6 +862,26 @@ class task(osv.osv):
              'team_id': task.team_id.id or False,
              'company_id': task.company_id.id or False,
             }, context=context)
+
+    def cancel(self, cr, uid, ids, params, context={}):
+        """
+        Cancel Task
+        """
+
+        if not isinstance(ids,list): ids = [ids]
+        for task in self.browse(cr, uid, ids, context=context):
+            vals = {}
+
+            vals.update({'state': 'cancelled'})
+            vals.update({'cancel_reason': _get_param(params, 'cancel_reason') })
+            vals.update({'remaining_hours': 0.0})
+            if not task.date_end:
+                vals.update({ 'date_end':time.strftime('%Y-%m-%d %H:%M:%S')})
+            self.write(cr, uid, [task.id],vals, context=context)
+            message = _("The task '%s' is done") % (task.name,)
+            self.log(cr, uid, task.id, message)
+        return True
+
 
 task()
 
