@@ -12,7 +12,7 @@
     login: test1
     new_password: test1
     groups_id: 
-      - openstc.openstc_agent
+      - openbase.openstc_agent
       - hotel.group_hotel_user
 -
   !record {model: openstc.service, id: openstc_prets_tests_service_voirie, view: false}:

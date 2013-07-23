@@ -15,7 +15,7 @@
         </record> -->
 
         <!-- STC Company  -->
-        <record id="base.main_company" model="res.company">
+        <record id="base.main_partner" model="res.partner">
             <field name="name">STC</field>
             <!--  <field name="partner_id" ref="main_partner"/>
             <field name="rml_footer1"></field>

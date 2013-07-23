@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    OpenSTC Interventions - Openerp Module to manage Cityhall technical department
+    Copyright (C) 2013 Siclic www.siclic.fr
+
+    This file is part of OpenSTC Interventions.
+
+    OpenSTC Interventions is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    OpenSTC Interventions is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with OpenSTC Interventions.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<openerp>
+	<data noupdate="1">
+    	
+	    <record id="sequence_resa_number_type" model="ir.sequence.type">
+            <field name="name">Type de Numéro de Réservation</field>
+            <field name="code">resa.number</field>
+        </record>
+        <record id="sequence_resa_number" model="ir.sequence">
+            <field name="name">Numéro de Réservation</field>
+            <field name="code">resa.number</field>
+            <field name="prefix">R-%(year)s-%(month)s-</field>
+            <field name="padding" eval="3"/>
+        </record>
+    	
+	<!-- res partner type init for resa -->
+	<record id="openstc_prets_partner_type_asso" model="openstc.partner.type">
+	    <field name="name">Association</field>
+	    <field name="code">ASSOCIATION</field>
+	</record>
+	
+	<!-- Data for Reservation uom -->
+	<record id="openstc_pret_uom_categ_resa" model="product.uom.categ">
+	    <field name="name">Temporel</field>
+	</record>
+	
+	<record id="openstc_pret_uom_day" model="product.uom">
+	    <field name="name">Day (Reservation)</field>
+	    <field name="category_id" eval="openstc_pret_uom_categ_resa"/>
+	    <field name="factor">1.0</field>
+	</record>
+	<record id="openstc_pret_uom_half_day" model="product.uom">
+	    <field name="name">Half-Day (Reservation)</field>
+	    <field name="category_id" eval="openstc_pret_uom_categ_resa"/>
+		<field name="uom_type">smaller</field>
+		<field name="factor">2.0</field>
+	</record>
+	<record id="openstc_pret_uom_hour" model="product.uom">
+	    <field name="name">Hour (Reservation)</field>
+	    <field name="category_id" eval="openstc_pret_uom_categ_resa"/>
+	    <field name="uom_type">smaller</field>
+	    <field name="factor">24.0</field>
+	</record>
+	
+	<!-- task category for default value when generating inter and task from reservation -->
+	<record id="openstc_pret_supply_categ_task" model="openstc.task.category">
+	    <field name="name">Livraison</field>
+	    <field name="code">LIVRAISON</field>
+	</record>
+	
+	    <record id="openstc_pret_email_template_resa_validee" model="email.template">
+	        <field name="name">Réservation Validée</field>
+	        <field name="model_id" ref="model_hotel_reservation"/>
+	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'bruno.plancher@siclic.fr'}</field>
+			<field name="email_to">${object.partner_mail or ''}</field>
+			<field name="subject">Votre Réservation: ${object.name or 'inconnu'} est validée</field>
+			<field name="body_html"><![CDATA[
+	<h2>Message Automatique</h2>
+	
+	<p>Votre Réservation a bien été enregistrée.  </p>
+	<p>Récapitulatif de votre Réservation : </p>
+	<ul>
+	<li>Libellé : ${object.name or ''}</li>
+	<%
+	from datetime import datetime
+	import pytz
+	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+	my_checkin_str = my_checkin_str.decode('utf-8')
+	my_checkout_str = my_checkout_str.decode('utf-8')
+	%>
+	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
+	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
+	<li><u>Ressources Réservées :</u> 
+	<ul>
+	% for line in object.reservation_line:
+	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>
+	% endfor
+	</ul>
+	</li>
+	</ul>
+   
+   % if object.folio_id:
+   	<p>Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.<br/>
+   	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.</p>
+   % endif
+   <br />
+   <p>Cordialement,</p>
+   <br />
+   <p>${object.shop_id.company_id.name or ''}</p>
+   <br />
+   <img src="data:image/png;base64,${object.shop_id.company_id.logo or ''}"/>
+   <br />
+   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>
+   
+			    ]]></field>
+			<field name="body_text"><![CDATA[
+			    Message Automatique
+			    
+			    Votre Réservation a bien été enregistrée.
+			    Récapitulatif de votre Réservation :
+			    
+			    Libellé : ${object.name or ''}
+			    <%
+				from datetime import datetime
+				import pytz
+				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkin_str = my_checkin_str.decode('utf-8')
+				my_checkout_str = my_checkout_str.decode('utf-8')
+			   %>
+			    Dates : ${my_checkin_str} - ${my_checkout_str}
+			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
+			    % for line in object.reservation_line:
+			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}
+			    % endfor
+			    
+			    
+			    % if object.folio_id:
+			    	Votre Réservation fait l'objet d'une facturation, vous pouvez voir en pièce jointe le Bon de Commande associé A votre Réservation.
+			    	Une facture vous sera envoyée à la restitution des ressources réservées une fois votre Evénement terminé.
+			    % endif
+			    
+			    Cordialement,
+			    
+			    ${object.shop_id.company_id.name or ''}
+			    
+			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.
+		    ]]></field>
+    </record>
+	    
+	<record id="openstc_pret_email_template_resa_en_attente" model="email.template">
+	        <field name="name">Réservation En Attente</field>
+	        <field name="model_id" ref="model_hotel_reservation"/>
+	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'bruno.plancher@siclic.fr'}</field>
+			<field name="email_to">${object.partner_mail or ''}</field>
+			<field name="subject">Votre Réservation: ${object.name or 'inconnu'} est en attente de Validation</field>
+			<field name="body_html"><![CDATA[
+			    <h2>Message Automatique</h2>
+			    
+			    <p>Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. </p>
+			    <p>Récapitulatif de votre Réservation : </p>
+			    <ul>
+			    <li>Libellé : ${object.name or ''}</li>
+				<%
+				import pytz
+				from datetime import datetime
+				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkin_str = my_checkin_str.decode('utf-8')
+				my_checkout_str = my_checkout_str.decode('utf-8')
+				%>
+			    <li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
+			    <li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
+			    <li><u>Ressources Réservées :</u> 
+			    <ul>
+			    % for line in object.reservation_line:
+			    <li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>
+			    % endfor
+			    </ul>
+			    </li>
+			    </ul>
+			    <br />
+			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. 
+			    <br />
+			    <p>Cordialement,</p>
+			    <br />
+			    <p>${object.shop_id.company_id.name or ''}</p>
+			    <br />
+			    <img src="data:image/png;base64,${object.shop_id.company_id.logo or ''}"/>
+			    <br />
+			    <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>
+			    
+			    ]]></field>
+			<field name="body_text"><![CDATA[
+			    Message Automatique
+			    
+			    Votre Réservation a été prise en compte mais est en attente de validation. Vous recevrez une autre notification (à cette même adresse mail) lorsqu'elle aura été traitée. 
+			    Récapitulatif de votre Réservation : 
+			    
+			    Libellé : ${object.name or ''}
+			   <%
+				import pytz
+				from datetime import datetime
+				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkin_str = my_checkin_str.decode('utf-8')
+				my_checkout_str = my_checkout_str.decode('utf-8')
+			    %>
+			    Dates : ${my_checkin_str} - ${my_checkout_str}
+			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
+			    % for line in object.reservation_line:
+			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}
+			    % endfor
+			    
+			    Toutefois, veuillez noter que, même si votre réservation n'est pas encore validée, les ressources qu'elle concerne vous sont mis de côté à partir de maintenant. 
+			    
+			    Cordialement,
+			    
+			    ${object.shop_id.company_id.name or ''}
+			    
+			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.
+		    ]]></field>
+    </record>
+	    
+	
+    <record id="openstc_pret_email_template_resa_done" model="email.template">
+	        <field name="name">Réservation Terminée</field>
+	        <field name="model_id" ref="model_hotel_reservation"/>
+	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'bruno.plancher@siclic.fr'}</field>
+			<field name="email_to">${object.partner_mail or ''}</field>
+			<field name="subject">Facture concernant votre Réservation: ${object.name or 'inconnu'}</field>
+			<field name="body_html"><![CDATA[
+	<h2>Message Automatique</h2>
+	
+	<p> ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''} </p>
+	
+	<p>Votre Réservation de ressources est terminée
+	% if object.folio_id:
+	, ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.
+	% endif
+	</p>
+	<p>Récapitulatif de votre Réservation : </p>
+	<ul>
+	<li>Libellé : ${object.name or ''}</li>
+	<%
+	from datetime import datetime
+	import pytz
+	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkin_str = my_checkin_str.decode('utf-8')
+	my_checkout_str = my_checkout_str.decode('utf-8')
+	%>
+	<li>Dates : ${my_checkin_str} - ${my_checkout_str}</li>
+	<li>Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}</li>
+	<li><u>Ressources Réservées :</u> 
+	<ul>
+	% for line in object.reservation_line:
+	<li>${line.reserve_product.name or ''} : ${line.qte_reserves or 0}</li>
+	% endfor
+	</ul>
+	</li>
+	</ul>
+	
+	Nous vous remercions d'avoir utilisé nos services de réservations en ligne.
+	
+   <br />
+   <p>Cordialement,</p>
+   <br />
+   <p>${object.shop_id.company_id.name or ''}</p>
+   <br />
+   <img src="data:image/png;base64,${object.shop_id.company_id.logo or ''}"/>
+   <br />
+   <p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>
+   
+			    ]]></field>
+			<field name="body_text"><![CDATA[
+			    Message Automatique
+			    
+			    ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
+			    
+			    Votre Réservation de ressources est terminée.
+			    % if object.folio_id:
+				Ayant fait l'objet d'une facturation, veuillez trouver ci-joint la facture correspondant à votre location.
+				% endif
+			    Récapitulatif de votre Réservation :
+			    
+			    Libellé : ${object.name or ''}
+			    <%
+				from datetime import datetime
+				import pytz
+				my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+				my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+				my_checkin_str = my_checkin_str.decode('utf-8')
+				my_checkout_str = my_checkout_str.decode('utf-8')
+				%>
+			    Dates : ${my_checkin_str} - ${my_checkout_str}
+			    Personne Responsable : ${object.partner_shipping_id.title.name or ''} ${object.partner_shipping_id.name or ''}
+			    % for line in object.reservation_line:
+			    ${line.reserve_product.name or ''} : ${line.qte_reserves or 0}
+			    % endfor
+			    
+			    Cordialement,
+			    
+			    ${object.shop_id.company_id.name or ''}
+			    
+			    Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.
+		    ]]></field>
+    </record>
+	
+        <record id="openstc_pret_email_template_resa_cancelled" model="email.template">
+	        <field name="name">Réservation annulée</field>
+	        <field name="model_id" ref="model_hotel_reservation"/>
+	    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or 'bruno.plancher@siclic.fr'}</field>
+			<field name="email_to">${object.partner_mail or ''}</field>
+			<field name="subject">Votre Réservation: ${object.name or 'inconnu'} a été annulée</field>
+			<field name="body_html"><![CDATA[
+	<h2>Message Automatique</h2>
+	<%
+	from datetime import datetime
+	import pytz
+	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkin_str = my_checkin_str.decode('utf-8')
+	my_checkout_str = my_checkout_str.decode('utf-8')
+	%>
+	
+	<p>Votre Réservation normalement prévue du ${my_checkin_str} au ${my_checkout_str} dans le cadre de votre manifestation : ${object.name} a été annulée pour la raison suivante :</p> 
+	<p<i>Saisir ici la raison de votre refus</i></p>
+	<br />
+	<p>Cordialement,</p>
+	<br />
+	<p>${object.shop_id.company_id.name or ''}</p>
+	<br />
+	<img src="data:image/png;base64,${object.shop_id.company_id.logo or ''}"/>
+	<br />
+	<p><i>Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.</i></p>
+   
+			    ]]></field>
+			<field name="body_text"><![CDATA[
+	Message Automatique
+	
+	<%
+	from datetime import datetime
+	import pytz
+	my_checkin = datetime.strptime(str(object.checkin),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkout = datetime.strptime(str(object.checkout),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+	my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime("%x %Hh%M".encode('utf-8'))
+	my_checkin_str = my_checkin_str.decode('utf-8')
+	my_checkout_str = my_checkout_str.decode('utf-8')
+	%>
+	
+	Votre Réservation normalement prévue du ${my_checkin_str} au ${my_checkout_str} dans le cadre de votre manifestation : ${object.name} a été annulée pour la raison suivante : 
+	<pSaisir ici la raison de votre refus
+	
+	Cordialement,
+	
+	${object.shop_id.company_id.name or ''}
+	
+	Selon la loi du 6 janvier 1978 de la Loi Informatique et Libertés, vous disposez d'un droit de regard, de rectification et de suppression sur l'ensemble des informations personnelles vous concernant.
+		    ]]></field>
+		</record> 
+	</data>
+</openerp>
