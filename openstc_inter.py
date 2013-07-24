@@ -306,8 +306,8 @@ class task(osv.osv):
         #default value: empty string for each id
         ret = {}.fromkeys(ids,'')
         #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
-        for inter in self.read(cr, uid, ids, ['state','tasks'], context=context):
-            ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
+        for task in self.read(cr, uid, ids, ['state','tasks'], context=context):
+            ret.update({task['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,task)])})
         return ret
 
     def test_check_permission(self, cr, uid, ids, action, context=None):
