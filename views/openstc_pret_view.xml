@@ -88,8 +88,12 @@
 						<field name="type_prod"/>
 						<field name="openstc_reservable"/>
 						<field name="openstc_maintenance"/>
-					</page>
-			</page>
+					</page>    
+				</page>
+				<button name="%(stock.action_view_change_product_quantity)d" position="attributes">
+				    <attribute name="context">{'default_location_id':%(stock.stock_location_stock)d}</attribute>
+				</button>
+				
 			</field>
 		</record>
 		
