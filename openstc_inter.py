@@ -25,13 +25,17 @@
 
 import types
 
+import re
 import time
+import operator
 import logging
 import netsvc
 import pytz
 from osv.orm import browse_record, browse_null
 from osv import fields, osv, orm
-from datetime import datetime
+from datetime import datetime, timedelta
+from dateutil import *
+from dateutil.tz import *
 from tools.translate import _
 
 #_logger = logging.getLogger(__name__)
@@ -97,7 +101,7 @@ def send_email(self, cr, uid, ids, params, context=None):
 
 class service(osv.osv):
     _inherit = "openstc.service"
-    
+
     _columns = {
         'asksBelongsto': fields.one2many('openstc.ask', 'service_id', "asks"),
         'category_ids':fields.many2many('openstc.task.category', 'openstc_task_category_services_rel', 'service_id', 'task_category_id', 'Categories'),
@@ -119,7 +123,7 @@ class users(osv.osv):
             'contact_id': fields.one2many('res.partner.address', 'user_id', "Partner"),
 
     }
-    
+
 class team(osv.osv):
     _inherit = "openstc.team"
     _columns = {
@@ -472,8 +476,230 @@ class task(osv.osv):
             self.log(cr, uid, task.id, message)
         return True
 
-task()
+    def planTasks(self, cr, uid, ids, params, context=None):
 
+        """
+        Plan tasks after drag&drop task on planning
+
+        :param cr: database cursor
+        :param uid: current user id
+        :param ids: list of ids
+        :param params: contains
+            startWorkingTime : date/heure début de journée travaillée
+            endWorkingTime : date/heure fin de journée
+            startLunchTime : date/heure début pause déjeuner
+            endLunchTime : date/heure fin pause déjeuner
+            startDt: date/heure du début de la plage souhaitée
+            teamMode : boolean, calendrier d'une équipe ou d'un agent
+            calendarId : celui de l'agent / ou celui de l'équipe, selon le teamMode
+
+        This method is used when plan tasks from client
+
+        """
+
+        self.log(cr, uid, ids[0], "planTasks")
+        if not len(ids) == 1: raise Exception('Pas de tâche à planifier')
+
+        #date format
+        timeDtFrmt = "%Y-%m-%d %H:%M:%S"
+
+        #Get current task
+        currentTask = self.browse(cr, uid, ids[0], context=context)
+        #if task belongs to an intervention
+        if currentTask.project_id:
+            #Copy is true when intervention is a template
+            copy = self.pool.get('project.project').is_template(cr, uid, [currentTask.project_id.id], context=context)
+
+
+        if 'cpt' not in params:  params['cpt'] = -1
+        if 'number' not in params: params['number'] = 0
+        #Init time to plan
+        if 'timeToPlan' not in params: params['timeToPlan'] = currentTask.planned_hours
+        #Planning is complete
+        elif params['timeToPlan']==0 or not params['startDt']: return True
+
+        teamMode = params['teamMode']
+        calendarId = params['calendarId']
+
+        #Get all events on 'startDt' for officer or team 'calendarId'
+        if 'events' not in params :
+#            try:
+            events = self.getTodayEventsById(cr, uid, ids, params, timeDtFrmt, context)
+#            except Exception, e:
+#                return e
+        else:
+            events = params['events']
+
+        cpt = params['cpt']
+        startDt = params['startDt']
+        size = len(events)
+
+        while True:
+           cpt+=1
+           #Get end date
+           endDt = startDt + timedelta(hours=params['timeToPlan'])
+           if cpt<size:
+               e = events[cpt]
+               if(startDt >= e['date_start'] and startDt<=e['date_end']):
+                    startDt = e['date_end']
+               elif startDt > e['date_start']:
+                    self.log(cr, uid, currentTask.id, "do nothing")
+               else:
+                   break
+           else:
+               break
+
+        if cpt  == size:
+             #Task was not completely scheduled
+            vals = {}
+            vals.update({
+                  'name':  currentTask.name,
+                  'project_id': currentTask.project_id.id,
+                  'parent_id': currentTask.id if copy else False,
+                  'state': 'draft',
+                  'planned_hours': params['timeToPlan'],
+                  'remaining_hours': params['timeToPlan'],
+                  'user_id': None,
+                  'team_id': None,
+                  'date_end': None,
+                  'date_start': None,
+            })
+            #Return to plan with the remaining time
+            self.write(cr, uid, [currentTask.id],vals, context=context)
+            params['timeToPlan'] = 0
+        else:
+            #Get next date
+            nextDt = events[cpt]['date_start']
+            #hours differences to next date
+            diff = (nextDt-startDt).total_seconds()/3600
+
+            if (params['timeToPlan'] - diff) == 0 :
+                #whole task is completely schedulable (all hours) before next so timeToPlan is set to 0
+                params['timeToPlan'] = 0
+                endDt = nextDt
+            elif (params['timeToPlan'] - diff) > 0 :
+                #task is not completely schedulable
+                params['timeToPlan'] = params['timeToPlan'] - diff
+                endDt = nextDt
+            else:
+                #there is less time to plan the number of hours possible before the next date, diff is re-calculate
+                params['timeToPlan'] = 0
+                diff = (endDt-startDt).total_seconds()/3600
+
+
+            if params['number'] > 0 :
+                #The task is divided : title is changed"
+                title = "(Suite-" + str(params['number']) + ")" + currentTask.name
+            else:
+                title = currentTask.name
+
+            vals = {
+                'name': title,
+                'planned_hours': diff,
+                'remaining_hours': diff,
+                'team_id': calendarId if teamMode else None,
+                'user_id': calendarId if not teamMode else None,
+                'date_start': datetime.strftime(startDt,timeDtFrmt),
+                'date_end': datetime.strftime(endDt,timeDtFrmt),
+                'state': 'open',
+                'parent_id': currentTask.id if copy else False,
+                'project_id': currentTask.project_id.id,
+            }
+
+            #All time is scheduled and intervention is not a template
+            if params['timeToPlan'] == 0 and not copy:
+                #Update task
+                self.write(cr, uid, [currentTask.id],vals, context=context)
+            else:
+                #Create task
+                self.create(cr, uid, vals);
+
+        params['startDt'] = endDt
+        params['number'] += 1
+        params['cpt'] = cpt - 1
+        #re-call the method with new params
+        self.planTasks(cr, uid, ids, params, context)
+
+        return True
+
+    def getTodayEventsById(self, cr, uid, ids, params, timeDtFrmt, context=None):
+        """
+        Plan tasks after drag&drop task on planning
+
+        :param cr: database cursor
+        :param uid: current user id
+        :param ids: list of ids
+        :param params: contains
+            startWorkingTime : date/heure début de journée travaillée
+            endWorkingTime : date/heure fin de journée
+            startLunchTime : date/heure début pause déjeuner
+            endLunchTime : date/heure fin pause déjeuner
+            startDt: date/heure du début de la plage souhaitée
+            teamMode : boolean, calendrier d'une équipe ou d'un agent
+            calendarId : celui de l'agent / ou celui de l'équipe, selon le teamMode
+
+        This method is used to get events on startDt (lunch including) for officer or team (calendarId)
+
+        """
+        if not set(('startWorkingTime','endWorkingTime','startLunchTime','endLunchTime','startDt','calendarId')).issubset(params) :
+            raise Exception('Erreur : il manque des paramètres pour pouvoir planifier (Heure d''embauche, heure de déjeuner...) \n Veuillez contacter votre administrateur ')
+
+        #Date format passed by javascript client : date from utc.
+        #Client swif lose the timezone because of the serialisation in JSON request (JSON.stringify)
+        timeDtFrmtWithTmz = "%Y-%m-%dT%H:%M:%S.000Z"
+        #Get user context
+        context_tz = self.pool.get('res.users').read(cr,uid,[uid], ['context_tz'])[0]['context_tz'] or 'Europe/Paris'
+        tzinfo = pytz.timezone(context_tz)
+
+        events= []
+
+        todayDt = datetime.now(tzinfo)
+        #Calculate time differencee between utc and user's timezone
+        deltaTz = int((datetime.utcoffset(todayDt).total_seconds())/3600)
+
+        #Get Start and end working time, lunch start and stop times
+        startDt = datetime.strptime(params['startDt'],timeDtFrmtWithTmz)
+        startWorkingTime = startDt.replace(hour= (int(params['startWorkingTime'])-deltaTz),minute=0, second=0, microsecond=0)
+        startLunchTime = startDt.replace( hour = (int(params['startLunchTime'])-deltaTz),minute=0, second=0, microsecond=0 )
+        endLunchTime = startDt.replace( hour = (int(params['endLunchTime'])-deltaTz),minute=0, second=0, microsecond=0 )
+
+        #Add in list
+        events.append({'title': "lunchTime", 'date_start': startLunchTime,
+                       'date_end': endLunchTime})
+        endWorkingTime = startDt.replace( hour = (int(params['endWorkingTime'])-deltaTz),minute=0, second=0, microsecond=0 )
+        events.append({'title': "endWorkingTime", 'date_start': endWorkingTime,
+                       'date_end': endWorkingTime})
+
+        task_ids = []
+        if params['teamMode'] == True:
+            #Get all tasks on 'startDt' for team
+            task_ids = self.search(cr,uid,
+                ['&',('date_start','>=', datetime.strftime(startWorkingTime,timeDtFrmt)),
+                    ('date_start','<=', datetime.strftime(endWorkingTime,timeDtFrmt)),
+                    ('team_id','=',params['calendarId'])
+                ])
+        else:
+            #Get all tasks on 'startDt' for officer
+            task_ids = self.search(cr,uid,
+                ['&',('date_start','>=', datetime.strftime(startWorkingTime,timeDtFrmt)),
+                    ('date_start','<=', datetime.strftime(endWorkingTime,timeDtFrmt)),
+                    ('user_id','=',params['calendarId'])
+                ])
+
+        tasks = self.read(cr,uid,task_ids, ['name','date_start','date_end'])
+        #Add tasks in list
+        for task in tasks :
+            events.append({'title': task['name'], 'date_start': datetime.strptime(task['date_start'],timeDtFrmt),
+                           'date_end': datetime.strptime(task['date_end'],timeDtFrmt) })
+
+        #Sort task
+        events.sort(key=operator.itemgetter('date_start'))
+        params['events'] = events
+        params['startDt'] = startDt
+        #Return tasks
+        return events
+
+task()
 
 class openstc_task_category(osv.osv):
 
@@ -716,6 +942,12 @@ class project(osv.osv):
     #Overrides  set_template method of project module
     def set_template(self, cr, uid, ids, context=None):
         return True;
+
+    def is_template(self, cr, uid, ids, context=None):
+        if not(len(ids) == 1) : return false
+        inter = self.pool.get('project.project').browse(cr, uid, ids[0], context=context)
+        if isinstance(inter, browse_null)!= True :
+            return inter.state == 'template' or False
 
     def _get_active_inter(self, cr, uid, context=None):
         if context is None:
