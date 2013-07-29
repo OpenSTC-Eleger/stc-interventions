@@ -288,26 +288,39 @@ class task(osv.osv):
             belongsToServiceManager = project_service_id in (s.id for s in user.service_ids) and user.isManager == True
             res[id] = True if belongsToOfficer or belongsToTeam or belongsToServiceManager or user.isDST else False
          return res
-
-
+    
+    #user can make survey of the task if it's an officer task, or a team task and user is a foreman / manager
+    def _task_survey_rights(self, cr, uid, record, groups_code):
+        ret = False
+        if not record.team_id:
+            ret = True
+        else:
+            ret = 'OFFI' not in groups_code
+        return ret
 
     _actions = {
-        'print':lambda self,cr,uid,record: record['state'] in ('draft','open'),
-        'cancel':lambda self,cr,uid,record: record['state'] == 'draft',
-        'delete':lambda self,cr,uid,record: record['state'] == 'draft',
-        'replan': lambda self,cr,uid,record: record['state'] == 'done',
-        'normal_mode_finished': lambda self,cr,uid,record: record['state'] == 'open',
-        'normal_mode_unfinished': lambda self,cr,uid,record: record['state'] == 'open',
-        'light_mode_finished': lambda self,cr,uid,record: record['state'] == 'draft',
-        'light_mode_unfinished': lambda self,cr,uid,record: record['state'] == 'draft',
+        'print':lambda self,cr,uid,record, groups_code: record.state in ('draft','open'),
+        'cancel':lambda self,cr,uid,record, groups_code: record.state == 'draft',
+        'delete':lambda self,cr,uid,record, groups_code: record.state == 'draft',
+        'replan': lambda self,cr,uid,record, groups_code: record.state == 'done',
+        'normal_mode_finished': lambda self,cr,uid,record, groups_code: self._task_survey_rights(cr, uid, record, groups_code) and record.state == 'open',
+        'normal_mode_unfinished': lambda self,cr,uid,record, groups_code: self._task_survey_rights(cr, uid, record, groups_code) and record.state == 'open',
+        'light_mode_finished': lambda self,cr,uid,record, groups_code: self._task_survey_rights(cr, uid, record, groups_code) and record.state == 'draft',
+        'light_mode_unfinished': lambda self,cr,uid,record, groups_code: self._task_survey_rights(cr, uid, record, groups_code) and record.state == 'draft',
+        'modify': lambda self,cr,uid,record, groups_code: True,
         
         }
+
     def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
         #default value: empty string for each id
         ret = {}.fromkeys(ids,'')
+        groups_code = []
+        groups_code = [group.code for group in self.pool.get("res.users").browse(cr, uid, uid, context=context).groups_id if group.code]
+        
         #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
-        for task in self.read(cr, uid, ids, ['state','tasks'], context=context):
-            ret.update({task['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,task)])})
+        for record in self.browse(cr, uid, ids, context=context):
+            #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
+            ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
         return ret
 
     def test_check_permission(self, cr, uid, ids, action, context=None):
@@ -339,7 +352,6 @@ class task(osv.osv):
 
         'cancel_reason': fields.text('Cancel reason'),
         'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
-
 
     }
 
@@ -713,16 +725,21 @@ class project(osv.osv):
         return res
     
     _actions = {
-        'cancel':lambda self,cr,uid,record: record['state'] in ('open','scheduled'),
-        'plan_unplan':lambda self,cr,uid,record: record['state'] == 'open' and not self.pool.get("project.task").search(cr, uid,[('state','=','draft'),('id','in',record['tasks'])]),
-        'add_task':lambda self,cr,uid,record: record['state'] not in ('scheduled','template'),
+        'cancel':lambda self,cr,uid,record: record.state in ('open','scheduled'),
+        'plan_unplan':lambda self,cr,uid,record: record.state == 'open' and not self.pool.get("project.task").search(cr, uid,[('state','=','draft'),('project_id','=',record.id)]),
+        'add_task':lambda self,cr,uid,record: record.state in ('open','template'),
+        'print': lambda self,cr,uid,record: True,
+        'modify': lambda self,cr,uid,record: True,
+        'create': lambda self,cr,uid,record: True,
+        
         }
     def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
         #default value: empty string for each id
         ret = {}.fromkeys(ids,'')
         #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
-        for inter in self.read(cr, uid, ids, ['state','tasks'], context=context):
-            ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
+        for record in self.browse(cr, uid, ids, context=context):
+            #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
+            ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record)]})
         return ret
 
     _columns = {
