@@ -292,7 +292,7 @@ class task(osv.osv):
             belongsToServiceManager = project_service_id in (s.id for s in user.service_ids) and user.isManager == True
             res[id] = True if belongsToOfficer or belongsToTeam or belongsToServiceManager or user.isDST else False
          return res
-    
+
     #user can make survey of the task if it's an officer task, or a team task and user is a foreman / manager
     def _task_survey_rights(self, cr, uid, record, groups_code):
         ret = False
@@ -312,7 +312,7 @@ class task(osv.osv):
         'light_mode_finished': lambda self,cr,uid,record, groups_code: self._task_survey_rights(cr, uid, record, groups_code) and record.state == 'draft',
         'light_mode_unfinished': lambda self,cr,uid,record, groups_code: self._task_survey_rights(cr, uid, record, groups_code) and record.state == 'draft',
         'modify': lambda self,cr,uid,record, groups_code: True,
-        
+
         }
 
     def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
@@ -320,7 +320,7 @@ class task(osv.osv):
         ret = {}.fromkeys(ids,'')
         groups_code = []
         groups_code = [group.code for group in self.pool.get("res.users").browse(cr, uid, uid, context=context).groups_id if group.code]
-        
+
         #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
         for record in self.browse(cr, uid, ids, context=context):
             #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
@@ -334,7 +334,7 @@ class task(osv.osv):
                 ret = True
             else:
                 print 'Error, user does not have %s right access'% action
-                
+
         return ret
     _columns = {
         'active':fields.function(_get_active, method=True,type='boolean', store=False),
@@ -584,7 +584,7 @@ class task(osv.osv):
                if(startDt >= e['date_start'] and startDt<=e['date_end']):
                     startDt = e['date_end']
                elif startDt > e['date_start']:
-                    self.log(cr, uid, currentTask.id, "do nothing")
+                    continue
                else:
                    break
            else:
@@ -949,7 +949,7 @@ class project(osv.osv):
                 if inter.planned_hours :
                     res[id] = round(100.0 * inter.effective_hours / inter.planned_hours, 0);
         return res
-    
+
     _actions = {
         'cancel':lambda self,cr,uid,record: record.state in ('open','scheduled'),
         'plan_unplan':lambda self,cr,uid,record: record.state == 'open' and not self.pool.get("project.task").search(cr, uid,[('state','=','draft'),('project_id','=',record.id)]),
@@ -957,7 +957,7 @@ class project(osv.osv):
         'print': lambda self,cr,uid,record: True,
         'modify': lambda self,cr,uid,record: True,
         'create': lambda self,cr,uid,record: True,
-        
+
         }
     def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
         #default value: empty string for each id
