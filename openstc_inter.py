@@ -980,8 +980,7 @@ class project(osv.osv):
         return res
     
     #if inter exists and is associated to a service, returns this service_id, else returns user services
-    def get_services_authorized(self, cr, uid, id, context=context):
-        ret = []
+    def get_services_authorized(self, cr, uid, id, context=None):
         if id:
             inter = self.browse(cr, uid, id, context=context)
             if inter.service_id:        
@@ -992,10 +991,11 @@ class project(osv.osv):
     
     def get_task_categ_authorized(self, cr, uid, id, context=None):
         service_ids = self.get_services_authorized(cr, uid, id, context=context)
+        ret = []
         if service_ids:
             task_ids = self.pool.get("openstc.task.category").search(cr, uid, [('service_ids','in',service_ids)])
-            ret = self.pool.get("openstc.task.category").read(cr, uid, task_ids, [])
-        return
+            ret = self.pool.get("openstc.task.category").read(cr, uid, task_ids, ['id','name'])
+        return ret
     
     _actions = {
         'cancel':lambda self,cr,uid,record: record.state in ('open','scheduled'),
