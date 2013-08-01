@@ -1609,7 +1609,25 @@ class ask(osv.osv):
             }
         return res
 
-
+    def getNbRequestsTodo(self, cr, uid, users_id, filter=[], context=None):
+        if not isinstance(users_id, list):
+            users_id = [users_id]
+        ret = {}
+        for user in self.pool.get("res.users").browse(cr, uid, users_id, context=context):
+            ret.update({str(user.id):0})
+            #first, i get the code of user groups to filter easier
+            groups = [group.code for group in user.groups_id if group.code]
+            search_filter = []
+            if 'DIRE' in groups:
+                search_filter.extend([('state','=','confirm')])
+            elif 'MANA' in groups:
+                search_filter.extend([('state','=','wait')])
+            #NOTE: if user is not DST nor Manager, returns all requests
+            
+            #launch search_count method adding optionnal filter defined in UI
+            search_filter.extend(filter)
+            ret[str(user.id)] = self.search_count(cr, user.id, search_filter, context=context)
+        return ret
 
 
 ask()
