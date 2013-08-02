@@ -292,7 +292,36 @@ class task(osv.osv):
             belongsToServiceManager = project_service_id in (s.id for s in user.service_ids) and user.isManager == True
             res[id] = True if belongsToOfficer or belongsToTeam or belongsToServiceManager or user.isDST else False
          return res
-
+    
+    #if tasks has an inter, returns service of this inter, else returns user services (returns empty list in unexpected cases)
+    def get_services_authorized(self, cr, uid, id, context=None):
+        ret = []
+        if id:
+            task = self.browse(cr, uid, id,context=context)
+            if task.project_id:
+                ret = [task.project_id.service_id and task.project_id.service_id.id] or []
+            else:
+                ret = self.pool.get("res.users").read(cr, uid, uid, ['service_ids'])['service_ids']
+        else:
+            ret = self.pool.get("res.users").read(cr, uid, uid, ['service_ids'])['service_ids']
+        return ret
+    
+    def get_vehicules_authorized(self, cr, uid, id, context=None):
+        service_id = self.get_services_authorized(cr, uid, id, context=context)
+        ret = []
+        if service_id:
+            vehicule_ids = self.pool.get("openstc.equipment").search(cr, uid, ['&','|',('technical_vehicle','=',True),('commercial_vehicle','=',True),('service_ids','in',service_id)])
+            ret = self.pool.get("openstc.equipment").read(cr, uid, vehicule_ids, ['id','name','type'],context=context)
+        return ret
+    
+    def get_materials_authorized(self, cr, uid, id, context=None):
+        service_id = self.get_services_authorized(cr, uid, id, context=context)
+        ret = []
+        if service_id:
+            material_ids = self.pool.get("openstc.equipment").search(cr, uid, ['&','|',('small_material','=',True),('fat_material','=',True),('service_ids','in',service_id)])
+            ret = self.pool.get("openstc.equipment").read(cr, uid, material_ids, ['id','name','type'],context=context)
+        return ret
+        
     #user can make survey of the task if it's an officer task, or a team task and user is a foreman / manager
     def _task_survey_rights(self, cr, uid, record, groups_code):
         ret = False
@@ -952,7 +981,25 @@ class project(osv.osv):
                 if inter.planned_hours :
                     res[id] = round(100.0 * inter.effective_hours / inter.planned_hours, 0);
         return res
-
+    
+    #if inter exists and is associated to a service, returns this service_id, else returns user services
+    def get_services_authorized(self, cr, uid, id, context=None):
+        if id:
+            inter = self.browse(cr, uid, id, context=context)
+            if inter.service_id:        
+                return [inter.service_id.id]
+            
+        return self.pool.get("res.users").read(cr, uid, uid, ['service_ids'])['service_ids']
+        
+    
+    def get_task_categ_authorized(self, cr, uid, id, context=None):
+        service_ids = self.get_services_authorized(cr, uid, id, context=context)
+        ret = []
+        if service_ids:
+            task_ids = self.pool.get("openstc.task.category").search(cr, uid, [('service_ids','in',service_ids)])
+            ret = self.pool.get("openstc.task.category").read(cr, uid, task_ids, ['id','name'])
+        return ret
+    
     _actions = {
         'cancel':lambda self,cr,uid,record: record.state in ('open','scheduled'),
         'plan_unplan':lambda self,cr,uid,record: record.state == 'open' and not self.pool.get("project.task").search(cr, uid,[('state','=','draft'),('project_id','=',record.id)]),
@@ -1566,7 +1613,25 @@ class ask(osv.osv):
             }
         return res
 
-
+    def getNbRequestsTodo(self, cr, uid, users_id, filter=[], context=None):
+        if not isinstance(users_id, list):
+            users_id = [users_id]
+        ret = {}
+        for user in self.pool.get("res.users").browse(cr, uid, users_id, context=context):
+            ret.update({str(user.id):0})
+            #first, i get the code of user groups to filter easier
+            groups = [group.code for group in user.groups_id if group.code]
+            search_filter = []
+            if 'DIRE' in groups:
+                search_filter.extend([('state','=','confirm')])
+            elif 'MANA' in groups:
+                search_filter.extend([('state','=','wait')])
+            #NOTE: if user is not DST nor Manager, returns all requests
+            
+            #launch search_count method adding optionnal filter defined in UI
+            search_filter.extend(filter)
+            ret[str(user.id)] = self.search_count(cr, user.id, search_filter, context=context)
+        return ret
 
 
 ask()
