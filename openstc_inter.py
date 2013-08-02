@@ -293,6 +293,15 @@ class task(osv.osv):
             res[id] = True if belongsToOfficer or belongsToTeam or belongsToServiceManager or user.isDST else False
          return res
     
+    def getUserTasksList(self, cr, uid, domain=[], fields=[], context=None):
+        #in taskLists, absences are removed from result
+        domain.extend([('state','!=','absent')])
+        #first i get tasks with filter asked by UI
+        res_ids = self.search(cr, uid, domain, context=context)
+        res_filtered = [item[0] for item in self._get_active(cr, uid, res_ids, 'active', False, context=context).items() if item[1]]
+        ret = self.read(cr, uid, res_filtered, fields, context=context)
+        return {'records':ret,'ids':res_filtered}
+    
     #if tasks has an inter, returns service of this inter, else returns user services (returns empty list in unexpected cases)
     def get_services_authorized(self, cr, uid, id, context=None):
         ret = []
@@ -356,15 +365,19 @@ class task(osv.osv):
             ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
         return ret
 
-    def test_check_permission(self, cr, uid, ids, action, context=None):
-        ret = False
-        for task in self.browse(cr, uid, ids, context=context):
-            if action in task.actions:
-                ret = True
-            else:
-                print 'Error, user does not have %s right access'% action
+#    def test_check_permission(self, cr, uid, ids, action, context=None):
+#        ret = False
+#        for task in self.browse(cr, uid, ids, context=context):
+#            if action in task.actions:
+#                ret = True
+#            else:
+#                print 'Error, user does not have %s right access'% action
 
         return ret
+    
+    def _get_task_from_inter(self, cr, uid, ids, context=None):
+        return self.search(cr, uid, [('project_id','in',ids)],context=context)
+    
     _columns = {
         'active':fields.function(_get_active, method=True,type='boolean', store=False),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
@@ -382,7 +395,8 @@ class task(osv.osv):
         'km': fields.integer('Km', select=1),
         'oil_qtity': fields.float('oil quantity', select=1),
         'oil_price': fields.float('oil price', select=1),
-
+        'site1':fields.related('project_id','site1',type='many2one',relation='openstc.site', string='Site',store={'project.task':[lambda self,cr,uid,ids,ctx={}:ids, ['project_id'], 10],
+                                                                                                                  'project.project':[lambda self,cr,uid,ids,ctx={}:_get_task_from_inter, ['site1'],11]}),
         'cancel_reason': fields.text('Cancel reason'),
         'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
