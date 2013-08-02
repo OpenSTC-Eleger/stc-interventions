@@ -541,6 +541,8 @@ class task(osv.osv):
         self.log(cr, uid, ids[0], "planTasks")
         if not len(ids) == 1: raise Exception('Pas de tâche à planifier')
 
+        #ret
+        results = {}
         #date format
         timeDtFrmt = "%Y-%m-%d %H:%M:%S"
 
@@ -556,8 +558,9 @@ class task(osv.osv):
         if 'number' not in params: params['number'] = 0
         #Init time to plan
         if 'timeToPlan' not in params: params['timeToPlan'] = currentTask.planned_hours
-        #Planning is complete
-        elif params['timeToPlan']==0 or not params['startDt']: return True
+        #Planning is complete : return current task upgraded
+        elif params['timeToPlan']==0 or not params['startDt']:
+            return  params['results']
 
         teamMode = params['teamMode']
         calendarId = params['calendarId']
@@ -590,10 +593,10 @@ class task(osv.osv):
            else:
                break
 
+
         if cpt  == size:
              #Task was not completely scheduled
-            vals = {}
-            vals.update({
+            results.update({
                   'name':  currentTask.name,
                   'project_id': currentTask.project_id.id,
                   'parent_id': currentTask.id if copy else False,
@@ -606,8 +609,9 @@ class task(osv.osv):
                   'date_start': None,
             })
             #Return to plan with the remaining time
-            self.write(cr, uid, [currentTask.id],vals, context=context)
+            self.write(cr, uid, [currentTask.id],results, context=context)
             params['timeToPlan'] = 0
+            params['results'] = results
         else:
             #Get next date
             nextDt = events[cpt]['date_start']
@@ -634,7 +638,7 @@ class task(osv.osv):
             else:
                 title = currentTask.name
 
-            vals = {
+            results = {
                 'name': title,
                 'planned_hours': diff,
                 'remaining_hours': diff,
@@ -650,18 +654,17 @@ class task(osv.osv):
             #All time is scheduled and intervention is not a template
             if params['timeToPlan'] == 0 and not copy:
                 #Update task
-                self.write(cr, uid, [currentTask.id],vals, context=context)
+                self.write(cr, uid, [currentTask.id],results, context=context)
             else:
                 #Create task
-                self.create(cr, uid, vals);
+                self.create(cr, uid, results);
 
+        params['results'] = results
         params['startDt'] = endDt
         params['number'] += 1
         params['cpt'] = cpt - 1
         #re-call the method with new params
-        self.planTasks(cr, uid, ids, params, context)
-
-        return True
+        return self.planTasks(cr, uid, ids, params, context)
 
     def getTodayEventsById(self, cr, uid, ids, params, timeDtFrmt, context=None):
         """
@@ -1322,6 +1325,7 @@ class ask(osv.osv):
 
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'site1': fields.many2one('openstc.site', 'Site principal'),
+        'site_name': fields.related('site1', 'name', type='char', string='Site'),
         'site2': fields.many2one('openstc.site', 'Site secondaire'),
         'site3': fields.many2one('openstc.site', 'Place'),
         'site_details': fields.text('Précision sur le site'),
