@@ -300,7 +300,7 @@ class task(osv.osv):
         res_ids = self.search(cr, uid, domain, context=context)
         res_filtered = [item[0] for item in self._get_active(cr, uid, res_ids, 'active', False, context=context).items() if item[1]]
         ret = self.read(cr, uid, res_filtered, fields, context=context)
-        return {'records':ret,'ids':res_filtered}
+        return ret
     
     #if tasks has an inter, returns service of this inter, else returns user services (returns empty list in unexpected cases)
     def get_services_authorized(self, cr, uid, id, context=None):
