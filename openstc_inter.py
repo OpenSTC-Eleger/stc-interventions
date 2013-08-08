@@ -1032,6 +1032,19 @@ class project(osv.osv):
             ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record)]})
         return ret
 
+    def _searchOverPourcent(self, cr, uid, obj, name, args, context=None):
+        if args and len(args[0]) >= 2:
+            arg = args[0]
+            where = ''
+            if arg[2] is False:
+                where = 'planned_hours = 0 or effective_hours / planned_hours = 0'
+            else:
+                where = 'planned_hours > 0 and 100 * effective_hours / planned_hours %s %s' % (arg[1], arg[2])
+            cr.execute('select id from %s where %s' % (self._table, where))
+            ret = cr.fetchall()
+            return [('id','in',[item[0] for item in ret])]
+        return [('id','>',0)]
+
     _columns = {
 
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
@@ -1051,12 +1064,12 @@ class project(osv.osv):
 
         'progress_rate': fields.function(_progress_rate, multi="progress", string='Progress', type='float', group_operator="avg", help="Percent of tasks closed according to the total of tasks todo.",
             store = {
-                'project.project': (_get_project_and_parents, ['tasks', 'parent_id', 'child_ids'], 10),
-                'project.task': (_get_projects_from_tasks, ['planned_hours', 'remaining_hours', 'work_ids', 'state'], 20),
+                'project.project': (_get_project_and_parents, ['tasks', 'parent_id', 'child_ids'], 9),
+                'project.task': (_get_projects_from_tasks, ['planned_hours', 'remaining_hours', 'work_ids', 'state'], 19),
             }),
 
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
-        'overPourcent' : fields.function(_overPourcent, method=True, string='OverPourcent',type='float', store=False),
+        'overPourcent' : fields.function(_overPourcent, fnct_search=_searchOverPourcent, method=True, string='OverPourcent',type='float', store=False),
         'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
     }
 
