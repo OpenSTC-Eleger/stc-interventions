@@ -541,6 +541,20 @@ class task(osv.osv):
              'company_id': task.company_id.id or False,
             }, context=context)
 
+    def create(self, cr, uid, vals, context=None):
+        res = super(task, self).create(cr, uid, vals, context=context)
+        #if task is created with reports_hours, update task_work and task values
+        self.reportHours(cr, uid, [res], vals, context=context)
+        return res
+    
+    def write(self, cr, uid, ids, vals, context=None):
+        res = super(task, self).write(cr, uid, ids, vals, context=context)
+        #if task(s) have hours to report, we update task works and those tasks 
+        if not isinstance(ids, list):
+            ids = [ids]
+        self.reportHours(cr, uid, ids, vals, context=context)
+        return res
+
     def cancel(self, cr, uid, ids, params, context={}):
         """
         Cancel Task
