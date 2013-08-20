@@ -430,7 +430,7 @@ class task(osv.osv):
         #do nothing if task no found or not report hours
         if task==None or task == False : return False
         if not _get_param(params, 'report_hours') : return False
-
+        project = None
         project_obj = self.pool.get('project.project')
         ask_obj = self.pool.get('openstc.ask')
         #Get intervention's task
