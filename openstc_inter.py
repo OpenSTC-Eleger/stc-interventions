@@ -497,10 +497,11 @@ class task(osv.osv):
             all_task_finnished = True
 
             #if task is the last at ['open','pending', 'draft'] state on intervention : close intervention and ask.
-            for t in project.tasks :
-                if task.id!=t.id and t.state in ['open','pending', 'draft']:
-                    all_task_finnished = False
-                    break
+            if project != None and project:
+                for t in project.tasks :
+                    if task.id!=t.id and t.state in ['open','pending', 'draft']:
+                        all_task_finnished = False
+                        break
 
             if all_task_finnished == True:
                 project_obj.write(cr, uid, project.id, {
