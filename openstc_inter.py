@@ -376,7 +376,7 @@ class task(osv.osv):
         return ret
     
     def _get_task_from_inter(self, cr, uid, ids, context=None):
-        return self.search(cr, uid, [('project_id','in',ids)],context=context)
+        return self.pool.get('project.task').search(cr, uid, [('project_id','in',ids)],context=context)
     
     _columns = {
         'active':fields.function(_get_active, method=True,type='boolean', store=False),
@@ -396,7 +396,7 @@ class task(osv.osv):
         'oil_qtity': fields.float('oil quantity', select=1),
         'oil_price': fields.float('oil price', select=1),
         'site1':fields.related('project_id','site1',type='many2one',relation='openstc.site', string='Site',store={'project.task':[lambda self,cr,uid,ids,ctx={}:ids, ['project_id'], 10],
-                                                                                                                  'project.project':[lambda self,cr,uid,ids,ctx={}:_get_task_from_inter, ['site1'],11]}),
+                                                                                                                  'project.project':[_get_task_from_inter, ['site1'],11]}),
         'cancel_reason': fields.text('Cancel reason'),
         'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
@@ -1457,6 +1457,31 @@ class ask(osv.osv):
         isList = isinstance(ids, types.ListType)
         if isList == False :
             ids = [ids]
+            
+        #if we validate an ask, we create inter associated and, if needed, task for the inter
+        if vals.has_key('state') and vals['state'] == 'valid':
+            browse_ask= self.browse(cr, uid, ids[0], context=context)
+            #inter with values to create, we use vals data if present
+            inter_values = {
+                'name': browse_ask.name,
+                'date_deadline' : vals['date_deadline'] if vals.has_key('date_deadline') else browse_ask.date_deadline,
+                'description': vals['description'] if vals.has_key('description') else browse_ask.description,
+                'site1': vals['site1'] if vals.has_key('site1') else browse_ask.site1.id,
+                'service_id':  vals['service_id'] if vals.has_key('service_id') else browse_ask.service_id.id
+                }
+            
+            #pop() fields from vals (because belongs to openstc.task) to use them for creating task
+            if vals.pop('create_task',False):
+                task_values = {
+                   'planned_hours':vals.pop('planned_hours',0.0),
+                   'category_id':vals.pop('category_id',False),
+                   'name':browse_ask.name
+                }
+                inter_values.update({'tasks':[(0,0,task_values)]})
+                
+            #and we update vals to create inter (and task if needed)
+            vals.update({'intervention_ids':[(0,0,inter_values)]})
+            
         res = super(ask, self).write(cr, uid, ids, vals, context=context)
         #if vals and vals.has_key('email_text'):
             #TODO uncomment
