@@ -503,18 +503,18 @@ class task(osv.osv):
                         all_task_finnished = False
                         break
 
-            if all_task_finnished == True:
-                project_obj.write(cr, uid, project.id, {
-                    'state': 'closed',
-                }, context=context)
-
-                if ask_id>0 :
-                    ask_obj.write(cr, uid, ask_id, {
+                if all_task_finnished == True:
+                    project_obj.write(cr, uid, project.id, {
                         'state': 'closed',
                     }, context=context)
-
-                #TODO
-                #send email ==>  email_text: demande 'closed',
+    
+                    if ask_id>0 :
+                        ask_obj.write(cr, uid, ask_id, {
+                            'state': 'closed',
+                        }, context=context)
+    
+                    #TODO
+                    #send email ==>  email_text: demande 'closed',
 
         return True
 
