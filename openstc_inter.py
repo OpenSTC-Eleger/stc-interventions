@@ -461,8 +461,8 @@ class task(osv.osv):
                 'state': 'done',
                 'date_start': task.date_start or _get_param(params, 'date_start'),
                 'date_end': task.date_end or _get_param(params, 'date_end'),
-                'team_id': task.team_id.id or _get_param(params, 'team_id'),
-                'user_id': task.user_id.id or _get_param(params, 'user_id'),
+                'team_id': task.team_id and task.team_id.id or _get_param(params, 'team_id'),
+                'user_id': task.user_id and task.user_id.id or _get_param(params, 'user_id'),
                 'equipment_ids': [[6, 0, equipments_ids]],
                 'remaining_hours': 0,
                 'km': 0 if params.has_key('km')== False else params['km'],
@@ -549,30 +549,43 @@ class task(osv.osv):
         return res
     
     def write(self, cr, uid, ids, vals, context=None):
-        res = super(task, self).write(cr, uid, ids, vals, context=context)
-        #if task(s) have hours to report, we update task works and those tasks 
-        if not isinstance(ids, list):
-            ids = [ids]
-        self.reportHours(cr, uid, ids, vals, context=context)
-        return res
+        #if we want to cancel task, we update some values automatically
+        if 'state' in vals and vals['state'] == 'cancelled':
+            for mTask in self.browse(cr, uid, ids, context=context):
+                if mTask.state <> 'cancelled':
+                    values = {}
+                    values.update({'cancel_reason': _get_param(vals, 'cancel_reason') })
+                    values.update({'remaining_hours': 0.0})
+                    vals.update(values)
+                    if not mTask.date_end:
+                        vals.update({ 'date_end':time.strftime('%Y-%m-%d %H:%M:%S')})
+                    super(task,self).write(cr, uid, [mTask.id],vals, context=context)
+        else:
+            res = super(task, self).write(cr, uid, ids, vals, context=context)
+            #if task(s) have hours to report, we update task works and those tasks 
+            if not isinstance(ids, list):
+                ids = [ids]
+            self.reportHours(cr, uid, ids, vals, context=context)
+        
+        return True
 
     def cancel(self, cr, uid, ids, params, context={}):
         """
         Cancel Task
         """
-
         if not isinstance(ids,list): ids = [ids]
         for task in self.browse(cr, uid, ids, context=context):
-            vals = {}
-
-            vals.update({'state': 'cancelled'})
-            vals.update({'cancel_reason': _get_param(params, 'cancel_reason') })
-            vals.update({'remaining_hours': 0.0})
-            if not task.date_end:
-                vals.update({ 'date_end':time.strftime('%Y-%m-%d %H:%M:%S')})
-            self.write(cr, uid, [task.id],vals, context=context)
-            message = _("The task '%s' is done") % (task.name,)
-            self.log(cr, uid, task.id, message)
+            if task.state <> 'cancelled':
+                vals = {}
+    
+                vals.update({'state': 'cancelled'})
+                vals.update({'cancel_reason': _get_param(params, 'cancel_reason') })
+                vals.update({'remaining_hours': 0.0})
+                if not task.date_end:
+                    vals.update({ 'date_end':time.strftime('%Y-%m-%d %H:%M:%S')})
+                self.write(cr, uid, [task.id],vals, context=context)
+            #message = _("The task '%s' is done") % (task.name,)
+            #self.log(cr, uid, task.id, message)
         return True
 
     def planTasks(self, cr, uid, ids, params, context=None):
