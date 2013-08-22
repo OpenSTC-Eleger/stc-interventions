@@ -130,6 +130,7 @@ class team(osv.osv):
         'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
 
         }
+team()
 
 class res_partner(osv.osv):
     _name = "res.partner"
@@ -1124,6 +1125,30 @@ class project(osv.osv):
             if ask_id :
                 ask_id[0]
         return False
+
+    def write(self, cr, uid, ids, vals, context=None):
+        if not isinstance(ids, list):
+            ids = [ids]
+        res = super(project, self).write(cr, uid, ids, vals, context=context)
+        task_obj = self.pool.get('project.task')
+        ask_obj = self.pool.get('openstc.ask')
+        #if we want to cancel inter, we cancel all tasks associated and close the parent ask
+        if 'state' in vals and vals['state'] == 'cancelled':
+            task_ids = task_obj.search(cr, uid, [('project_id.id','in',ids)],context=context)
+            if task_ids:
+                task_obj.write(cr, uid, task_ids, {'state':'cancelled',
+                                                               'user_id':False,
+                                                               'team_id':False,
+                                                               'date_end':False,
+                                                               'date_start':False,
+                                                               'cancel_reason':vals.get('cancel_reason',False)},context=context)
+            ask_ids = [item['ask_id'][0] for item in self.read(cr, uid, ids, ['ask_id'],context=context) if item['ask_id']]
+            if ask_ids:
+                ask_obj.write(cr, uid, ask_ids, {'state':'closed'})
+            #TODO uncomment
+            #send_email(self, cr, uid, [ask_id], params, context=None)
+            
+        return res
 
     #Cancel intervention from swif
     def cancel(self, cr, uid, ids, params, context=None):
