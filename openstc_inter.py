@@ -841,7 +841,7 @@ class openstc_task_category(osv.osv):
     _columns = {
         'name': fields.char('Name', size=64, required=True, select=True),
         'code': fields.char('Code', size=32),
-        'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
+        'complete_name': fields.function(_name_get_fnc, type="char", string='Name', method=True, store={'openstc.task.category':[lambda self,cr,uid,ids,ctx={}:ids, ['name','parent_id'],10]}),
         'parent_id': fields.many2one('openstc.task.category','Parent Category', select=True, ondelete='cascade'),
         'child_id': fields.one2many('openstc.task.category', 'parent_id', string='Child Categories'),
         'sequence': fields.integer('Sequence', select=True, help="Gives the sequence order when displaying a list of product categories."),
