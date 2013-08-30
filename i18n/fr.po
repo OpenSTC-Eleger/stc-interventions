@@ -934,6 +934,7 @@ msgstr "Attribuer une demande à"
 #: model:ir.ui.menu,name:openstc.openstc_menu_action_view_task
 #: field:openstc.create.task.wizard,task_ids:0
 #: field:openstc.team,tasks:0
+#: model:ir.ui.menu,name:openstc.openstc_menu_action_view_task
 #: field:res.users,tasks:0
 msgid "Tasks"
 msgstr "Tâches"
