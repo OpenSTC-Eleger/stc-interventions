@@ -836,6 +836,25 @@ class openstc_task_category(osv.osv):
         return dict(res)
 
 
+    _actions = {
+        'delete':lambda self,cr,uid,record, groups_code: 'DIRE' in groups_code,
+        'update': lambda self,cr,uid,record, groups_code: 'MANA' in groups_code or 'DIRE' in groups_code,
+        'create': lambda self,cr,uid,record,groups_code: 'MANA' in groups_code or 'DIRE' in groups_code,
+
+    }
+
+    def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
+        #default value: empty string for each id
+        ret = {}.fromkeys(ids,'')
+        groups_code = []
+        groups_code = [group.code for group in self.pool.get("res.users").browse(cr, uid, uid, context=context).groups_id if group.code]
+
+        #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
+        for record in self.browse(cr, uid, ids, context=context):
+            #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
+            ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
+        return ret
+
     _name = "openstc.task.category"
     _description = "Task Category"
     _columns = {
@@ -851,6 +870,8 @@ class openstc_task_category(osv.osv):
         'unit': fields.char('Unit', size=32),
         'quantity': fields.integer('Quantity'),
         'tasksAssigned': fields.one2many('project.task', 'category_id', "tasks"),
+        'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
+
     }
 
     _sql_constraints = [
