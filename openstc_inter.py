@@ -855,6 +855,34 @@ class openstc_task_category(osv.osv):
             ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
         return ret
 
+    _fields_names = {'service_names':'service_ids'}
+
+    #@TODO: move this feature to template model (in another git branch)
+    def __init__(self, pool, cr):
+        #method to retrieve many2many fields with custom format
+        def _get_fields_names(self, cr, uid, ids, name, args, context=None):
+            res = {}
+            if not isinstance(name, list):
+                name = [name]
+            for obj in self.browse(cr, uid, ids, context=context):
+                #for each field_names to read, retrieve their values
+                res[obj.id] = {}
+                for fname in name:
+                    #many2many browse_record field to map
+                    field_ids = obj[self._fields_names[fname]]
+                    val = []
+                    for item in field_ids:
+                        val.append([item.id,item.name_get()[0][1]])
+                    res[obj.id].update({fname:val})
+            return res
+        
+        ret = super(openstc_task_category, self).__init__(pool,cr)
+        #add _field_names to fields definition of the model
+        for f in self._fields_names.keys():
+            #force name of new field with '_names' suffix
+            self._columns.update({f:fields.function(_get_fields_names, type='char',method=True, multi='field_names',store=False)})
+        return ret
+
     _name = "openstc.task.category"
     _description = "Task Category"
     _columns = {
