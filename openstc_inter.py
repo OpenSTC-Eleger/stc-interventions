@@ -1170,6 +1170,8 @@ class project(osv.osv):
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
         'overPourcent' : fields.function(_overPourcent, fnct_search=_searchOverPourcent, method=True, string='OverPourcent',type='float', store=False),
         'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
+        'equipment_id': fields.many2one('openstc.equipment','Equipment'),
+        'has_equipment': fields.boolean('Request is about equipment'),
     }
 
     #Overrides  set_template method of project module
@@ -1257,6 +1259,7 @@ class project(osv.osv):
 
     _defaults = {
         'ask_id' : _get_ask,
+        'has_equipment': False,
     }
 
     _sql_constraints = [
@@ -1560,7 +1563,8 @@ class ask(osv.osv):
 
         'actions' : fields.function(_is_possible_action, method=True, string='Valider',type='selection', store=False),
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
-
+        'equipment_id': fields.many2one('openstc.equipment','Equipment'),
+        'has_equipment': fields.boolean('Request is about equipment'),
     }
 
 
@@ -1569,6 +1573,7 @@ class ask(osv.osv):
         'state': '',
         'current_date': lambda *a: datetime.now().strftime('%Y-%m-%d'),
         'actions': [],
+        'has_equipment': False,
     }
 
 
@@ -1597,6 +1602,8 @@ class ask(osv.osv):
                 'date_deadline' : vals['date_deadline'] if vals.has_key('date_deadline') else browse_ask.date_deadline,
                 'description': vals['description'] if vals.has_key('description') else browse_ask.description,
                 'site1': vals['site1'] if vals.has_key('site1') else browse_ask.site1.id,
+                'has_equipment': vals['has_equipment'] if vals.has_key('has_equipment') else browse_ask.has_equipment,
+                'equipment_id': vals['equipment_id'] if vals.has_key('equipment_id') else browse_ask.equipment_id and browse_ask.equipment_id.id or False,
                 'service_id':  vals['service_id'] if vals.has_key('service_id') else browse_ask.service_id.id
                 }
             
