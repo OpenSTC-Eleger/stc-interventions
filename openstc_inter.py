@@ -293,7 +293,7 @@ class task(osv.osv):
             belongsToServiceManager = project_service_id in (s.id for s in user.service_ids) and user.isManager == True
             res[id] = True if belongsToOfficer or belongsToTeam or belongsToServiceManager or user.isDST else False
          return res
-    
+
     def getUserTasksList(self, cr, uid, domain=[], fields=[], context=None):
         #in taskLists, absences are removed from result
         domain.extend([('state','!=','absent')])
@@ -302,7 +302,7 @@ class task(osv.osv):
         res_filtered = [item[0] for item in self._get_active(cr, uid, res_ids, 'active', False, context=context).items() if item[1]]
         ret = self.read(cr, uid, res_filtered, fields, context=context)
         return ret
-    
+
     #if tasks has an inter, returns service of this inter, else returns user services (returns empty list in unexpected cases)
     def get_services_authorized(self, cr, uid, id, context=None):
         ret = []
@@ -315,7 +315,7 @@ class task(osv.osv):
         else:
             ret = self.pool.get("res.users").read(cr, uid, uid, ['service_ids'])['service_ids']
         return ret
-    
+
     def get_vehicules_authorized(self, cr, uid, id, context=None):
         service_id = self.get_services_authorized(cr, uid, id, context=context)
         ret = []
@@ -323,7 +323,7 @@ class task(osv.osv):
             vehicule_ids = self.pool.get("openstc.equipment").search(cr, uid, ['&','|',('technical_vehicle','=',True),('commercial_vehicle','=',True),('service_ids','in',service_id)])
             ret = self.pool.get("openstc.equipment").read(cr, uid, vehicule_ids, ['id','name','type'],context=context)
         return ret
-    
+
     def get_materials_authorized(self, cr, uid, id, context=None):
         service_id = self.get_services_authorized(cr, uid, id, context=context)
         ret = []
@@ -331,7 +331,7 @@ class task(osv.osv):
             material_ids = self.pool.get("openstc.equipment").search(cr, uid, ['&','|',('small_material','=',True),('fat_material','=',True),('service_ids','in',service_id)])
             ret = self.pool.get("openstc.equipment").read(cr, uid, material_ids, ['id','name','type'],context=context)
         return ret
-        
+
     #user can make survey of the task if it's an officer task, or a team task and user is a foreman / manager
     def _task_survey_rights(self, cr, uid, record, groups_code):
         ret = False
@@ -375,10 +375,10 @@ class task(osv.osv):
 #                print 'Error, user does not have %s right access'% action
 
         return ret
-    
+
     def _get_task_from_inter(self, cr, uid, ids, context=None):
         return self.pool.get('project.task').search(cr, uid, [('project_id','in',ids)],context=context)
-    
+
     _columns = {
         'active':fields.function(_get_active, method=True,type='boolean', store=False),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
@@ -508,12 +508,12 @@ class task(osv.osv):
                     project_obj.write(cr, uid, project.id, {
                         'state': 'closed',
                     }, context=context)
-    
+
                     if ask_id>0 :
                         ask_obj.write(cr, uid, ask_id, {
                             'state': 'closed',
                         }, context=context)
-    
+
                     #TODO
                     #send email ==>  email_text: demande 'closed',
 
@@ -548,7 +548,7 @@ class task(osv.osv):
         #if task is created with reports_hours, update task_work and task values
         self.reportHours(cr, uid, [res], vals, context=context)
         return res
-    
+
     def write(self, cr, uid, ids, vals, context=None):
         #if we want to cancel task, we update some values automatically
         if 'state' in vals and vals['state'] == 'cancelled':
@@ -563,11 +563,11 @@ class task(osv.osv):
                     super(task,self).write(cr, uid, [mTask.id],vals, context=context)
         else:
             res = super(task, self).write(cr, uid, ids, vals, context=context)
-            #if task(s) have hours to report, we update task works and those tasks 
+            #if task(s) have hours to report, we update task works and those tasks
             if not isinstance(ids, list):
                 ids = [ids]
             self.reportHours(cr, uid, ids, vals, context=context)
-        
+
         return True
 
     def cancel(self, cr, uid, ids, params, context={}):
@@ -578,7 +578,7 @@ class task(osv.osv):
         for task in self.browse(cr, uid, ids, context=context):
             if task.state <> 'cancelled':
                 vals = {}
-    
+
                 vals.update({'state': 'cancelled'})
                 vals.update({'cancel_reason': _get_param(params, 'cancel_reason') })
                 vals.update({'remaining_hours': 0.0})
@@ -598,13 +598,13 @@ class task(osv.osv):
         :param uid: current user id
         :param ids: list of ids
         :param params: contains
-            startWorkingTime : date/heure début de journée travaillée
-            endWorkingTime : date/heure fin de journée
-            startLunchTime : date/heure début pause déjeuner
-            endLunchTime : date/heure fin pause déjeuner
-            startDt: date/heure du début de la plage souhaitée
-            teamMode : boolean, calendrier d'une équipe ou d'un agent
-            calendarId : celui de l'agent / ou celui de l'équipe, selon le teamMode
+            start_working_time : date/heure début de journée travaillée
+            end_working_time : date/heure fin de journée
+            start_lunch_time : date/heure début pause déjeuner
+            end_lunch_time : date/heure fin pause déjeuner
+            start_dt: date/heure du début de la plage souhaitée
+            team_mode : boolean, calendrier d'une équipe ou d'un agent
+            calendar_id : celui de l'agent / ou celui de l'équipe, selon le team_mode
 
         This method is used when plan tasks from client
 
@@ -631,13 +631,13 @@ class task(osv.osv):
         #Init time to plan
         if 'timeToPlan' not in params: params['timeToPlan'] = currentTask.planned_hours
         #Planning is complete : return current task upgraded
-        elif params['timeToPlan']==0 or not params['startDt']:
+        elif params['timeToPlan']==0 or not params['start_dt']:
             return  params['results']
 
-        teamMode = params['teamMode']
-        calendarId = params['calendarId']
+        team_mode = params['team_mode']
+        calendar_id = params['calendar_id']
 
-        #Get all events on 'startDt' for officer or team 'calendarId'
+        #Get all events on 'start_dt' for officer or team 'calendar_id'
         if 'events' not in params :
 #            try:
             events = self.getTodayEventsById(cr, uid, ids, params, timeDtFrmt, context)
@@ -647,18 +647,18 @@ class task(osv.osv):
             events = params['events']
 
         cpt = params['cpt']
-        startDt = params['startDt']
+        start_dt = params['start_dt']
         size = len(events)
 
         while True:
            cpt+=1
            #Get end date
-           endDt = startDt + timedelta(hours=params['timeToPlan'])
+           endDt = start_dt + timedelta(hours=params['timeToPlan'])
            if cpt<size:
                e = events[cpt]
-               if(startDt >= e['date_start'] and startDt<=e['date_end']):
-                    startDt = e['date_end']
-               elif startDt > e['date_start']:
+               if(start_dt >= e['date_start'] and start_dt<=e['date_end']):
+                    start_dt = e['date_end']
+               elif start_dt > e['date_start']:
                     continue
                else:
                    break
@@ -688,7 +688,7 @@ class task(osv.osv):
             #Get next date
             nextDt = events[cpt]['date_start']
             #hours differences to next date
-            diff = (nextDt-startDt).total_seconds()/3600
+            diff = (nextDt-start_dt).total_seconds()/3600
 
             if (params['timeToPlan'] - diff) == 0 :
                 #whole task is completely schedulable (all hours) before next so timeToPlan is set to 0
@@ -701,7 +701,7 @@ class task(osv.osv):
             else:
                 #there is less time to plan the number of hours possible before the next date, diff is re-calculate
                 params['timeToPlan'] = 0
-                diff = (endDt-startDt).total_seconds()/3600
+                diff = (endDt-start_dt).total_seconds()/3600
 
 
             if params['number'] > 0 :
@@ -714,9 +714,9 @@ class task(osv.osv):
                 'name': title,
                 'planned_hours': diff,
                 'remaining_hours': diff,
-                'team_id': calendarId if teamMode else None,
-                'user_id': calendarId if not teamMode else None,
-                'date_start': datetime.strftime(startDt,timeDtFrmt),
+                'team_id': calendar_id if team_mode else None,
+                'user_id': calendar_id if not team_mode else None,
+                'date_start': datetime.strftime(start_dt,timeDtFrmt),
                 'date_end': datetime.strftime(endDt,timeDtFrmt),
                 'state': 'open',
                 'parent_id': currentTask.id if copy else False,
@@ -732,7 +732,7 @@ class task(osv.osv):
                 self.create(cr, uid, results);
 
         params['results'] = results
-        params['startDt'] = endDt
+        params['start_dt'] = endDt
         params['number'] += 1
         params['cpt'] = cpt - 1
         #re-call the method with new params
@@ -746,18 +746,18 @@ class task(osv.osv):
         :param uid: current user id
         :param ids: list of ids
         :param params: contains
-            startWorkingTime : date/heure début de journée travaillée
-            endWorkingTime : date/heure fin de journée
-            startLunchTime : date/heure début pause déjeuner
-            endLunchTime : date/heure fin pause déjeuner
-            startDt: date/heure du début de la plage souhaitée
-            teamMode : boolean, calendrier d'une équipe ou d'un agent
-            calendarId : celui de l'agent / ou celui de l'équipe, selon le teamMode
+            start_working_time : date/heure début de journée travaillée
+            end_working_time : date/heure fin de journée
+            start_lunch_time : date/heure début pause déjeuner
+            end_lunch_time : date/heure fin pause déjeuner
+            start_dt: date/heure du début de la plage souhaitée
+            team_mode : boolean, calendrier d'une équipe ou d'un agent
+            calendar_id : celui de l'agent / ou celui de l'équipe, selon le team_mode
 
-        This method is used to get events on startDt (lunch including) for officer or team (calendarId)
+        This method is used to get events on start_dt (lunch including) for officer or team (calendar_id)
 
         """
-        if not set(('startWorkingTime','endWorkingTime','startLunchTime','endLunchTime','startDt','calendarId')).issubset(params) :
+        if not set(('start_working_time','end_working_time','start_lunch_time','end_lunch_time','start_dt','calendar_id')).issubset(params) :
             raise Exception('Erreur : il manque des paramètres pour pouvoir planifier (Heure d''embauche, heure de déjeuner...) \n Veuillez contacter votre administrateur ')
 
         #Date format passed by javascript client : date from utc.
@@ -774,32 +774,32 @@ class task(osv.osv):
         deltaTz = int((datetime.utcoffset(todayDt).total_seconds())/3600)
 
         #Get Start and end working time, lunch start and stop times
-        startDt = datetime.strptime(params['startDt'],timeDtFrmtWithTmz)
-        startWorkingTime = startDt.replace(hour= (int(params['startWorkingTime'])-deltaTz),minute=0, second=0, microsecond=0)
-        startLunchTime = startDt.replace( hour = (int(params['startLunchTime'])-deltaTz),minute=0, second=0, microsecond=0 )
-        endLunchTime = startDt.replace( hour = (int(params['endLunchTime'])-deltaTz),minute=0, second=0, microsecond=0 )
+        start_dt = datetime.strptime(params['start_dt'],timeDtFrmtWithTmz)
+        start_working_time = start_dt.replace(hour= (int(params['start_working_time'])-deltaTz),minute=0, second=0, microsecond=0)
+        start_lunch_time = start_dt.replace( hour = (int(params['start_lunch_time'])-deltaTz),minute=0, second=0, microsecond=0 )
+        end_lunch_time = start_dt.replace( hour = (int(params['end_lunch_time'])-deltaTz),minute=0, second=0, microsecond=0 )
 
         #Add in list
-        events.append({'title': "lunchTime", 'date_start': startLunchTime,
-                       'date_end': endLunchTime})
-        endWorkingTime = startDt.replace( hour = (int(params['endWorkingTime'])-deltaTz),minute=0, second=0, microsecond=0 )
-        events.append({'title': "endWorkingTime", 'date_start': endWorkingTime,
-                       'date_end': endWorkingTime})
+        events.append({'title': "lunchTime", 'date_start': start_lunch_time,
+                       'date_end': end_lunch_time})
+        end_working_time = start_dt.replace( hour = (int(params['end_working_time'])-deltaTz),minute=0, second=0, microsecond=0 )
+        events.append({'title': "end_working_time", 'date_start': end_working_time,
+                       'date_end': end_working_time})
 
         task_ids = []
-        if params['teamMode'] == True:
-            #Get all tasks on 'startDt' for team
+        if params['team_mode'] == True:
+            #Get all tasks on 'start_dt' for team
             task_ids = self.search(cr,uid,
-                ['&',('date_start','>=', datetime.strftime(startWorkingTime,timeDtFrmt)),
-                    ('date_start','<=', datetime.strftime(endWorkingTime,timeDtFrmt)),
-                    ('team_id','=',params['calendarId'])
+                ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
+                    ('date_start','<=', datetime.strftime(end_working_time,timeDtFrmt)),
+                    ('team_id','=',params['calendar_id'])
                 ])
         else:
-            #Get all tasks on 'startDt' for officer
+            #Get all tasks on 'start_dt' for officer
             task_ids = self.search(cr,uid,
-                ['&',('date_start','>=', datetime.strftime(startWorkingTime,timeDtFrmt)),
-                    ('date_start','<=', datetime.strftime(endWorkingTime,timeDtFrmt)),
-                    ('user_id','=',params['calendarId'])
+                ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
+                    ('date_start','<=', datetime.strftime(end_working_time,timeDtFrmt)),
+                    ('user_id','=',params['calendar_id'])
                 ])
 
         tasks = self.read(cr,uid,task_ids, ['name','date_start','date_end'])
@@ -811,7 +811,7 @@ class task(osv.osv):
         #Sort task
         events.sort(key=operator.itemgetter('date_start'))
         params['events'] = events
-        params['startDt'] = startDt
+        params['start_dt'] = startDt
         #Return tasks
         return events
 
@@ -875,7 +875,7 @@ class openstc_task_category(osv.osv):
                         val.append([item.id,item.name_get()[0][1]])
                     res[obj.id].update({fname:val})
             return res
-        
+
         ret = super(openstc_task_category, self).__init__(pool,cr)
         #add _field_names to fields definition of the model
         for f in self._fields_names.keys():
@@ -935,7 +935,7 @@ openstc_task_category()
 class openstc_absent_type(osv.osv):
     _name = "openstc.absent.type"
     _description = ""
-    
+
     _actions = {
         'delete':lambda self,cr,uid,record, groups_code: 'DIRE' in groups_code,
         'update': lambda self,cr,uid,record, groups_code: 'MANA' in groups_code or 'DIRE' in groups_code,
@@ -1094,17 +1094,17 @@ class project(osv.osv):
                 if inter.planned_hours :
                     res[id] = round(100.0 * inter.effective_hours / inter.planned_hours, 0);
         return res
-    
+
     #if inter exists and is associated to a service, returns this service_id, else returns user services
     def get_services_authorized(self, cr, uid, id, context=None):
         if id:
             inter = self.browse(cr, uid, id, context=context)
-            if inter.service_id:        
+            if inter.service_id:
                 return [inter.service_id.id]
-            
+
         return self.pool.get("res.users").read(cr, uid, uid, ['service_ids'])['service_ids']
-        
-    
+
+
     def get_task_categ_authorized(self, cr, uid, id, context=None):
         service_ids = self.get_services_authorized(cr, uid, id, context=context)
         ret = []
@@ -1112,7 +1112,7 @@ class project(osv.osv):
             task_ids = self.pool.get("openstc.task.category").search(cr, uid, [('service_ids','in',service_ids)])
             ret = self.pool.get("openstc.task.category").read(cr, uid, task_ids, ['id','name'])
         return ret
-    
+
     _actions = {
         'cancel':lambda self,cr,uid,record: record.state in ('open','scheduled'),
         'plan_unplan':lambda self,cr,uid,record: record.state == 'open' and not self.pool.get("project.task").search(cr, uid,[('state','=','draft'),('project_id','=',record.id)]),
@@ -1219,7 +1219,7 @@ class project(osv.osv):
                 ask_obj.write(cr, uid, ask_ids, {'state':'closed'})
             #TODO uncomment
             #send_email(self, cr, uid, [ask_id], params, context=None)
-            
+
         return res
 
     #Cancel intervention from swif
@@ -1272,7 +1272,7 @@ project()
 class intervention_assignement(osv.osv):
     _name = "openstc.intervention.assignement"
     _description = ""
-    
+
     _actions = {
         'create':lambda self,cr,uid,record, groups_code: 'MANA' in groups_code or 'DIRE' in groups_code,
         'update':lambda self,cr,uid,record, groups_code: 'MANA' in groups_code or 'DIRE' in groups_code,
@@ -1290,8 +1290,8 @@ class intervention_assignement(osv.osv):
             #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
             ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
         return ret
-    
-    
+
+
     _columns = {
             'name': fields.char('Affectation ', size=128, required=True),
             'code': fields.char('Code affectation', size=32, required=True),
@@ -1592,7 +1592,7 @@ class ask(osv.osv):
         isList = isinstance(ids, types.ListType)
         if isList == False :
             ids = [ids]
-            
+
         #if we validate an ask, we create inter associated and, if needed, task for the inter
         if vals.has_key('state') and vals['state'] == 'valid':
             browse_ask= self.browse(cr, uid, ids[0], context=context)
@@ -1606,7 +1606,7 @@ class ask(osv.osv):
                 'equipment_id': vals['equipment_id'] if vals.has_key('equipment_id') else browse_ask.equipment_id and browse_ask.equipment_id.id or False,
                 'service_id':  vals['service_id'] if vals.has_key('service_id') else browse_ask.service_id.id
                 }
-            
+
             #pop() fields from vals (because belongs to openstc.task) to use them for creating task
             if vals.pop('create_task',False):
                 task_values = {
@@ -1615,10 +1615,10 @@ class ask(osv.osv):
                    'name':browse_ask.name
                 }
                 inter_values.update({'tasks':[(0,0,task_values)]})
-                
+
             #and we update vals to create inter (and task if needed)
             vals.update({'intervention_ids':[(0,0,inter_values)]})
-            
+
         res = super(ask, self).write(cr, uid, ids, vals, context=context)
         #if vals and vals.has_key('email_text'):
             #TODO uncomment
@@ -1831,7 +1831,7 @@ class ask(osv.osv):
             elif 'MANA' in groups:
                 search_filter.extend([('state','=','wait')])
             #NOTE: if user is not DST nor Manager, returns all requests
-            
+
             #launch search_count method adding optionnal filter defined in UI
             search_filter.extend(filter)
             ret[str(user.id)] = self.search_count(cr, user.id, search_filter, context=context)
