@@ -632,7 +632,7 @@ class task(osv.osv):
         if 'timeToPlan' not in params: params['timeToPlan'] = currentTask.planned_hours
         #Planning is complete : return current task upgraded
         elif params['timeToPlan']==0 or not params['start_dt']:
-            return  params['results']
+            return  True; #params['results']
 
         team_mode = params['team_mode']
         calendar_id = params['calendar_id']
