@@ -614,7 +614,7 @@ class task(osv.osv):
         if not len(ids) == 1: raise Exception('Pas de tâche à planifier')
 
         #ret
-        returnIds = [ids[0]]
+        params["returnIds"] = [ids[0]]
         results = {}
         #date format
         timeDtFrmt = "%Y-%m-%d %H:%M:%S"
@@ -633,7 +633,7 @@ class task(osv.osv):
         if 'timeToPlan' not in params: params['timeToPlan'] = currentTask.planned_hours
         #Planning is complete : return current task upgraded
         elif params['timeToPlan']==0 or not params['start_dt']:
-            return  returnIds; #params['results']
+            return  params["returnIds"]; #params['results']
 
         team_mode = params['team_mode']
         calendar_id = params['calendar_id']
@@ -728,7 +728,7 @@ class task(osv.osv):
             if params['timeToPlan'] == 0 and not copy:
                 #Update task
                 id = self.write(cr, uid, [currentTask.id],results, context=context)
-                returnIds.append(id)
+                params["returnIds"].append(id)
             else:
                 #Create task
                 self.create(cr, uid, results);
