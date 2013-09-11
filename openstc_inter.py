@@ -614,7 +614,7 @@ class task(osv.osv):
         if not len(ids) == 1: raise Exception('Pas de tâche à planifier')
 
         #ret
-        returnIds = []
+        returnIds = [ids[0]]
         results = {}
         #date format
         timeDtFrmt = "%Y-%m-%d %H:%M:%S"
@@ -627,9 +627,7 @@ class task(osv.osv):
             copy = self.pool.get('project.project').is_template(cr, uid, [currentTask.project_id.id], context=context)
 
 
-        if 'cpt' not in params:
-            params['cpt'] = -1
-            returnIds.append(ids[0])
+        if 'cpt' not in params:  params['cpt'] = -1
         if 'number' not in params: params['number'] = 0
         #Init time to plan
         if 'timeToPlan' not in params: params['timeToPlan'] = currentTask.planned_hours
