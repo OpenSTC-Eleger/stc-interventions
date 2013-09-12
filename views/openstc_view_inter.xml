@@ -975,38 +975,42 @@
    			groups="openbase.openstc_dst,openbase.openstc_manager"
    			sequence="5"/>
 
-		<!--  Configuration/Dictionnaires -->
-   		<menuitem
-   			id="menu_openstc_dico"
-   			groups="openbase.openstc_dst"
-   			name="Dictionnaires"
-   			parent="menu_configuration"
-   			sequence="6"/>
-
+		
    	 	<menuitem action="action_openstc_view_assignement2"
    			id="menu_action_openstc_view_assignement2"
-   			parent="menu_openstc_dico"
+   			parent="menu_configuration"
    			groups="openbase.openstc_dst"
    			sequence="1"/>
 
    		<menuitem action="openstc_task_category_action2"
    			id="menu_action_openstc_view_task_category2"
-   			parent="menu_openstc_dico"
+   			parent="menu_configuration"
    			groups="openbase.openstc_dst"
    			name="Catégories des tâches"
    			sequence="2"/>
 
    	 	<menuitem action="action_openstc_view_absent_type2"
    			id="menu_action_openstc_view_absent_type2"
-   			parent="menu_openstc_dico"
+   			parent="menu_configuration"
    			groups="openbase.openstc_dst"
    			sequence="3"/>
 
    		<menuitem action="action_openstc_view_partner_type2"
    			id="menu_action_openstc_view_partner_type2"
-   			parent="menu_openstc_dico"
+   			parent="menu_configuration"
    			groups="openbase.openstc_dst"
    			sequence="4"/>
+
+		
+		
+		<!--  Configuration/Dictionnaires -->
+   		<!-- <menuitem
+   			id="menu_openstc_dico"
+   			groups="openbase.openstc_dst"
+   			name="Dictionnaires"
+   			parent="menu_configuration"
+   			sequence="6"/> -->
+   		<delete id="menu_openstc_dico" model="ir.ui.menu"/>
 
 
    		<!--  Carto -->
