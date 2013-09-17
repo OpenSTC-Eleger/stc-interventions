@@ -241,6 +241,7 @@ class task(osv.osv):
 
 
 
+
     #Overrides _is_template method of project module
     def _is_template(self, cr, uid, ids, field_name, arg, context=None):
         res = {}
@@ -339,6 +340,34 @@ class task(osv.osv):
             ret = True
         else:
             ret = 'OFFI' not in groups_code
+        return ret
+
+
+    _fields_names = {'equipment_names':'equipment_ids'}
+    #@TODO: move this feature to template model (in another git branch)
+    def __init__(self, pool, cr):
+        #method to retrieve many2many fields with custom format
+        def _get_fields_names(self, cr, uid, ids, name, args, context=None):
+            res = {}
+            if not isinstance(name, list):
+                name = [name]
+            for obj in self.browse(cr, uid, ids, context=context):
+                #for each field_names to read, retrieve their values
+                res[obj.id] = {}
+                for fname in name:
+                    #many2many browse_record field to map
+                    field_ids = obj[self._fields_names[fname]]
+                    val = []
+                    for item in field_ids:
+                        val.append([item.id,item.name_get()[0][1]])
+                    res[obj.id].update({fname:val})
+            return res
+
+        ret = super(task, self).__init__(pool,cr)
+        #add _field_names to fields definition of the model
+        for f in self._fields_names.keys():
+            #force name of new field with '_names' suffix
+            self._columns.update({f:fields.function(_get_fields_names, type='char',method=True, multi='field_names',store=False)})
         return ret
 
     _actions = {
