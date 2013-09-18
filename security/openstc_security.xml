@@ -89,7 +89,7 @@
 </data>
     <!--  RULES -->
 
-<data noupdate="1">
+<data noupdate="0">
      <!--  <record model="ir.rule" id="group_rule">
         <field name="name">Group Rule</field>
         <field name="model_id" ref="base.model_res_groups"/>
