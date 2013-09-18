@@ -68,7 +68,15 @@
     </record>
 
 
-
+    <record model="ir.rule" id="service_rule">
+        <field name="name">Service Rule</field>
+        <field name="model_id" ref="model_openstc_service"/>
+        <field name="domain_force">[('id','in',[g.id for g in user.service_ids])]</field>
+        <field eval="0" name="perm_unlink"/>
+        <field eval="0" name="perm_write"/>
+        <field eval="1" name="perm_read"/>
+        <field eval="0" name="perm_create"/>
+    </record>
 
     <!--
     <record model="ir.rule" id="task_rule">
@@ -90,6 +98,6 @@
         <field eval="1" name="global"/>
     </record>
     -->
-    
+
    	</data>
 </openerp>
