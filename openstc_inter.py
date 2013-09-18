@@ -477,6 +477,8 @@ class task(osv.osv):
         #Prepare equipment list
         if params.has_key('equipment_ids') and len(params['equipment_ids'])>0 :
             equipments_ids = params['equipment_ids']
+            if not isinstance(equipments_ids[0], list) and not isinstance(equipments_ids[0], tuple):
+                equipments_ids = [(6,0,equipments_ids)]
         else :
             equipments_ids = []
         #update mobile equipment kilometers
@@ -493,7 +495,7 @@ class task(osv.osv):
                 'date_end': task.date_end or _get_param(params, 'date_end'),
                 'team_id': task.team_id and task.team_id.id or _get_param(params, 'team_id'),
                 'user_id': task.user_id and task.user_id.id or _get_param(params, 'user_id'),
-                'equipment_ids': [[6, 0, equipments_ids]],
+                'equipment_ids': equipments_ids,
                 'remaining_hours': 0,
                 'km': 0 if params.has_key('km')== False else params['km'],
                 'oil_qtity': 0 if params.has_key('oil_qtity')== False else params['oil_qtity'],
