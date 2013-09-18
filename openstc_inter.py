@@ -1520,7 +1520,7 @@ class ask(osv.osv):
                                                         , context)
 
                              if ask.state == 'closed' :
-                                 if intervention.state == 'closed':
+                                 if intervention.state == 'closed' and last_date!=False :
                                      res[id] += _(' Ended date ') + last_date.strftime(_("%A, %d. %B %Y %H:%M").encode('utf-8')).decode('utf-8')
                                  else:
                                       if intervention.cancel_reason:
