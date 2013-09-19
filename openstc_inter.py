@@ -1600,6 +1600,7 @@ class ask(osv.osv):
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
         'equipment_id': fields.many2one('openstc.equipment','Equipment'),
         'has_equipment': fields.boolean('Request is about equipment'),
+        'is_citizen': fields.boolean('Claimer is a citizen'),
     }
 
 
@@ -1609,6 +1610,7 @@ class ask(osv.osv):
         'current_date': lambda *a: datetime.now().strftime('%Y-%m-%d'),
         'actions': [],
         'has_equipment': False,
+        'is_citizen': False,
     }
 
 
