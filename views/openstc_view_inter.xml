@@ -19,8 +19,8 @@
     along with OpenSTC Interventions.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <openerp>
-    <data noupdate="0">
-
+    <!-- <data noupdate="0">-->
+	<data>
         <!--  Intervention assignment -->
 
         <record id="openstc_intervention_assignement_form_view" model="ir.ui.view">
