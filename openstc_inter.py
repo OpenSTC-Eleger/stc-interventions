@@ -1150,7 +1150,7 @@ class project(osv.osv):
 
     _actions = {
         'cancel':lambda self,cr,uid,record: record.state in ('open','scheduled'),
-        'plan_unplan':lambda self,cr,uid,record: (record.state == 'open' and not self.pool.get("project.task").search(cr, uid,[('state','=','draft'),('project_id','=',record.id)])) or record.state == 'pending' ,
+        'plan_unplan':lambda self,cr,uid,record: (record.state == 'open' and not self.pool.get("project.task").search(cr, uid,[('state','=','draft'),('project_id','=',record.id)])) or record.state == 'scheduled' ,
         'add_task':lambda self,cr,uid,record: record.state in ('open','template'),
         'print': lambda self,cr,uid,record: True,
         'modify': lambda self,cr,uid,record: True,
