@@ -272,7 +272,7 @@
        
 
        <record id="action_openstc_view_equipment" model="ir.actions.act_window">
-            <field name="name">Matériel</field>
+            <field name="name">Matériels</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">openstc.equipment</field>
             <field name="view_type">form</field>
