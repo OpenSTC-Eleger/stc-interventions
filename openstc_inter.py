@@ -1570,7 +1570,7 @@ class ask(osv.osv):
         'partner_address': fields.many2one('res.partner.address', 'Contact',ondelete='set null'),
 
 
-        'partner_type': fields.many2one('openstc.partner.type', 'Partner Type', required=True),
+        'partner_type': fields.many2one('openstc.partner.type', 'Partner Type', required=False),
         'partner_type_code': fields.char('Partner code', size=128),
 
         'partner_phone': fields.related('partner_address', 'phone', type='char', string='Téléphone'),
@@ -1581,7 +1581,7 @@ class ask(osv.osv):
         'people_email': fields.char('Email', size=128),
 
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
-        'site1': fields.many2one('openstc.site', 'Site principal'),
+        'site1': fields.many2one('openstc.site', 'Site principal', required=True),
         'site_name': fields.related('site1', 'name', type='char', string='Site'),
         'site2': fields.many2one('openstc.site', 'Site secondaire'),
         'site3': fields.many2one('openstc.site', 'Place'),
@@ -1600,6 +1600,7 @@ class ask(osv.osv):
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
         'equipment_id': fields.many2one('openstc.equipment','Equipment'),
         'has_equipment': fields.boolean('Request is about equipment'),
+        'is_citizen': fields.boolean('Claimer is a citizen'),
     }
 
 
@@ -1609,6 +1610,7 @@ class ask(osv.osv):
         'current_date': lambda *a: datetime.now().strftime('%Y-%m-%d'),
         'actions': [],
         'has_equipment': False,
+        'is_citizen': False,
     }
 
 
