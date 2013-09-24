@@ -958,7 +958,7 @@ msgstr ""
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_equipment
 #: model:ir.ui.menu,name:openstc.menu_action_openstc_view_equipment
-msgid "Matériels"
+msgid "Equipements"
 msgstr ""
 
 #. module: openstc
