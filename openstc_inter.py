@@ -829,7 +829,7 @@ class task(osv.osv):
                 ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
                     ('date_start','<=', datetime.strftime(end_working_time,timeDtFrmt)),
                 '|',('team_id','=',params['calendar_id']),
-                    ('user_ids','in', self.pool.get('openstc.team').read(cr, uid, params['calendar_id'], ['user_ids'])['user_ids'] )
+                    ('user_id','in', self.pool.get('openstc.team').read(cr, uid, params['calendar_id'], ['user_ids'])['user_ids'] )
                 ])
         else:
             #Get all tasks on 'start_dt' for officer
