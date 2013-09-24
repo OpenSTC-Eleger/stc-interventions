@@ -828,14 +828,16 @@ class task(osv.osv):
             task_ids = self.search(cr,uid,
                 ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
                     ('date_start','<=', datetime.strftime(end_working_time,timeDtFrmt)),
-                    ('team_id','=',params['calendar_id'])
+                    ('team_id','=',params['calendar_id']),
+                    ('user_ids','in', self.pool.get('openstc.team').read(cr, uid, params['calendar_id'], ['user_ids'])['user_ids'] )
                 ])
         else:
             #Get all tasks on 'start_dt' for officer
             task_ids = self.search(cr,uid,
                 ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
                     ('date_start','<=', datetime.strftime(end_working_time,timeDtFrmt)),
-                    ('user_id','=',params['calendar_id'])
+                    ('user_id','=', params['calendar_id']),
+                    ('team_id','in', self.pool.get('res.users').read(cr, uid, params['calendar_id'], ['team_ids'])['team_ids'] )
                 ])
 
         tasks = self.read(cr,uid,task_ids, ['name','date_start','date_end'])
