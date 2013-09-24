@@ -962,8 +962,8 @@ msgstr "Produit"
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_equipment
 #: model:ir.ui.menu,name:openstc.menu_action_openstc_view_equipment
-msgid "Matériels"
-msgstr "Matériels"
+msgid "Equipements"
+msgstr "Equipements"
 
 #. module: openstc
 #: field:openstc.create.task.wizard,inter_id:0
