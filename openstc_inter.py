@@ -428,6 +428,7 @@ class task(osv.osv):
         'site1':fields.related('project_id','site1',type='many2one',relation='openstc.site', string='Site',store={'project.task':[lambda self,cr,uid,ids,ctx={}:ids, ['project_id'], 10],
                                                                                                                   'project.project':[_get_task_from_inter, ['site1'],11]}),
         'inter_desc': fields.related('project_id', 'description', type='char'),
+        'inter_equipment': fields.related('project_id', 'equipment_id', type='many2one',relation='openstc.equipment'),
         'cancel_reason': fields.text('Cancel reason'),
         'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
