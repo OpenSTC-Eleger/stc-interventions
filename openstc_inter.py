@@ -1340,7 +1340,7 @@ class intervention_assignement(osv.osv):
     }
 
     _sql_constraints = [
-        ('code_uniq', 'unique (code)', '*code* / The code name must be unique !')
+        ('code_uniq', 'unique (code)', '_-code-_ / The code name must be unique !')
     ]
 intervention_assignement()
 
