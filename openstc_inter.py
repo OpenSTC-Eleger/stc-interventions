@@ -1338,6 +1338,10 @@ class intervention_assignement(osv.osv):
             'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
     }
+
+    _sql_constraints = [
+        ('code_uniq', 'unique (code)', 'The code name must be unique !')
+    ]
 intervention_assignement()
 
 class project_work(osv.osv):
