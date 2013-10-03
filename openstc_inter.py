@@ -106,6 +106,7 @@ class service(osv.osv):
         'asksBelongsto': fields.one2many('openstc.ask', 'service_id', "asks"),
         'category_ids':fields.many2many('openstc.task.category', 'openstc_task_category_services_rel', 'service_id', 'task_category_id', 'Categories'),
     }
+
 service()
 
 
@@ -1000,6 +1001,9 @@ class openstc_absent_type(osv.osv):
             'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
     }
+    _sql_constraints = [
+        ('code_uniq', 'unique (code)', '*code* / The code name must be unique !')
+    ]
 openstc_absent_type()
 
 #----------------------------------------------------------
