@@ -943,7 +943,8 @@ class openstc_task_category(osv.osv):
     }
 
     _sql_constraints = [
-        ('category_uniq', 'unique(name,parent_id)', 'Category must be unique!'),
+        ('category_uniq', 'unique(name,parent_id)', '*name* / Name and Category parent must be unique! Change name or category parent'),
+        ('code_uniq', 'unique (code)', '*code* / The code name must be unique !')
     ]
 
 
