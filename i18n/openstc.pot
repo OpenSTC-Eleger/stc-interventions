@@ -899,7 +899,7 @@ msgstr ""
 #. module: openstc
 #: model:ir.actions.act_window,name:openstc.action_openstc_view_assignement2
 #: model:ir.ui.menu,name:openstc.menu_action_openstc_view_assignement2
-msgid "Affectations des interventions"
+msgid "Catégories des interventions"
 msgstr ""
 
 #. module: openstc

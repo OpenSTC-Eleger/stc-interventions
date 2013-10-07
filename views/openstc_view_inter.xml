@@ -34,7 +34,7 @@
             </field>
         </record>
         <record id="action_openstc_view_assignement2" model="ir.actions.act_window">
-            <field name="name">Affectations des interventions</field>
+            <field name="name">Catégories des interventions</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">openstc.intervention.assignement</field>
             <field name="view_type">form</field>
