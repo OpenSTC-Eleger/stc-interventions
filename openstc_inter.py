@@ -1569,6 +1569,18 @@ class ask(osv.osv):
 
         return res
 
+    def _get_partner_name(self, cr, uid, ids, fields ,arg, context=None):
+        ret = {}.fromkeys(ids,'')
+        partner_obj = self.pool.get('res.partner')
+        for record in self.browse(cr, uid, ids, context=context):
+            if( record.people_name!='' ):
+                ret[record.id] = record.people_name
+            else :
+                ret[record.id] = partner_obj.read(cr, uid, record.partner_id.id,
+                                    ['name'],
+                                    context)['name']
+        return ret
+
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True),
         'create_date' : fields.datetime('Create Date', readonly=True, select=False),
@@ -1580,6 +1592,7 @@ class ask(osv.osv):
         'intervention_ids': fields.one2many('project.project', 'ask_id', "Interventions", String="Interventions"),
 
         'partner_id': fields.many2one('res.partner', 'Partner', ondelete='set null'),
+        'partner_name':fields.function(_get_partner_name, method=True, string="PArnter name",type="char", store=True),
         'partner_address': fields.many2one('res.partner.address', 'Contact',ondelete='set null'),
 
 
