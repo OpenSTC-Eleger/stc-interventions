@@ -867,7 +867,7 @@
 
     	<menuitem
             icon="terp-project" id="base.menu_main_pm"
-            name="Interventions" sequence="10"
+            name="OpenSTC" sequence="10"
             groups="openbase.openstc_employee"/>
 
  		<!--  <record id="project.menu_project_management" model="ir.ui.menu">
