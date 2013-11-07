@@ -788,28 +788,33 @@
    	    <delete id="menu_action_openstc_view_partner_type2" model="ir.ui.menu"/>
    	    <delete id="menu_carto" model="ir.ui.menu"/>
 		
+		<menuitem name="Gestion des Interventions"
+		    parent="openbase.menu_configuration"
+		    id="menu_configuration_openstc"
+   			sequence="6"/>
+   	    
    	 	<menuitem action="action_openstc_view_assignement2"
    			id="menu_action_openstc_view_assignement2"
-   			parent="openbase.menu_configuration"
+   			parent="menu_configuration_openstc"
    			groups="openbase.openstc_dst"
    			sequence="6"/>
 
    		<menuitem action="openstc_task_category_action2"
    			id="menu_action_openstc_view_task_category2"
-   			parent="openbase.menu_configuration"
+   			parent="menu_configuration_openstc"
    			groups="openbase.openstc_dst"
    			name="Catégories des tâches"
    			sequence="7"/>
 
    	 	<menuitem action="action_openstc_view_absent_type2"
    			id="menu_action_openstc_view_absent_type2"
-   			parent="openbase.menu_configuration"
+   			parent="menu_configuration_openstc"
    			groups="openbase.openstc_dst"
    			sequence="8"/>
 
    		<menuitem action="action_openstc_view_partner_type2"
    			id="menu_action_openstc_view_partner_type2"
-   			parent="openbase.menu_configuration"
+   			parent="menu_configuration_openstc"
    			groups="openbase.openstc_dst"
    			sequence="9"/>
 
