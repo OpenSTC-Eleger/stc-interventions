@@ -308,34 +308,7 @@
 		    </field>
 		</record>
 
-
-		<!--  partner type -->
-		<record model="ir.ui.view" id="view_openstc_partner_form_type">
-            <field name="name">openstc.partner.type.form</field>
-            <field name="model">openstc.partner.type.type</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Organisation type">
-                	<group colspan="2" col="2">
-                		<field name="code" />
-                		<field name="name"/>
-                	</group>
-                </form>
-            </field>
-        </record>
-
-        
-
-       <record id="action_openstc_view_partner_type2" model="ir.actions.act_window">
-            <field name="name">Types d'organisation</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">openstc.partner.type</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-
-
-     	<!-- ask -->
+		<!-- ask -->
         <record model="ir.ui.view" id="view_openstc_ask_form">
             <field name="name">openstc.ask.form</field>
             <field name="model">openstc.ask</field>
@@ -811,12 +784,6 @@
    			parent="menu_configuration_openstc"
    			groups="openbase.openstc_dst"
    			sequence="8"/>
-
-   		<menuitem action="action_openstc_view_partner_type2"
-   			id="menu_action_openstc_view_partner_type2"
-   			parent="menu_configuration_openstc"
-   			groups="openbase.openstc_dst"
-   			sequence="9"/>
 
    		<delete id="menu_openstc_dico" model="ir.ui.menu"/>
 
