@@ -1595,7 +1595,7 @@ class ask(osv.osv):
         'partner_name':fields.function(_get_partner_name, method=True, string="PArnter name",type="char", store=True),
         'partner_address': fields.many2one('res.partner.address', 'Contact',ondelete='set null'),
 
-
+        'partner_type': fields.related('partner_id', 'type_id', string='Partner type', type='many2one', relation='openstc.partner.type'),
 #        'partner_type': fields.many2one('openstc.partner.type', 'Partner Type', required=False),
 #        'partner_type_code': fields.char('Partner code', size=128),
 
