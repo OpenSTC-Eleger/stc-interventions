@@ -16,6 +16,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: openstc
+#: model:ir.ui.menu,name:base.menu_main_pm
+msgid "OpenSTC"
+msgstr "OpenSTC"
+
+#. module: openstc
 #: view:openstc.ask:0
 msgid "For confirm the ask by DST"
 msgstr "Confirmer la demande par le DST"

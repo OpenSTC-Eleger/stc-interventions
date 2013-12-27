@@ -1101,123 +1101,146 @@
    		-->
 
    		<!-- Configuration -->
-   	    <menuitem id="menu_configuration"
+   	    <!--  <menuitem id="menu_configuration"
 			groups="openstc_dst"
 			name="Configuration"
 			parent="base.menu_main_pm"
-			sequence="3"/>
+			sequence="3"/> -->
+	    <delete id="menu_configuration" model="ir.ui.menu"/>
 
    	    <delete id="menu_openstc_partner" model="ir.ui.menu"/>
    	    <delete id="menu_action_openstc_view_partner_type2" model="ir.ui.menu"/>
    	    <delete id="menu_carto" model="ir.ui.menu"/>
-
+		<delete id="menu_carto" model="ir.ui.menu"/>
 
 
    		<!--  Configuration/Partner -->
-   		<menuitem
+   		<!-- <menuitem
    		    action="action_openstc_view_partner"
    			id="menu_openstc_partner"
    			groups="openstc_dst"
    			name="Organisations"
    			parent="menu_configuration"
-   			sequence="1"/>
-
+   			sequence="1"/>  -->
+ 		<delete id="menu_openstc_partner" model="ir.ui.menu"/>
 
    		<!--  Configuration/Service -->
-   		<menuitem action="action_openstc_view_service"
+   		<!--<menuitem action="action_openstc_view_service"
    			id="menu_action_openstc_view_service"
    			parent="menu_configuration"
    			groups="openstc_dst"
-   			sequence="2"/>
+   			sequence="2"/>  -->
+   		<delete id="menu_action_openstc_view_service" model="ir.ui.menu"/>
 
    		<!--  Configuration/Site -->
-		<menuitem action="action_openstc_view_site"
+		<!--<menuitem action="action_openstc_view_site"
    			id="menu_action_openstc_view_site"
    			parent="menu_configuration"
    			groups="openstc_dst,openstc_manager"
-   			sequence="3"/>
+   			sequence="3"/>  -->
+   		<delete id="menu_action_openstc_view_service" model="ir.ui.menu"/>
 
 		<!--  Configuration/Team -->
-		<menuitem action="action_openstc_view_team"
+		<!--<menuitem action="action_openstc_view_team"
    			id="menu_action_openstc_view_teams"
    			parent="menu_configuration"
    			name="Equipes"
    			groups="openstc_dst"
-   			sequence="4"/>
+   			sequence="4"/>  -->
+		<delete id="menu_action_openstc_view_teams" model="ir.ui.menu"/>
 
 		<!--  Configuration/Material -->
-		<menuitem action="action_openstc_view_equipment"
+		<!--<menuitem action="action_openstc_view_equipment"
    			id="menu_action_openstc_view_equipment"
    			parent="menu_configuration"
    			groups="openstc_dst,openstc_manager"
-   			sequence="5"/>
+   			sequence="5"/>  -->
+
+   		<delete id="action_openstc_view_equipment" model="ir.ui.menu"/>
 
 		<!--  Configuration/Dictionnaires -->
-   		<menuitem
+   		<!--<menuitem
    			id="menu_openstc_dico"
    			groups="openstc_dst"
    			name="Dictionnaires"
    			parent="menu_configuration"
-   			sequence="6"/>
+   			sequence="6"/>  -->
 
-   	 	<menuitem action="action_openstc_view_assignement2"
+   		<delete id="menu_openstc_dico" model="ir.ui.menu"/>
+
+   	 	<!--<menuitem action="action_openstc_view_assignement2"
    			id="menu_action_openstc_view_assignement2"
    			parent="menu_openstc_dico"
    			groups="openstc_dst"
-   			sequence="1"/>
+   			sequence="1"/>  -->
 
-   		<menuitem action="openstc_task_category_action2"
+   		<delete id="menu_action_openstc_view_assignement2" model="ir.ui.menu"/>
+
+   		<!--<menuitem action="openstc_task_category_action2"
    			id="menu_action_openstc_view_task_category2"
    			parent="menu_openstc_dico"
    			groups="openstc_dst"
    			name="Catégories des tâches"
-   			sequence="2"/>
+   			sequence="2"/>  -->
+   		<delete id="menu_action_openstc_view_task_category2" model="ir.ui.menu"/>
 
-   	 	<menuitem action="action_openstc_view_absent_type2"
+   	 	<!--<menuitem action="action_openstc_view_absent_type2"
    			id="menu_action_openstc_view_absent_type2"
    			parent="menu_openstc_dico"
    			groups="openstc_dst"
-   			sequence="3"/>
+   			sequence="3"/>  -->
 
-   		<menuitem action="action_openstc_view_partner_type2"
+   		<delete id="menu_action_openstc_view_absent_type2" model="ir.ui.menu"/>
+
+   		<!--<menuitem action="action_openstc_view_partner_type2"
    			id="menu_action_openstc_view_partner_type2"
    			parent="menu_openstc_dico"
    			groups="openstc_dst"
-   			sequence="4"/>
+   			sequence="4"/>  -->
 
+		<delete id="menu_action_openstc_view_partner_type2" model="ir.ui.menu"/>
 
    		<!--  Carto -->
 
-   	  <menuitem id="menu_carto"
+   	  <!--<menuitem id="menu_carto"
 			name="Cartographie"
 			groups="base.group_erp_manager"
 			parent="base.menu_main_pm"
-			sequence="4"/>
+			sequence="4"/>  -->
+
+		<delete id="menu_carto" model="ir.ui.menu"/>
 
 
-   	 <menuitem action="action_openstc_view_carto_inter"
+   	 <!--<menuitem action="action_openstc_view_carto_inter"
    			id="menu_action_openstc_view_carto_request"
    			parent="menu_carto"
    			name="nouvelle intervention"
    			groups="base.group_erp_manager"
-   			sequence="1"/>
-   	 <menuitem action="action_openstc_view_carto_inter"
+   			sequence="1"/>  -->
+
+   		<delete id="menu_action_openstc_view_carto_request" model="ir.ui.menu"/>
+   	 <!--<menuitem action="action_openstc_view_carto_inter"
    			id="menu_action_openstc_view_carto_intervention"
    			parent="menu_carto"
    			groups="base.group_erp_manager"
-   			sequence="2"/>
-   	 <menuitem action="action_openstc_view_carto_inter"
+   			sequence="2"/>  -->
+
+   		<delete id="menu_action_openstc_view_carto_intervention" model="ir.ui.menu"/>
+   	 <!--<menuitem action="action_openstc_view_carto_inter"
    			id="menu_action_openstc_view_carto_stat"
    			parent="menu_carto"
    			name="statistique"
    			groups="base.group_erp_manager"
-   			sequence="3"/>
-   	 <menuitem action="action_openstc_view_carto_inter"
+   			sequence="3"/>  -->
+   		<delete id="menu_action_openstc_view_carto_stat" model="ir.ui.menu"/>
+   	 <!--<menuitem action="action_openstc_view_carto_inter"
    			id="menu_action_openstc_view_carto_geoportail"
    			parent="menu_carto"
    			name="geoportail"
    			groups="base.group_erp_manager"
-   			sequence="4"/>
+   			sequence="4"/>  -->
+
+   		<delete id="menu_action_openstc_view_carto_geoportail" model="ir.ui.menu"/>
 
 		<!--  Dashboard -->
    		<!--  <menuitem id="base.menu_project_report"

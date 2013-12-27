@@ -68,26 +68,6 @@
     </record>
 
 
-    <record model="ir.rule" id="service_rule">
-        <field name="name">Service Rule</field>
-        <field name="model_id" ref="model_openstc_service"/>
-        <field name="domain_force">[('id','in',[g.id for g in user.service_ids])]</field>
-        <field name="groups" eval="[(6,0,[ref('openbase.openstc_employee')])]" />
-        <field eval="0" name="perm_unlink"/>
-        <field eval="0" name="perm_write"/>
-        <field eval="1" name="perm_read"/>
-        <field eval="0" name="perm_create"/>
-    </record>
-
-    <record model="ir.rule" id="service_rule_all_access">
-        <field name="name">Service Rule All Access (DST)</field>
-        <field name="model_id" ref="model_openstc_service"/>
-        <field name="groups" eval="[(6,0,[ref('openbase.openstc_dst')])]" />
-        <field eval="0" name="perm_unlink"/>
-        <field eval="0" name="perm_write"/>
-        <field eval="1" name="perm_read"/>
-        <field eval="0" name="perm_create"/>
-    </record>
     
     
     <!--
