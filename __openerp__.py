@@ -35,34 +35,19 @@
     Module STC, technical services management (calendar, board, ...)
     """,
     "data": [
-        #'security/openstc_security_base.xml',
         'security/openstc_security_inter.xml',
-        #'views/openstc_pret_data_base.xml',
-        #'views/openstc_pret_data_resa.xml',
         'security/ir.model.access.csv',
 
         'wizard/create_task_view.xml',
         'wizard/ask_refused_view.xml',
         'wizard/ask_modify_service.xml',
-        #"wizard/openstc_pret_view_wizard.xml",
 
-        #'views/openstc_view_base.xml',
         'views/openstc_view_inter.xml',
-        #"views/openstc_pret_checkout_view.xml",
-        #"views/openstc_pret_view_base.xml",
-        #"views/openstc_pret_view_resa.xml",
-        #'views/openstc_pret_menus_view.xml',
 
         'workflow/ask.xml',
-        #"report/openstc_pret_qte_dispo_report_view.xml",
         "unit_tests/unit_tests.xml",
 
-        #'data/base_data.xml',
-        #"unit_tests/openstc_prets_tests.xml",
-        #"test/cr_commit.yml", "test/openstc_prets_tests.yml",
     ],
-    #"test":"test/openstc_prets_tests.yml",
-    #"js":['static/src/js/calendar_inherit.js'],
     "demo": [],
     "test": [],
     "installable": True,

@@ -24,7 +24,7 @@
 #import logging
 
 import types
-
+from openbase.openbase_core import OpenbaseCore 
 import re
 import time
 import operator
@@ -99,7 +99,7 @@ def send_email(self, cr, uid, ids, params, context=None):
     return True
 
 
-class service(osv.osv):
+class service(OpenbaseCore):
     _inherit = "openstc.service"
 
     _columns = {
@@ -110,20 +110,20 @@ class service(osv.osv):
 service()
 
 
-class site(osv.osv):
+class site(OpenbaseCore):
     _inherit = "openstc.site"
     _columns = {
         'asksBelongsto': fields.one2many('openstc.ask', 'site1', "asks"),
         'intervention_ids': fields.one2many('project.project', 'site1', "Interventions", String="Interventions"),
         }
 
-class users(osv.osv):
+class users(OpenbaseCore):
     _inherit = "res.users"
     _columns = {
             'tasks': fields.one2many('project.task', 'user_id', "Tasks"),
     }
 
-class team(osv.osv):
+class team(OpenbaseCore):
     _inherit = "openstc.team"
     _columns = {
         'tasks': fields.one2many('project.task', 'team_id', "Tasks"),
@@ -131,7 +131,7 @@ class team(osv.osv):
         }
 team()
 
-class res_partner(osv.osv):
+class res_partner(OpenbaseCore):
     _name = "res.partner"
     _description = "res.partner"
     _inherit = "res.partner"
@@ -156,7 +156,7 @@ res_partner()
 # Tâches
 #----------------------------------------------------------
 
-class task(osv.osv):
+class task(OpenbaseCore):
     _name = "project.task"
     _description = "Task ctm"
     _inherit = "project.task"
@@ -267,31 +267,6 @@ class task(osv.osv):
 
 
     _fields_names = {'equipment_names':'equipment_ids'}
-    #@TODO: move this feature to template model (in another git branch)
-    def __init__(self, pool, cr):
-        #method to retrieve many2many fields with custom format
-        def _get_fields_names(self, cr, uid, ids, name, args, context=None):
-            res = {}
-            if not isinstance(name, list):
-                name = [name]
-            for obj in self.browse(cr, uid, ids, context=context):
-                #for each field_names to read, retrieve their values
-                res[obj.id] = {}
-                for fname in name:
-                    #many2many browse_record field to map
-                    field_ids = obj[self._fields_names[fname]]
-                    val = []
-                    for item in field_ids:
-                        val.append([item.id,item.name_get()[0][1]])
-                    res[obj.id].update({fname:val})
-            return res
-
-        ret = super(task, self).__init__(pool,cr)
-        #add _field_names to fields definition of the model
-        for f in self._fields_names.keys():
-            #force name of new field with '_names' suffix
-            self._columns.update({f:fields.function(_get_fields_names, type='char',method=True, multi='field_names',store=False)})
-        return ret
 
     _actions = {
         'print':lambda self,cr,uid,record, groups_code: record.state in ('draft','open'),
@@ -305,28 +280,6 @@ class task(osv.osv):
         'modify': lambda self,cr,uid,record, groups_code: True,
 
         }
-
-    def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
-        #default value: empty string for each id
-        ret = {}.fromkeys(ids,'')
-        groups_code = []
-        groups_code = [group.code for group in self.pool.get("res.users").browse(cr, uid, uid, context=context).groups_id if group.code]
-
-        #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
-        for record in self.browse(cr, uid, ids, context=context):
-            #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
-            ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
-        return ret
-
-#    def test_check_permission(self, cr, uid, ids, action, context=None):
-#        ret = False
-#        for task in self.browse(cr, uid, ids, context=context):
-#            if action in task.actions:
-#                ret = True
-#            else:
-#                print 'Error, user does not have %s right access'% action
-
-        return ret
 
     def _get_task_from_inter(self, cr, uid, ids, context=None):
         return self.pool.get('project.task').search(cr, uid, [('project_id','in',ids)],context=context)
@@ -353,7 +306,6 @@ class task(osv.osv):
         'inter_desc': fields.related('project_id', 'description', type='char'),
         'inter_equipment': fields.related('project_id', 'equipment_id', type='many2one',relation='openstc.equipment'),
         'cancel_reason': fields.text('Cancel reason'),
-        'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
     }
 
@@ -779,7 +731,7 @@ class task(osv.osv):
 
 task()
 
-class openstc_task_category(osv.osv):
+class openstc_task_category(OpenbaseCore):
 
     def name_get(self, cr, uid, ids, context=None):
         if not len(ids):
@@ -805,45 +757,7 @@ class openstc_task_category(osv.osv):
 
     }
 
-    def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
-        #default value: empty string for each id
-        ret = {}.fromkeys(ids,'')
-        groups_code = []
-        groups_code = [group.code for group in self.pool.get("res.users").browse(cr, uid, uid, context=context).groups_id if group.code]
-
-        #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
-        for record in self.browse(cr, uid, ids, context=context):
-            #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
-            ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
-        return ret
-
     _fields_names = {'service_names':'service_ids'}
-
-    #@TODO: move this feature to template model (in another git branch)
-    def __init__(self, pool, cr):
-        #method to retrieve many2many fields with custom format
-        def _get_fields_names(self, cr, uid, ids, name, args, context=None):
-            res = {}
-            if not isinstance(name, list):
-                name = [name]
-            for obj in self.browse(cr, uid, ids, context=context):
-                #for each field_names to read, retrieve their values
-                res[obj.id] = {}
-                for fname in name:
-                    #many2many browse_record field to map
-                    field_ids = obj[self._fields_names[fname]]
-                    val = []
-                    for item in field_ids:
-                        val.append([item.id,item.name_get()[0][1]])
-                    res[obj.id].update({fname:val})
-            return res
-
-        ret = super(openstc_task_category, self).__init__(pool,cr)
-        #add _field_names to fields definition of the model
-        for f in self._fields_names.keys():
-            #force name of new field with '_names' suffix
-            self._columns.update({f:fields.function(_get_fields_names, type='char',method=True, multi='field_names',store=False)})
-        return ret
 
     _name = "openstc.task.category"
     _description = "Task Category"
@@ -860,7 +774,6 @@ class openstc_task_category(osv.osv):
         'unit': fields.char('Unit', size=32),
         'quantity': fields.integer('Quantity'),
         'tasksAssigned': fields.one2many('project.task', 'category_id', "tasks"),
-        'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
     }
 
@@ -895,7 +808,7 @@ openstc_task_category()
 
 
 
-class openstc_absent_type(osv.osv):
+class openstc_absent_type(OpenbaseCore):
     _name = "openstc.absent.type"
     _description = ""
 
@@ -906,22 +819,10 @@ class openstc_absent_type(osv.osv):
 
     }
 
-    def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
-        #default value: empty string for each id
-        ret = {}.fromkeys(ids,'')
-        groups_code = []
-        groups_code = [group.code for group in self.pool.get("res.users").browse(cr, uid, uid, context=context).groups_id if group.code]
-
-        #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
-        for record in self.browse(cr, uid, ids, context=context):
-            #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
-            ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
-        return ret
     _columns = {
             'name': fields.char('Affectation ', size=128, required=True),
             'code': fields.char('Code affectation', size=32, required=True),
             'description': fields.text('Description'),
-            'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
     }
     _sql_constraints = [
@@ -934,7 +835,7 @@ openstc_absent_type()
 #----------------------------------------------------------
 
 
-class project(osv.osv):
+class project(OpenbaseCore):
     _name = "project.project"
     _description = "Interventon stc"
     _inherit = "project.project"
@@ -1088,14 +989,7 @@ class project(osv.osv):
         'create': lambda self,cr,uid,record: True,
 
         }
-    def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
-        #default value: empty string for each id
-        ret = {}.fromkeys(ids,'')
-        #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
-        for record in self.browse(cr, uid, ids, context=context):
-            #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
-            ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record)]})
-        return ret
+
 
     def _searchOverPourcent(self, cr, uid, obj, name, args, context=None):
         if args and len(args[0]) >= 2:
@@ -1135,7 +1029,6 @@ class project(osv.osv):
 
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
         'overPourcent' : fields.function(_overPourcent, fnct_search=_searchOverPourcent, method=True, string='OverPourcent',type='float', store=False),
-        'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
         'equipment_id': fields.many2one('openstc.equipment','Equipment'),
         'has_equipment': fields.boolean('Request is about equipment'),
     }
@@ -1235,7 +1128,7 @@ class project(osv.osv):
 project()
 
 
-class intervention_assignement(osv.osv):
+class intervention_assignement(OpenbaseCore):
     _name = "openstc.intervention.assignement"
     _description = ""
 
@@ -1245,24 +1138,11 @@ class intervention_assignement(osv.osv):
         'delete':lambda self,cr,uid,record, groups_code: 'DIRE' in groups_code,
 
         }
-    def _get_actions(self, cr, uid, ids, myFields ,arg, context=None):
-        #default value: empty string for each id
-        ret = {}.fromkeys(ids,'')
-        groups_code = []
-        groups_code = [group.code for group in self.pool.get("res.users").browse(cr, uid, uid, context=context).groups_id if group.code]
-
-        #evaluation of each _actions item, if test returns True, adds key to actions possible for this record
-        for record in self.browse(cr, uid, ids, context=context):
-            #ret.update({inter['id']:','.join([key for key,func in self._actions.items() if func(self,cr,uid,inter)])})
-            ret.update({record.id:[key for key,func in self._actions.items() if func(self,cr,uid,record,groups_code)]})
-        return ret
-
 
     _columns = {
             'name': fields.char('Affectation ', size=128, required=True),
             'code': fields.char('Code affectation', size=32, required=True),
             'asksAssigned': fields.one2many('openstc.ask', 'intervention_assignement_id', "asks"),
-            'actions':fields.function(_get_actions, method=True, string="Actions possibles",type="char", store=False),
 
     }
 
@@ -1271,7 +1151,7 @@ class intervention_assignement(osv.osv):
     ]
 intervention_assignement()
 
-class project_work(osv.osv):
+class project_work(OpenbaseCore):
     _name = "project.task.work"
     _description = "Task work"
     _inherit = "project.task.work"
@@ -1285,7 +1165,7 @@ class project_work(osv.osv):
 project_work()
 
 
-class project_task_type(osv.osv):
+class project_task_type(OpenbaseCore):
     _name = "project.task.type"
     _description = "project.task.type"
     _inherit = "project.task.type"
@@ -1297,7 +1177,7 @@ class project_task_type(osv.osv):
 project_task_type()
 
 
-class project_task_history(osv.osv):
+class project_task_history(OpenbaseCore):
     _name = 'project.task.history'
     _description = 'History of Tasks'
     _inherit = "project.task.history"
@@ -1307,21 +1187,7 @@ class project_task_history(osv.osv):
 
     }
 
-project_task_history()
-
-class project_vs_hours(osv.osv):
-    _name = "project.vs.hours"
-    _description = " Project vs  hours"
-    _inherit = "project.vs.hours"
-
-    _columns = {
-
-    }
-
-project_vs_hours()
-
-
-class ask(osv.osv):
+class ask(OpenbaseCore):
     _name = "openstc.ask"
     _description = "openstc.ask"
     _order = "create_date desc"
@@ -1830,7 +1696,7 @@ ask()
 # Others
 #----------------------------------------------------------
 
-class openstc_planning(osv.osv):
+class openstc_planning(OpenbaseCore):
     _name = "openstc.planning"
     _description = "Planning"
 
@@ -1841,7 +1707,7 @@ class openstc_planning(osv.osv):
 openstc_planning()
 
 
-class todo(osv.osv):
+class todo(OpenbaseCore):
     _name = "openstc.todo"
     _description = "todo stc"
     _rec_name = "title"
