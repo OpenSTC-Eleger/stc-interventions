@@ -21,6 +21,5 @@
 #
 ##############################################################################
 
-import openstc_pret_qte_dispo_report
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
