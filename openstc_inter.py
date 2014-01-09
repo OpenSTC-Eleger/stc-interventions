@@ -1245,6 +1245,15 @@ class ask(OpenbaseCore):
 
         return res
 
+    def managerOnly(self, cr, uid, record, groups_code):
+        return 'DIRE' in groups_code or 'MANA' in groups_code
+    
+    _actions = {
+        'valid':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','confirm','refused'),
+        'refused':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','confirm'),
+        'confirm':lambda self,cr,uid,record,groups_code: 'MANA' in groups_code and record.state in ('wait','refused'),
+        }
+
 #    def _is_valid_action(self, cr, uid, ids, fields, arg, context):
 #        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
 #        for id in res:
@@ -1410,7 +1419,6 @@ class ask(OpenbaseCore):
                           help='If the task is created the state is \'Wait\'.\n If the task is started, the state becomes \'In Progress\'.\n If review is needed the task is in \'Pending\' state.\
                           \n If the task is over, the states is set to \'Done\'.'),
 
-        'actions' : fields.function(_is_possible_action, method=True, string='Valider',type='selection', store=False),
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
         'equipment_id': fields.many2one('openstc.equipment','Equipment'),
         'has_equipment': fields.boolean('Request is about equipment'),
