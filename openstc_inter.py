@@ -24,7 +24,7 @@
 #import logging
 
 import types
-from openbase.openbase_core import OpenbaseCore 
+from openbase.openbase_core import OpenbaseCore
 import re
 import time
 import operator
@@ -1247,7 +1247,7 @@ class ask(OpenbaseCore):
 
     def managerOnly(self, cr, uid, record, groups_code):
         return 'DIRE' in groups_code or 'MANA' in groups_code
-    
+
     _actions = {
         'valid':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','confirm','refused'),
         'refused':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','confirm'),
@@ -1380,16 +1380,16 @@ class ask(OpenbaseCore):
 
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True),
-        'create_date' : fields.datetime('Create Date', readonly=True, select=False),
+        'create_date' : fields.datetime('Create Date', readonly=True, select=True),
         'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'write_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'current_date': fields.datetime('Date'),
         'confirm_by_dst': fields.boolean('Confirm by DST'),
-        'description': fields.text('Description'),
+        'description': fields.text('Description', select=True),
         'intervention_ids': fields.one2many('project.project', 'ask_id', "Interventions", String="Interventions"),
 
         'partner_id': fields.many2one('res.partner', 'Partner', ondelete='set null'),
-        'partner_name':fields.function(_get_partner_name, method=True, string="PArnter name",type="char", store=True),
+        'partner_name':fields.function(_get_partner_name, method=True, string="PArnter name",type="char", store=True, select=True),
         'partner_address': fields.many2one('res.partner.address', 'Contact',ondelete='set null'),
 
 
@@ -1404,7 +1404,7 @@ class ask(OpenbaseCore):
         'people_email': fields.char('Email', size=128),
 
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
-        'site1': fields.many2one('openstc.site', 'Site principal', required=True),
+        'site1': fields.many2one('openstc.site', 'Site principal', required=True, select=True),
 #        'site_name': fields.related('site1', 'name', type='char', string='Site'),
 #        'site2': fields.many2one('openstc.site', 'Site secondaire'),
 #        'site3': fields.many2one('openstc.site', 'Place'),
@@ -1413,14 +1413,14 @@ class ask(OpenbaseCore):
         'refusal_reason': fields.text('Refusal reason'),
         'manager_id': fields.many2one('res.users', 'Manager'),
         'partner_service_id': fields.related('partner_id', 'service_id', type='many2one', relation='openstc.service', string='Service du demandeur', help='...'),
-        'service_id':fields.many2one('openstc.service', 'Service concerné'),
-        'date_deadline': fields.date('Date souhaitée'),
+        'service_id':fields.many2one('openstc.service', 'Service concerné', select=True),
+        'date_deadline': fields.date('Date souhaitée', select=True),
         'state': fields.selection(_get_request_states, 'State', readonly=True,
                           help='If the task is created the state is \'Wait\'.\n If the task is started, the state becomes \'In Progress\'.\n If review is needed the task is in \'Pending\' state.\
                           \n If the task is over, the states is set to \'Done\'.'),
 
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
-        'equipment_id': fields.many2one('openstc.equipment','Equipment'),
+        'equipment_id': fields.many2one('openstc.equipment','Equipment', select=True),
         'has_equipment': fields.boolean('Request is about equipment'),
         'is_citizen': fields.boolean('Claimer is a citizen'),
     }
