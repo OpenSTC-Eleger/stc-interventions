@@ -1008,15 +1008,15 @@ class project(OpenbaseCore):
 
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
         'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
-        'create_date' : fields.datetime('Create Date', readonly=True),
+        'create_date' : fields.datetime('Create Date', readonly=True, select=True),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'date_deadline': fields.date('Deadline',select=True),
-        'site1': fields.many2one('openstc.site', 'Site principal'),
+        'site1': fields.many2one('openstc.site', 'Site principal', select=True),
         'state': fields.selection([('closed', 'Closed'),('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
                                   'State', readonly=True, required=True, help=''),
 
-        'service_id': fields.many2one('openstc.service', 'Service'),
-        'description': fields.text('Description'),
+        'service_id': fields.many2one('openstc.service', 'Service', select=True),
+        'description': fields.text('Description', select=True),
         'site_details': fields.text('Précision sur le site'),
         'cancel_reason': fields.text('Cancel reason'),
 
@@ -1029,7 +1029,7 @@ class project(OpenbaseCore):
 
         'tooltip' : fields.function(_tooltip, method=True, string='Tooltip',type='char', store=False),
         'overPourcent' : fields.function(_overPourcent, fnct_search=_searchOverPourcent, method=True, string='OverPourcent',type='float', store=False),
-        'equipment_id': fields.many2one('openstc.equipment','Equipment'),
+        'equipment_id': fields.many2one('openstc.equipment','Equipment', select=True),
         'has_equipment': fields.boolean('Request is about equipment'),
     }
 
