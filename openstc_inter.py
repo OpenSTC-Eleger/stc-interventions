@@ -1012,7 +1012,7 @@ class project(OpenbaseCore):
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'date_deadline': fields.date('Deadline',select=True),
         'site1': fields.many2one('openstc.site', 'Site principal', select=True),
-        'state': fields.selection([('closed', 'Closed'),('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('closing', 'Closing'), ('cancelled', 'Cancelled')],
+        'state': fields.selection([('closed', 'Closed'),('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('cancelled', 'Cancelled')],
                                   'State', readonly=True, required=True, help=''),
 
         'service_id': fields.many2one('openstc.service', 'Service', select=True),
