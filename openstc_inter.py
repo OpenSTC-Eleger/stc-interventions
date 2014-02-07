@@ -33,9 +33,14 @@ import netsvc
 import pytz
 from osv.orm import browse_record, browse_null
 from osv import fields, osv, orm
-from datetime import datetime, timedelta
+#from datetime import datetime, timedelta
+#from dateutil import *
+#from dateutil.tz import *
+import datetime as dt
+from datetime import datetime, date, timedelta
 from dateutil import *
 from dateutil.tz import *
+
 from tools.translate import _
 
 #_logger = logging.getLogger(__name__)
@@ -1378,6 +1383,13 @@ class ask(OpenbaseCore):
                                     context)['name']
         return ret
 
+    def _get_month(self, cr, uid, ids, fields ,arg, context=None):
+        ret = {}.fromkeys(ids,'')
+        for record in self.browse(cr, uid, ids, context=context):
+            ret[record.id] = datetime.strptime(record.create_date, '%Y-%m-%d %H:%M:%S').month
+
+        return ret
+
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True ),
         'create_date' : fields.datetime('Create Date', readonly=True, select=True),
@@ -1390,6 +1402,9 @@ class ask(OpenbaseCore):
 
         'partner_id': fields.many2one('res.partner', 'Partner', ondelete='set null'),
         'partner_name':fields.function(_get_partner_name, method=True, string="PArnter name",type="char", store=True, select=True),
+
+        'month' : fields.function(_get_month, method=True, string='Month',type='char', store=True),
+
         'partner_address': fields.many2one('res.partner.address', 'Contact',ondelete='set null'),
 
 
@@ -1695,6 +1710,39 @@ class ask(OpenbaseCore):
             search_filter.extend(filter)
             ret[str(user.id)] = self.search_count(cr, user.id, search_filter, context=context)
         return ret
+
+    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
+        newargs = []
+        for s in args :
+            for keyword in self.SQL_KEYWORDS :
+                if keyword in s :
+                    value = self.get_value_from_sql_keywords(s[0],keyword)
+                    s[2] = value
+                    newargs.extend([s])
+                    break;
+        return super(OpenbaseCore, self).search(cr, uid, newargs, offset, limit, order, context, count)
+
+    def get_value_from_sql_keywords(self, field, keyword):
+        val = ""
+        timeDtFrmt = "%Y-%m-%d %H:%M:%S"
+        today = date.today()
+        start_day_month = dt.datetime(today.year, today.month, 1)
+        dates = [today + dt.timedelta(days=i) for i in range(0 - today.weekday(), 7 - today.weekday())]
+        if keyword == 'FIRSTDAYWEEK':
+             return datetime.strftime(dates[0],timeDtFrmt)
+        elif keyword == 'LASTDAYWEEK':
+             return datetime.strftime(dates[6],timeDtFrmt)
+        elif keyword == 'FIRSTDAYMONTH':
+            return datetime.strftime(dt.datetime(today.year, today.month, 1),timeDtFrmt)
+        elif keyword == 'LASTDAYMONTH':
+            date_on_next_month = start_day_month + dt.timedelta(31)
+            start_next_month = dt.datetime(date_on_next_month.year, date_on_next_month.month, 1)
+            return datetime.strftime(start_next_month - dt.timedelta(1),timeDtFrmt)
+        elif keyword == 'OVERMONTH':
+             return datetime.strftime(start_day_month + dt.timedelta(31),timeDtFrmt)
+        elif keyword == 'OUTDATED':
+            return datetime.strftime(today,timeDtFrmt)
+        return val
 
 
 ask()
