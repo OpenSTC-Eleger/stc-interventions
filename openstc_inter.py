@@ -33,11 +33,7 @@ import netsvc
 import pytz
 from osv.orm import browse_record, browse_null
 from osv import fields, osv, orm
-#from datetime import datetime, timedelta
-#from dateutil import *
-#from dateutil.tz import *
-import datetime as dt
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from dateutil import *
 from dateutil.tz import *
 
@@ -1130,6 +1126,7 @@ class project(OpenbaseCore):
         ('ask_uniq', 'unique(name,ask_id)', 'Demande déjà validée!'),
     ]
 
+
 project()
 
 
@@ -1710,40 +1707,6 @@ class ask(OpenbaseCore):
             search_filter.extend(filter)
             ret[str(user.id)] = self.search_count(cr, user.id, search_filter, context=context)
         return ret
-
-    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
-        newargs = []
-        for s in args :
-            for keyword in self.SQL_KEYWORDS :
-                if keyword in s :
-                    value = self.get_value_from_sql_keywords(s[0],keyword)
-                    s[2] = value
-                    newargs.extend([s])
-                    break;
-        return super(OpenbaseCore, self).search(cr, uid, newargs, offset, limit, order, context, count)
-
-    def get_value_from_sql_keywords(self, field, keyword):
-        val = ""
-        timeDtFrmt = "%Y-%m-%d %H:%M:%S"
-        today = date.today()
-        start_day_month = dt.datetime(today.year, today.month, 1)
-        dates = [today + dt.timedelta(days=i) for i in range(0 - today.weekday(), 7 - today.weekday())]
-        if keyword == 'FIRSTDAYWEEK':
-             return datetime.strftime(dates[0],timeDtFrmt)
-        elif keyword == 'LASTDAYWEEK':
-             return datetime.strftime(dates[6],timeDtFrmt)
-        elif keyword == 'FIRSTDAYMONTH':
-            return datetime.strftime(dt.datetime(today.year, today.month, 1),timeDtFrmt)
-        elif keyword == 'LASTDAYMONTH':
-            date_on_next_month = start_day_month + dt.timedelta(31)
-            start_next_month = dt.datetime(date_on_next_month.year, date_on_next_month.month, 1)
-            return datetime.strftime(start_next_month - dt.timedelta(1),timeDtFrmt)
-        elif keyword == 'OVERMONTH':
-             return datetime.strftime(start_day_month + dt.timedelta(31),timeDtFrmt)
-        elif keyword == 'OUTDATED':
-            return datetime.strftime(today,timeDtFrmt)
-        return val
-
 
 ask()
 
