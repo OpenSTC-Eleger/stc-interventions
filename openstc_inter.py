@@ -1380,12 +1380,6 @@ class ask(OpenbaseCore):
                                     context)['name']
         return ret
 
-    def _get_month(self, cr, uid, ids, fields ,arg, context=None):
-        ret = {}.fromkeys(ids,'')
-        for record in self.browse(cr, uid, ids, context=context):
-            ret[record.id] = datetime.strptime(record.create_date, '%Y-%m-%d %H:%M:%S').month
-
-        return ret
 
     _columns = {
         'name': fields.char('Asks wording', size=128, required=True, select=True ),
@@ -1399,8 +1393,6 @@ class ask(OpenbaseCore):
 
         'partner_id': fields.many2one('res.partner', 'Partner', ondelete='set null'),
         'partner_name':fields.function(_get_partner_name, method=True, string="PArnter name",type="char", store=True, select=True),
-
-        'month' : fields.function(_get_month, method=True, string='Month',type='char', store=True),
 
         'partner_address': fields.many2one('res.partner.address', 'Contact',ondelete='set null'),
 
