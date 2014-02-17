@@ -780,7 +780,7 @@ class openstc_task_category(OpenbaseCore):
 
     _sql_constraints = [
         ('category_uniq', 'unique(name,parent_id)', '*name* / Name and Category parent must be unique! Change name or category parent'),
-        ('code_uniq', 'unique (code)', '*code* / The code name must be unique !')
+        ('code_uniq', 'unique (code)', '*code* /codeNameUniq!')
     ]
 
 
@@ -827,7 +827,7 @@ class openstc_absent_type(OpenbaseCore):
 
     }
     _sql_constraints = [
-        ('code_uniq', 'unique (code)', '*code* / The code name must be unique !')
+        ('code_uniq', 'unique (code)', '*code* /codeNameUniq')
     ]
 openstc_absent_type()
 
@@ -1149,7 +1149,7 @@ class intervention_assignement(OpenbaseCore):
     }
 
     _sql_constraints = [
-        ('code_uniq', 'unique (code)', '*code* / The code name must be unique !')
+        ('code_uniq', 'unique (code)', '*code* /codeNameUniq')
     ]
 intervention_assignement()
 
