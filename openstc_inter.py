@@ -43,7 +43,7 @@ from tools.translate import _
 
 def _get_request_states(self, cursor, user_id, context=None):
     return (
-                ('wait', 'Wait'),('confirm', 'To be confirm'),('valid', 'Valid'),('refused', 'Refused'),('closed', 'Closed')
+                ('wait', 'Wait'),('to_confirm', 'To be confirm'),('valid', 'Valid'),('refused', 'Refused'),('finished', 'Finished')
             )
 
 def _get_param(params, key):
@@ -415,16 +415,16 @@ class task(OpenbaseCore):
 
                 if all_task_finnished == True:
                     project_obj.write(cr, uid, project.id, {
-                        'state': 'closed',
+                        'state': 'finished',
                     }, context=context)
 
                     if ask_id>0 :
                         ask_obj.write(cr, uid, ask_id, {
-                            'state': 'closed',
+                            'state': 'finished',
                         }, context=context)
 
                     #TODO
-                    #send email ==>  email_text: demande 'closed',
+                    #send email ==>  email_text: demande 'finished',
 
         return True
 
@@ -1013,7 +1013,7 @@ class project(OpenbaseCore):
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'date_deadline': fields.date('Deadline',select=True),
         'site1': fields.many2one('openstc.site', 'Site principal', select=True),
-        'state': fields.selection([('closed', 'Closed'),('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('cancelled', 'Cancelled')],
+        'state': fields.selection([('finished', 'Finished'),('template', 'Template'),('open', 'Open'),('scheduled', 'Scheduled'),('pending', 'Pending'), ('cancelled', 'Cancelled')],
                                   'State', readonly=True, required=True, help=''),
 
         'service_id': fields.many2one('openstc.service', 'Service', select=True),
@@ -1076,7 +1076,7 @@ class project(OpenbaseCore):
                                                                'cancel_reason':vals.get('cancel_reason',False)},context=context)
             ask_ids = [item['ask_id'][0] for item in self.read(cr, uid, ids, ['ask_id'],context=context) if item['ask_id']]
             if ask_ids:
-                ask_obj.write(cr, uid, ask_ids, {'state':'closed'})
+                ask_obj.write(cr, uid, ask_ids, {'state':'finished'})
             #TODO uncomment
             #send_email(self, cr, uid, [ask_id], params, context=None)
 
@@ -1111,7 +1111,7 @@ class project(OpenbaseCore):
             #update ask state of intervention
             if ask_id :
                 ask_obj.write(cr, uid, ask_id , {
-                            'state': 'closed',
+                            'state': 'finished',
                         }, context=context)
                 #TODO uncomment
                 #send_email(self, cr, uid, [ask_id], params, context=None)
@@ -1185,7 +1185,7 @@ class project_task_history(OpenbaseCore):
     _inherit = "project.task.history"
 
     _columns = {
-        'state': fields.selection([('closed', 'Closed'),('absent', 'Absent'),('draft', 'New'),('open', 'In Progress'),('pending', 'Pending'), ('done', 'Done'), ('cancelled', 'Cancelled')], 'State'),
+        'state': fields.selection([('finished', 'Finished'),('absent', 'Absent'),('draft', 'New'),('open', 'In Progress'),('pending', 'Pending'), ('done', 'Done'), ('cancelled', 'Cancelled')], 'State'),
 
     }
 
@@ -1235,15 +1235,15 @@ class ask(OpenbaseCore):
                         if ask['state'] == 'wait' :
                             res[id] = ['valid', 'refused']
                             if isDST == False:
-                                res[id] = ['valid', 'refused', 'confirm']
+                                res[id] = ['valid', 'refused', 'to_confirm']
 
-                        if ask['state'] == 'confirm' :
+                        if ask['state'] == 'to_confirm' :
                             res[id] = ['valid', 'refused']
 
                         if ask['state'] == 'refused' :
                             res[id] = ['valid']
                             if isDST == False:
-                                res[id] = ['valid', 'confirm']
+                                res[id] = ['valid', 'to_confirm']
 
         return res
 
@@ -1251,9 +1251,9 @@ class ask(OpenbaseCore):
         return 'DIRE' in groups_code or 'MANA' in groups_code
 
     _actions = {
-        'valid':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','confirm','refused'),
-        'refused':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','confirm'),
-        'confirm':lambda self,cr,uid,record,groups_code: 'MANA' in groups_code and record.state in ('wait','refused'),
+        'valid':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','to_confirm','refused'),
+        'refused':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','to_confirm'),
+        'to_confirm':lambda self,cr,uid,record,groups_code: 'MANA' in groups_code and record.state in ('wait','refused'),
         }
 
 #    def _is_valid_action(self, cr, uid, ids, fields, arg, context):
@@ -1265,7 +1265,7 @@ class ask(OpenbaseCore):
 #                res[id] = True;
 #        return res
 #
-#    def _is_request_confirm_action(self, cr, uid, ids, fields, arg, context):
+#    def _is_request_to_confirm_action(self, cr, uid, ids, fields, arg, context):
 #        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
 #        for id in res:
 #            asks = self.read(cr, uid, [id], ['state'], context=context)
@@ -1300,7 +1300,7 @@ class ask(OpenbaseCore):
             ask = ask_obj.browse(cr, uid, id, context)
             if ask :
                 modifyBy = user_obj.browse(cr, uid, ask.write_uid.id, context).name
-                if ask.state == 'valid' or ask.state == 'closed' :
+                if ask.state == 'valid' or ask.state == 'finished' :
                     for intervention_id in ask.intervention_ids :
                          first_date = None
                          last_date = None
@@ -1331,8 +1331,8 @@ class ask(OpenbaseCore):
                                                         datetime.strptime(first_date, '%Y-%m-%d  %H:%M:%S')
                                                         , context)
 
-                             if ask.state == 'closed' :
-                                 if intervention.state == 'closed' and last_date!=False :
+                             if ask.state == 'finished' :
+                                 if intervention.state == 'finished' and last_date!=False :
                                      res[id] += _(' Ended date ') + last_date.strftime(_("%A, %d. %B %Y %H:%M").encode('utf-8')).decode('utf-8')
                                  else:
                                       if intervention.cancel_reason:
@@ -1359,7 +1359,7 @@ class ask(OpenbaseCore):
                     else:
                         res[id] = _(' request refused ')
 
-                elif ask.state == 'confirm' :
+                elif ask.state == 'to_confirm' :
                     if ask.note:
                         res[id] = ask.note + '\n('+ modifyBy +')';
                     else:
@@ -1582,7 +1582,7 @@ class ask(OpenbaseCore):
 
     def action_to_be_confirm(self, cr, uid, ids, context=None):
          #TODO send email to DST
-         return self.write(cr, uid, ids, {'state': 'confirm'}, context=context)
+         return self.write(cr, uid, ids, {'state': 'to_confirm'}, context=context)
 
     def action_confirm(self, cr, uid, ids, context=None):
          #TODO send email to chef de service
@@ -1690,7 +1690,7 @@ class ask(OpenbaseCore):
             groups = [group.code for group in user.groups_id if group.code]
             search_filter = []
             if 'DIRE' in groups:
-                search_filter.extend([('state','=','confirm')])
+                search_filter.extend([('state','=','to_confirm')])
             elif 'MANA' in groups:
                 search_filter.extend([('state','=','wait')])
             #NOTE: if user is not DST nor Manager, returns all requests
