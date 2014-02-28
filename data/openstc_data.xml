@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    OpenSTC Interventions - Openerp Module to manage Cityhall technical department
+    Copyright (C) 2013 Siclic www.siclic.fr
+
+    This file is part of OpenSTC Interventions.
+
+    OpenSTC Interventions is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    OpenSTC Interventions is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with OpenSTC Interventions.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<openerp>
+	<data noupdate="0">
+		<!-- mail template about has been validated -->
+		    <record id="openstc_email_template_ask_valid" model="email.template">
+		        <field name="name">Demande d'intervention Validée</field>
+		        <field name="model_id" ref="model_openstc_ask"/>
+		    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or ''}</field>
+				<field name="email_to">${object.partner_mail or ''}</field>
+				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est validée</field>
+				<!-- -----------------BODY HTML-------------- -->
+				<field name="body_html"><![CDATA[
+				<h2>Madame, Monsieur,</h2>
+
+				<p>Nous vous confirmons la validation de : </p>
+
+				]]></field>
+				<!-- -----------------BODY TEXT-------------- -->
+				<field name="body_text"><![CDATA[
+				Madame, Monsieur
+
+				Nous vous confirmons la réservation de :
+
+		    ]]></field>
+	    </record>
+
+		<record id="openstc_pret_email_template_ask_finished" model="email.template">
+		        <field name="name">Demande d'intervention terminée</field>
+		        <field name="model_id" ref="model_openstc_ask"/>
+		    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or ''}</field>
+				<field name="email_to">${object.partner_mail or ''}</field>
+				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est terminée</field>
+				<!-- -----------------BODY HTML-------------- -->
+				<field name="body_html"><![CDATA[
+				<h2>Madame, Monsieur,</h2>
+
+				]]></field>
+
+				<!-- -----------------BODY TEXT-------------- -->
+				<field name="body_text"><![CDATA[
+				<h2>Madame, Monsieur,</h2>
+
+
+			    ]]></field>
+	    </record>
+	</data>
+</openerp>

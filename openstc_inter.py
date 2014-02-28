@@ -1256,35 +1256,6 @@ class ask(OpenbaseCore):
         'to_confirm':lambda self,cr,uid,record,groups_code: 'MANA' in groups_code and record.state in ('wait','refused'),
         }
 
-#    def _is_valid_action(self, cr, uid, ids, fields, arg, context):
-#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
-#        for id in res:
-#            asks = self.read(cr, uid, [id], ['state'], context=context)
-#            ask = asks[0] or False
-#            if ask['state'] in arg:
-#                res[id] = True;
-#        return res
-#
-#    def _is_request_to_confirm_action(self, cr, uid, ids, fields, arg, context):
-#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
-#        for id in res:
-#            asks = self.read(cr, uid, [id], ['state'], context=context)
-#            group_obj = self.pool.get('res.groups')
-#            group_ids = group_obj.search(cr, uid, [('code','=','DIRECTOR')])
-#            ask = asks[0] or False
-#            if ask['state'] in arg and len(group_ids)>0 :
-#                res[id] = True;
-#        return res
-#
-#    def _is_refuse_action(self, cr, uid, ids, fields, arg, context):
-#        res = self._is_possible_action(cr, uid, ids, fields, arg, context)
-#        for id in res:
-#            asks = self.read(cr, uid, [id], ['state'], context=context)
-#            ask = asks[0] or False
-#            if ask['state'] in arg:
-#                res[id] = True;
-#        return res
-
     def _tooltip(self, cr, uid, ids, myFields, arg, context):
         res = {}
 
@@ -1395,11 +1366,6 @@ class ask(OpenbaseCore):
         'partner_name':fields.function(_get_partner_name, method=True, string="PArnter name",type="char", store=True, select=True),
 
         'partner_address': fields.many2one('res.partner.address', 'Contact',ondelete='set null'),
-
-
-#        'partner_type': fields.many2one('openstc.partner.type', 'Partner Type', required=False),
-#        'partner_type_code': fields.char('Partner code', size=128),
-
         'partner_phone': fields.related('partner_address', 'phone', type='char', string='Téléphone'),
         'partner_email': fields.related('partner_address', 'email', type='char', string='Email'),
 
@@ -1409,9 +1375,6 @@ class ask(OpenbaseCore):
 
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Affectation'),
         'site1': fields.many2one('openstc.site', 'Site principal', required=True, select=True ),
-#        'site_name': fields.related('site1', 'name', type='char', string='Site'),
-#        'site2': fields.many2one('openstc.site', 'Site secondaire'),
-#        'site3': fields.many2one('openstc.site', 'Place'),
         'site_details': fields.text('Précision sur le site'),
         'note': fields.text('Note'),
         'refusal_reason': fields.text('Refusal reason'),
@@ -1489,155 +1452,54 @@ class ask(OpenbaseCore):
         return res
 
 
-    #valid ask from swif
-    def valid(self, cr, uid, ids, params, context=None):
-        ask_obj = self.pool.get(self._name)
-        ask = ask_obj.browse(cr, uid, ids[0], context)
-        project_obj = self.pool.get('project.project')
-        task_obj = self.pool.get('project.task')
-
-        #update ask with concerned service
-        ask_obj.write(cr, uid, ids[0], {
-                'state': params['request_state'],
-                'description': params['description'],
-                'intervention_assignement_id': params['intervention_assignement_id'],
-                'service_id':  params['service_id'],
-                'email_text': params['email_text'],
-            }, context=context)
-
-        #create intervention
-        project_id = project_obj.create(cr, uid, {
-                'ask_id': ask.id,
-                'name': ask.name,
-                'date_deadline': params['date_deadline'],
-                'description': params['description'],
-                'state': params['project_state'],
-                'site1': params['site1'],
-                'service_id':  params['service_id'],
-            }, context=context)
-
-        if params['create_task'] :
-            #create task
-            task_obj.create(cr, uid, {
-                 'project_id': project_id,
-                 'name': ask.name,
-                 'planned_hours': params['planned_hours'],
-                 'category_id': params['category_id'],
-                }, context=context)
-        #TODO : after configuration mail sender uncomment send_mail function
-        #send_email(self, cr, uid, ids, params, context=None)
+    def action_wait(self, cr, uid, ids, context=None):
+        #Nothing to do
+        return True
+    def action_valid(self, cr, uid, ids, context=None):
+        #self.send_email(cr, uid, ids, {'state': 'wait'}, context=context)
+        return True
+    def action_confirm(self, cr, uid, ids, context=None):
+        #Nothing to do
+        return True
+    def action_refused(self, cr, uid, ids, context=None):
+        #Nothing to do
+        return True
+    def action_finished(self, cr, uid, ids, context=None):
+        #self.send_email(cr, uid, ids, {'state': 'wait'}, context=context)
         return True
 
 
+    def envoyer_mail(self, cr, uid, ids, vals=None, attach_ids=[], context=None):
+        #TODO: check if company wants to send email (info not(opt_out) in partner)
+        #We keep only inter if partner have not opt_out checked
+        inter = self.browse(cr, uid, ids[0])
+        if not inter.partner_id.opt_out :
+            email_obj = self.pool.get("email.template")
+            email_tmpl_id = 0
+            prod_attaches = {}
+            data_obj = self.pool.get('ir.model.data')
+            model_map = { 'valid':'openstc_email_template_ask_valid',
+                         'finished':'openstc_email_template_ask_finished'}
+            #first, retrieve template_id according to 'state' parameter
+            if vals.get('state','') in model_map.keys():
+                email_tmpl_id = data_obj.get_object_reference(cr, uid, 'openstc',model_map.get(vals.get('state')))[1]
+                if email_tmpl_id:
+                    if isinstance(email_tmpl_id, list):
+                        email_tmpl_id = email_tmpl_id[0]
+                    #generate mail and send it
+                    mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, resa.id)
+                    self.pool.get("mail.message").write(cr, uid, [mail_id], {'attachment_ids':attach_values})
+                    self.pool.get("mail.message").send(cr, uid, [mail_id])
 
-
-    def action_wait(self, cr, uid, ids, context=None):
-        return self.write(cr, uid, ids, {'state': 'wait'}, context=context)
-    def action_valid(self, cr, uid, ids, context=None):
-        return self.write(cr, uid, ids, {'state': 'wait'}, context=context)
-    def action_confirm(self, cr, uid, ids, context=None):
-         return self.write(cr, uid, ids, {'state': 'to_confirm'}, context=context)
-    def action_refused(self, cr, uid, ids, context=None):
-        return self.write(cr, uid, ids, {'state': 'wait'}, context=context)
-    def action_finished(self, cr, uid, ids, context=None):
-        return self.write(cr, uid, ids, {'state': 'wait'}, context=context)
-
-
+        return True
 
 
     def unlink(self, cr, uid, ids, context=None):
-        for mydocument in self.browse(cr, uid, ids):
-            if mydocument.intervention_ids!=None and len(mydocument.intervention_ids) > 0:
+        for ask in self.browse(cr, uid, ids):
+            if ask.intervention_ids!=None and len(ask.intervention_ids) > 0:
                 raise osv.except_osv(_('Suppression Impossible !'),_('Des interventions sont liées à la demande'))
             else:
                 return super(ask, self).unlink(cr, uid, ids, context=context)
-
-    def onChangePartner(self, cr, uid, ids, partner_id, context=None):
-        res = {}
-        if partner_id :
-            partner_obj = self.pool.get('res.partner')
-            partner = partner_obj.browse(cr, uid, partner_id, context)
-            addresses = partner_obj.address_get(cr, uid, [partner.id])
-            res['value'] = {
-                'partner_address': addresses['default'],
-                'partner_phone' : partner.phone,
-                'partner_email': partner.email,
-                'site1': partner.technical_site_id.id,
-                'service_id': partner.technical_service_id.id,
-                'partner_service_id': partner.service_id.id,
-            }
-        else :
-            res['value'] = {
-                'partner_id' : False,
-                'partner_address': False,
-                'partner_phone' : '',
-                'partner_email': '',
-                'site1': False,
-                'service_id': '',
-                'partner_service_id': '',
-            }
-        return res
-
-    def onChangePartnerType(self, cr, uid, ids, partner_type, context=None):
-        res = {}
-        partner_type_obj = self.pool.get('openstc.partner.type')
-        partner_type_code = partner_type_obj.read(cr, uid, partner_type, ['code'],context)['code']
-
-        if partner_type_code:
-            res['partner_type_code'] = partner_type_code
-            res['partner_id'] = False
-            res['partner_address'] = None
-            res['partner_phone'] = ''
-            res['partner_email'] = ''
-            res['site1'] = None
-            res['service_id'] = ''
-            res['partner_service_id'] = ''
-        else:
-            res['partner_id'] = False
-            res['partner_address'] = None
-            res['partner_phone'] = ''
-            res['partner_email'] = ''
-            res['site1'] = None
-            res['service_id'] = ''
-            res['partner_service_id'] = ''
-
-        return {'value': res}
-
-    def onChangePartnerAddress(self, cr, uid, ids, partner_address, context=None):
-        res = {}
-        if partner_address :
-            partner_address_obj = self.pool.get('res.partner.address')
-            partner_address = partner_address_obj.browse(cr, uid, partner_address, context)
-            res['value'] = {
-                'partner_phone' : partner_address.phone,
-                'partner_email': partner_address.email,
-            }
-        else :
-            res['value'] = {
-                'partner_phone' : '',
-                'partner_email': '',
-            }
-        return res
-
-    def getNbRequestsTodo(self, cr, uid, users_id, filter=[], context=None):
-        if not isinstance(users_id, list):
-            users_id = [users_id]
-        ret = {}
-        for user in self.pool.get("res.users").browse(cr, uid, users_id, context=context):
-            ret.update({str(user.id):0})
-            #first, i get the code of user groups to filter easier
-            groups = [group.code for group in user.groups_id if group.code]
-            search_filter = []
-            if 'DIRE' in groups:
-                search_filter.extend([('state','=','to_confirm')])
-            elif 'MANA' in groups:
-                search_filter.extend([('state','=','wait')])
-            #NOTE: if user is not DST nor Manager, returns all requests
-
-            #launch search_count method adding optionnal filter defined in UI
-            search_filter.extend(filter)
-            ret[str(user.id)] = self.search_count(cr, user.id, search_filter, context=context)
-        return ret
 
 ask()
 
