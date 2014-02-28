@@ -46,6 +46,13 @@
             <field name="">Value</field>
         </record>
 
+        <record id="wkf_ask_activity_confirm" model="workflow.activity">
+            <field name="name">confirm</field>
+            <field name="wkf_id" ref="wkf_openstc_ask"/>
+            <field name="kind">function</field>
+            <field name="action">action_confirm()</field>
+        </record>
+
         <record id="wkf_ask_activity_refused" model="workflow.activity">
             <field name="name">refused</field>
             <field name="wkf_id" ref="wkf_openstc_ask"/>
@@ -53,11 +60,11 @@
             <field name="action">action_refused()</field>
         </record>
 
-        <record id="wkf_ask_activity_confirm" model="workflow.activity">
-            <field name="name">confirm</field>
+        <record id="wkf_ask_activity_finished" model="workflow.activity">
+            <field name="name">finished</field>
             <field name="wkf_id" ref="wkf_openstc_ask"/>
             <field name="kind">function</field>
-            <field name="action">action_to_be_confirm()</field>
+            <field name="action">action_finished()</field>
         </record>
 
 
@@ -65,12 +72,6 @@
         <!-- ************************************************************** -->
         <!-- ** Créations des transitions ********************************* -->
         <!-- ************************************************************** -->
-
-        <record id="wkf_ask_trans_wait_valid" model="workflow.transition">
-            <field name="act_from" ref="wkf_ask_activity_wait"/>
-            <field name="act_to" ref="wkf_ask_activity_valid"/>
-            <field name="signal">signal_valid</field>
-        </record>
 
         <record id="wkf_ask_trans_wait_refused" model="workflow.transition">
             <field name="act_from" ref="wkf_ask_activity_wait"/>
@@ -84,10 +85,28 @@
             <field name="signal">signal_confirm</field>
         </record>
 
+        <record id="wkf_ask_trans_wait_valid" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_wait"/>
+            <field name="act_to" ref="wkf_ask_activity_valid"/>
+            <field name="signal">signal_valid</field>
+        </record>
+
         <record id="wkf_ask_trans_confirm_wait" model="workflow.transition">
             <field name="act_from" ref="wkf_ask_activity_confirm"/>
             <field name="act_to" ref="wkf_ask_activity_wait"/>
             <field name="signal">signal_wait</field>
+        </record>
+
+        <record id="wkf_ask_trans_confirm_wait" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_confirm"/>
+            <field name="act_to" ref="wkf_ask_activity_valid"/>
+            <field name="signal">signal_valid</field>
+        </record>
+
+        <record id="wkf_ask_trans_confirm_wait" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_valid"/>
+            <field name="act_to" ref="wkf_ask_activity_valid"/>
+            <field name="signal">signal_valid</field>
         </record>
 
     </data>

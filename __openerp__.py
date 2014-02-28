@@ -44,7 +44,7 @@
 
         'views/openstc_view_inter.xml',
 
-        'workflow/ask.xml',
+        'workflow/openstc_workflow.xml',
         "unit_tests/unit_tests.xml",
 
     ],

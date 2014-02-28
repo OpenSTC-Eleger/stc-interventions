@@ -1529,82 +1529,21 @@ class ask(OpenbaseCore):
         return True
 
 
-    def action_valid(self, cr, uid, ids, context=None):
-        if context is None:
-            context = {}
 
-        document = self.browse(cr, uid, ids)[0]
-        data_obj = self.pool.get('ir.model.data')
-        form_view = data_obj.get_object_reference(cr, uid, 'openstc', 'view_openstc_ask_form2')
-        action_id = self.pool.get('ir.actions.act_window').search(cr, uid, [("name", "=", "Intervention asks")], context=context)
-        action_obj = self.pool.get('ir.actions.act_window').browse(cr, uid, action_id, context=context)[0]
-        res = {}
-        if action_obj:
-            res = {
-                'name' : 'Mentions',
-                'view_type': 'form',
-                'view_mode': 'form,tree',
-                'res_id': int(document.id),
-                'view_id': action_obj.view_id and [action_obj.view_id.id] or False,
-                'views': [(form_view and form_view[1] or False, 'form')],
-                'res_model': action_obj.res_model,
-                'type': action_obj.type,
-                'target': 'new',
-                }
-        return res
-
-
-    def action_valid_ok(self, cr, uid, ids, context=None):
-        self.write(cr, uid, ids, {'state': 'valid'}, context=context)
-        this = self.browse(cr, uid, ids[0], context=context)
-        intervention_obj = self.pool.get('project.project')
-        intervention_id = intervention_obj.create(cr, uid, {
-                #'qualifier_id': uid,
-                'name': this.name or 'A completer',
-                'date_deadline': this.date_deadline,
-                #'user_id': this.intervention_manager.id,
-                'site1': this.site1.id,
-                'ask_id': this.id,
-            }, context=context)
-
-
-        data_obj = self.pool.get('ir.model.data')
-        action_id = self.pool.get('ir.actions.act_window').search(cr, uid, [("name", "=", "Intervention asks")], context=context)
-        action_obj = self.pool.get('ir.actions.act_window').browse(cr, uid, action_id, context=context)[0]
-        res = {}
-        if action_obj:
-            res = {
-                'view_mode': 'tree,form',
-                'res_model': action_obj.res_model,
-                'type': action_obj.type,
-                }
-        return res
-
-    def action_to_be_confirm(self, cr, uid, ids, context=None):
-         #TODO send email to DST
-         return self.write(cr, uid, ids, {'state': 'to_confirm'}, context=context)
-
-    def action_confirm(self, cr, uid, ids, context=None):
-         #TODO send email to chef de service
-         return self.write(cr, uid, ids, {'state': 'wait', 'confirm_by_dst': True}, context=context)
-
-    def action_refused(self, cr, uid, ids, context=None):
-        if context is None:
-            context = {}
-        mod_obj = self.pool.get('ir.model.data')
-        act_obj = self.pool.get('ir.actions.act_window')
-        result = mod_obj._get_id(cr, uid, 'openstc', 'action_openstc_refused_ask_view')
-        if result:
-            id = mod_obj.read(cr, uid, [result], ['res_id'])[0]['res_id']
-        result = {}
-        if not id:
-            return result
-        result = act_obj.read(cr, uid, [id], context=context)[0]
-        result['target'] = 'new'
-        return result
 
     def action_wait(self, cr, uid, ids, context=None):
         return self.write(cr, uid, ids, {'state': 'wait'}, context=context)
+    def action_valid(self, cr, uid, ids, context=None):
+        return self.write(cr, uid, ids, {'state': 'wait'}, context=context)
+    def action_confirm(self, cr, uid, ids, context=None):
+         return self.write(cr, uid, ids, {'state': 'to_confirm'}, context=context)
+    def action_refused(self, cr, uid, ids, context=None):
+        return self.write(cr, uid, ids, {'state': 'wait'}, context=context)
+    def action_finished(self, cr, uid, ids, context=None):
+        return self.write(cr, uid, ids, {'state': 'wait'}, context=context)
+
+
+
 
     def unlink(self, cr, uid, ids, context=None):
         for mydocument in self.browse(cr, uid, ids):
