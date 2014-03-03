@@ -20,21 +20,19 @@
 -->
 <openerp>
 	<data noupdate="0">
-		<!-- mail template about has been validated -->
+	     	<!-- mail template about has been created -->
 		    <record id="openstc_email_template_ask_valid" model="email.template">
 		        <field name="name">Demande d'intervention Validée</field>
 		        <field name="model_id" ref="model_openstc_ask"/>
 		    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or ''}</field>
 				<field name="email_to">${object.partner_mail or ''}</field>
 				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est validée</field>
-				<!-- -----------------BODY HTML-------------- -->
+				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
-				<h2>Madame, Monsieur,</h2>
 
-				<p>Nous vous confirmons la validation de : </p>
 
 				]]></field>
-				<!-- -----------------BODY TEXT-------------- -->
+				<!-- BODY TEXT -->
 				<field name="body_text"><![CDATA[
 				Madame, Monsieur
 
@@ -42,20 +40,81 @@
 
 		    ]]></field>
 	    </record>
+		<!-- mail template about has been validated -->
+		<record id="openstc_email_template_ask_valid" model="email.template">
+		        <field name="name">Demande d'intervention Validée</field>
+		        <field name="model_id" ref="model_openstc_ask"/>
+		    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or ''}</field>
+				<field name="email_to">${object.partner_mail or ''}</field>
+				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est validée</field>
+				<!-- BODY HTML -->
+				<field name="body_html"><![CDATA[
+				<h2>Madame, Monsieur,</h2>
 
+				<p>Nous vous confirmons la validation de : </p>
+
+				]]></field>
+				<!-- BODY TEXT -->
+				<field name="body_text"><![CDATA[
+				Madame, Monsieur
+
+				Nous vous confirmons la réservation de :
+
+		    ]]></field>
+	    </record>
+		<!-- mail template about has been finished -->
 		<record id="openstc_pret_email_template_ask_finished" model="email.template">
 		        <field name="name">Demande d'intervention terminée</field>
 		        <field name="model_id" ref="model_openstc_ask"/>
 		    	<field name="email_from">${object.shop_id.company_id.partner_id.address[0].email or ''}</field>
 				<field name="email_to">${object.partner_mail or ''}</field>
 				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est terminée</field>
-				<!-- -----------------BODY HTML-------------- -->
+				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
 				<h2>Madame, Monsieur,</h2>
 
+					<%
+					from datetime import datetime
+					import pytz
+
+					my_last_checkout = None
+
+					%>
+
+					% for inter in object.intervention_ids:
+						for task in inter.tasks:
+						<%
+							my_checkin = datetime.strptime(str(task.date_start),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+							my_checkout = datetime.strptime(str(task.date_end),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+							if my_last_checkout == None:
+								my_last_checkout = my_checkout
+							if my_checkout > my_last_checkout:
+								my_last_checkout = my_checkout
+
+
+							my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+							my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+							my_last_checkout_str = my_last_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+
+							my_checkin_str = my_checkin_str.decode('utf-8')
+							my_checkout_str = my_checkout_str.decode('utf-8')
+							my_last_checkout_str = my_last_checkout_str.decode('utf-8')
+
+
+						%>
+						% endfor
+					% endfor
+
+					<p>L'intervention <b>${object.name}</b> s'est déroulée du ${my_checkin_str} au ${my_last_checkout_str}.
+					Cette intervention est terminée.</p>
+
+				   <br />
+				   <p>${object.write_uid.signature or ''} <br />
+				   ${object.shop_id.company_id.name or ''} </p>
+
 				]]></field>
 
-				<!-- -----------------BODY TEXT-------------- -->
+				<!-- BODY TEXT -->
 				<field name="body_text"><![CDATA[
 				<h2>Madame, Monsieur,</h2>
 

@@ -44,7 +44,7 @@
 
         'views/openstc_view_inter.xml',
 
-        'data/openresa_data.xml',
+        'data/openstc_data.xml',
 
         'workflow/openstc_workflow.xml',
         "unit_tests/unit_tests.xml",

@@ -1263,6 +1263,7 @@ class ask(OpenbaseCore):
         project_obj = self.pool.get('project.project')
         task_obj = self.pool.get('project.task')
         user_obj = self.pool.get('res.users')
+        modifyBy = ''
 
         for id in ids:
             res[id] = ''
@@ -1270,7 +1271,8 @@ class ask(OpenbaseCore):
 
             ask = ask_obj.browse(cr, uid, id, context)
             if ask :
-                modifyBy = user_obj.browse(cr, uid, ask.write_uid.id, context).name
+                if ask.write_uid:
+                    modifyBy = user_obj.browse(cr, uid, ask.write_uid.id, context).name
                 if ask.state == 'valid' or ask.state == 'finished' :
                     for intervention_id in ask.intervention_ids :
                          first_date = None
@@ -1410,6 +1412,7 @@ class ask(OpenbaseCore):
             data['manager_id'] = manager_id[0]
 
         res = super(ask, self).create(cr, uid, data, context)
+        #netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
         #TODO uncomment
         #send_email(self, cr, uid, [res], data, context)
         return res
@@ -1446,17 +1449,19 @@ class ask(OpenbaseCore):
             vals.update({'intervention_ids':[(0,0,inter_values)]})
 
         res = super(ask, self).write(cr, uid, ids, vals, context=context)
+        netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
         #if vals and vals.has_key('email_text'):
             #TODO uncomment
             #send_email(self, cr, uid, ids, vals, context)
         return res
 
 
+
     def action_wait(self, cr, uid, ids, context=None):
-        #Nothing to do
+        #self.envoyer_mail(self, cr, uid, ids, vals=None, context=None)
         return True
     def action_valid(self, cr, uid, ids, context=None):
-        #self.send_email(cr, uid, ids, {'state': 'wait'}, context=context)
+        #self.envoyer_mail(self, cr, uid, ids, vals=None, context=None)
         return True
     def action_confirm(self, cr, uid, ids, context=None):
         #Nothing to do
@@ -1465,11 +1470,11 @@ class ask(OpenbaseCore):
         #Nothing to do
         return True
     def action_finished(self, cr, uid, ids, context=None):
-        #self.send_email(cr, uid, ids, {'state': 'wait'}, context=context)
+        #self.envoyer_mail(self, cr, uid, ids, vals=None, context=None)
         return True
 
 
-    def envoyer_mail(self, cr, uid, ids, vals=None, attach_ids=[], context=None):
+    def envoyer_mail(self, cr, uid, ids, vals=None, context=None):
         #TODO: check if company wants to send email (info not(opt_out) in partner)
         #We keep only inter if partner have not opt_out checked
         inter = self.browse(cr, uid, ids[0])
