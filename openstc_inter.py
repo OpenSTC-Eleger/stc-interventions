@@ -1457,33 +1457,36 @@ class ask(OpenbaseCore):
 
 
 
-    def action_wait(self, cr, uid, ids, context=None):
-        #self.envoyer_mail(self, cr, uid, ids, vals=None, context=None)
+    def action_wait(self, cr, uid, ids):
+        self.send_mail(cr, uid, ids, {'state':'wait'})
         return True
-    def action_valid(self, cr, uid, ids, context=None):
-        #self.envoyer_mail(self, cr, uid, ids, vals=None, context=None)
+    def action_valid(self, cr, uid, ids):
+        self.send_mail(cr, uid, ids, {'state':'valid'})
         return True
-    def action_confirm(self, cr, uid, ids, context=None):
+    def action_confirm(cr, uid, ids):
         #Nothing to do
         return True
-    def action_refused(self, cr, uid, ids, context=None):
+    def action_refused( cr, uid, ids):
         #Nothing to do
         return True
-    def action_finished(self, cr, uid, ids, context=None):
-        #self.envoyer_mail(self, cr, uid, ids, vals=None, context=None)
+    def action_finished(self, cr, uid, ids):
+        self.send_mail(cr, uid, ids, {'state':'finished'})
         return True
 
 
-    def envoyer_mail(self, cr, uid, ids, vals=None, context=None):
+    def send_mail(self, cr, uid, ids, vals=None, context=None):
         #TODO: check if company wants to send email (info not(opt_out) in partner)
         #We keep only inter if partner have not opt_out checked
-        inter = self.browse(cr, uid, ids[0])
-        if not inter.partner_id.opt_out :
+        isList = isinstance(ids, types.ListType)
+        if isList == False :
+            ids = [ids]
+        ask = self.browse(cr, uid, ids[0], context=context)
+        if not ask.partner_id.opt_out :
             email_obj = self.pool.get("email.template")
             email_tmpl_id = 0
-            prod_attaches = {}
             data_obj = self.pool.get('ir.model.data')
-            model_map = { 'valid':'openstc_email_template_ask_valid',
+            model_map = {'wait':'openstc_email_template_ask_wait',
+                         'valid':'openstc_email_template_ask_valid',
                          'finished':'openstc_email_template_ask_finished'}
             #first, retrieve template_id according to 'state' parameter
             if vals.get('state','') in model_map.keys():
@@ -1492,8 +1495,8 @@ class ask(OpenbaseCore):
                     if isinstance(email_tmpl_id, list):
                         email_tmpl_id = email_tmpl_id[0]
                     #generate mail and send it
-                    mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, resa.id)
-                    self.pool.get("mail.message").write(cr, uid, [mail_id], {'attachment_ids':attach_values})
+                    mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, ask.id)
+                    self.pool.get("mail.message").write(cr, uid, [mail_id], {})
                     self.pool.get("mail.message").send(cr, uid, [mail_id])
 
         return True
