@@ -201,5 +201,46 @@
 
 			    ]]></field>
 	    </record>
+
+
+
+
+
+		<!-- mail template about has been created -->
+		<record id="openstc_email_template_project_scheduled" model="email.template">
+		        <field name="name">Intervention planifiée</field>
+		        <field name="model_id" ref="model_project_project"/>
+		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
+				<field name="email_to">pierreyves.fadet@siclic.fr</field>
+				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est planifiée</field>
+				<!-- BODY HTML -->
+				<field name="body_html"><![CDATA[
+					<h2>Madame, Monsieur,</h2>
+
+					<p>Nous vous confirmons que la demande d'intervention suivante a été planifiée </p>
+					<%
+					from datetime import datetime
+					import pytz
+					%>
+					<p>${ object.name } : </p>
+					<p>${ object.description } </p>
+				    ${ object.partner_id.company_id.name or '' } </p>
+
+				]]></field>
+				<!-- BODY TEXT -->
+				<field name="body_text"><![CDATA[
+					Madame, Monsieur,
+
+					Nous vous confirmons que la demande d'intervention suivante a été planifiée
+					<%
+					from datetime import datetime
+					import pytz
+					%>
+					${ object.name } :
+					${ object.description }
+
+				    ${ object.partner_id.company_id.name or '' }
+		    ]]></field>
+	    </record>
 	</data>
 </openerp>

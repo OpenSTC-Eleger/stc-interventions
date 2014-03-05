@@ -841,6 +841,9 @@ class project(OpenbaseCore):
     _description = "Interventon stc"
     _inherit = "project.project"
 
+    def _mail_templates(self, cr, uid, context=None):
+        return  {'scheduled':'openstc_email_template_project_scheduled'}
+
     def _get_projects_from_tasks(self, cr, uid, task_ids, context=None):
         tasks = self.pool.get('project.task').browse(cr, uid, task_ids, context=context)
         project_ids = [task.project_id.id for task in tasks if task.project_id]
@@ -1079,8 +1082,36 @@ class project(OpenbaseCore):
                 ask_obj.write(cr, uid, ask_ids, {'state':'finished'})
             #TODO uncomment
             #send_email(self, cr, uid, [ask_id], params, context=None)
-
+        netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
         return res
+
+    def action_open(self, cr, uid, ids):
+        return True
+
+    def action_template(self, cr, uid, ids):
+        return True
+
+    def action_scheduled(self, cr, uid, ids):
+        self.valid_and_send_mail(cr, uid, ids,{'state':'scheduled'})
+        return True
+
+    def action_pending(self, cr, uid, ids):
+        return True
+
+    def action_cancelled(self, cr, uid, ids):
+        return True
+
+    def action_finished(self, cr, uid, ids):
+        return True
+
+    def valid_and_send_mail(self, cr, uid, ids, vals, context=None):
+        inter = self.browse(cr, uid, ids[0], context=context)
+        #if object.partner_id.type_id.sending_mail
+        if inter.ask_id.partner_id.type_id.sending_mail:
+             self.send_mail(cr, uid, inter.id, vals, 'openstc', self._name,
+                                self._mail_templates(cr, uid, context))
+        return True
+
 
     #Cancel intervention from swif
     def cancel(self, cr, uid, ids, params, context=None):
@@ -1193,6 +1224,11 @@ class ask(OpenbaseCore):
     _name = "openstc.ask"
     _description = "openstc.ask"
     _order = "create_date desc"
+
+    def _mail_templates(self, cr, uid, context=None):
+        return  {'wait':'openstc_email_template_ask_wait',
+                 'valid':'openstc_email_template_ask_valid',
+                 'finished':'openstc_email_template_ask_finished'}
 
     def _get_user_service(self, cr, uid, ipurchase_orderds, fieldnames, name, args):
         return False
@@ -1412,9 +1448,6 @@ class ask(OpenbaseCore):
             data['manager_id'] = manager_id[0]
 
         res = super(ask, self).create(cr, uid, data, context)
-        #netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
-        #TODO uncomment
-        #send_email(self, cr, uid, [res], data, context)
         return res
 
     def write(self, cr, uid, ids, vals, context=None):
@@ -1450,18 +1483,15 @@ class ask(OpenbaseCore):
 
         res = super(ask, self).write(cr, uid, ids, vals, context=context)
         netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
-        #if vals and vals.has_key('email_text'):
-            #TODO uncomment
-            #send_email(self, cr, uid, ids, vals, context)
         return res
 
 
 
     def action_wait(self, cr, uid, ids):
-        self.send_mail(cr, uid, ids, {'state':'wait'})
+        self.valid_and_send_mail(cr, uid, ids,{'state':'wait'})
         return True
     def action_valid(self, cr, uid, ids):
-        self.send_mail(cr, uid, ids, {'state':'valid'})
+        self.valid_and_send_mail(cr, uid, ids,{'state':'valid'})
         return True
     def action_confirm(cr, uid, ids):
         #Nothing to do
@@ -1470,36 +1500,43 @@ class ask(OpenbaseCore):
         #Nothing to do
         return True
     def action_finished(self, cr, uid, ids):
-        self.send_mail(cr, uid, ids, {'state':'finished'})
+        self.valid_and_send_mail(cr, uid, ids,{'state':'finished'})
         return True
 
-
-    def send_mail(self, cr, uid, ids, vals=None, context=None):
-        #TODO: check if company wants to send email (info not(opt_out) in partner)
-        #We keep only inter if partner have not opt_out checked
-        isList = isinstance(ids, types.ListType)
-        if isList == False :
-            ids = [ids]
+    def valid_and_send_mail(self, cr, uid, ids, vals, context=None):
         ask = self.browse(cr, uid, ids[0], context=context)
-        if not ask.partner_id.opt_out :
-            email_obj = self.pool.get("email.template")
-            email_tmpl_id = 0
-            data_obj = self.pool.get('ir.model.data')
-            model_map = {'wait':'openstc_email_template_ask_wait',
-                         'valid':'openstc_email_template_ask_valid',
-                         'finished':'openstc_email_template_ask_finished'}
-            #first, retrieve template_id according to 'state' parameter
-            if vals.get('state','') in model_map.keys():
-                email_tmpl_id = data_obj.get_object_reference(cr, uid, 'openstc',model_map.get(vals.get('state')))[1]
-                if email_tmpl_id:
-                    if isinstance(email_tmpl_id, list):
-                        email_tmpl_id = email_tmpl_id[0]
-                    #generate mail and send it
-                    mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, ask.id)
-                    self.pool.get("mail.message").write(cr, uid, [mail_id], {})
-                    self.pool.get("mail.message").send(cr, uid, [mail_id])
-
+        #if object.partner_id.type_id.sending_mail
+        if ask.partner_id.type_id.sending_mail:
+             self.send_mail(cr, uid, ask.id, vals, 'openstc', self._name,
+                                self._mail_templates(cr, uid, context))
         return True
+
+
+#    def send_mail(self, cr, uid, ids, vals=None, context=None):
+#        isList = isinstance(ids, types.ListType)
+#        if isList == False :
+#            ids = [ids]
+#        ask = self.browse(cr, uid, ids[0], context=context)
+#        #Test if partner type has notification option
+#        if ask.partner_id.type_id.sending_mail :
+#            email_obj = self.pool.get("email.template")
+#            email_tmpl_id = 0
+#            data_obj = self.pool.get('ir.model.data')
+#            model_map = {'wait':'openstc_email_template_ask_wait',
+#                         'valid':'openstc_email_template_ask_valid',
+#                         'finished':'openstc_email_template_ask_finished'}
+#            #first, retrieve template_id according to 'state' parameter
+#            if vals.get('state','') in model_map.keys():
+#                email_tmpl_id = data_obj.get_object_reference(cr, uid, 'openstc',model_map.get(vals.get('state')))[1]
+#                if email_tmpl_id:
+#                    if isinstance(email_tmpl_id, list):
+#                        email_tmpl_id = email_tmpl_id[0]
+#                    #generate mail and send it
+#                    mail_id = email_obj.send_mail(cr, uid, email_tmpl_id, ask.id)
+#                    self.pool.get("mail.message").write(cr, uid, [mail_id], {})
+#                    self.pool.get("mail.message").send(cr, uid, [mail_id])
+#
+#        return True
 
 
     def unlink(self, cr, uid, ids, context=None):
