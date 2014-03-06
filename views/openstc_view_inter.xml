@@ -20,7 +20,7 @@
 -->
 <openerp>
     <!-- <data noupdate="0">-->
-	<data>
+	<data noupdate="0">
         <!--  Intervention assignment -->
 
         <record id="openstc_intervention_assignement_form_view" model="ir.ui.view">
@@ -28,7 +28,7 @@
             <field name="model">openstc.intervention.assignement</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="planning">
+                <form string="Categorie">
 					<field name="name" />
                 </form>
             </field>
@@ -45,7 +45,7 @@
 
         <record id="openstc_task_category_form_view" model="ir.ui.view">
             <field name="name">openstc.planning.form</field>
-            <field name="model">openstc.planning</field>
+            <field name="model">project.project</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="planning">
@@ -56,12 +56,10 @@
         <record id="openstc_action_view_planning" model="ir.actions.act_window">
             <field name="name">Planning</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">openstc.planning</field>
+            <field name="res_model">project.project</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-
-        <!--  Carto -->
 
         <record id="openstc_task_category_form_view" model="ir.ui.view">
             <field name="name">openstc.planning.form</field>
@@ -72,13 +70,6 @@
 					<field name="name" />
                 </form>
             </field>
-        </record>
-        <record id="action_openstc_view_carto_inter" model="ir.actions.act_window">
-            <field name="name">Statut interventions</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">openstc.planning</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
         </record>
 
 		<!--  Category -->
@@ -760,12 +751,12 @@
    	    <delete id="menu_openstc_partner" model="ir.ui.menu"/>
    	    <delete id="menu_action_openstc_view_partner_type2" model="ir.ui.menu"/>
    	    <delete id="menu_carto" model="ir.ui.menu"/>
-		
+
 		<menuitem name="Gestion des Interventions"
 		    parent="openbase.menu_configuration"
 		    id="menu_configuration_openstc"
    			sequence="6"/>
-   	    
+
    	 	<menuitem action="action_openstc_view_assignement2"
    			id="menu_action_openstc_view_assignement2"
    			parent="menu_configuration_openstc"
@@ -787,38 +778,7 @@
 
    		<delete id="menu_openstc_dico" model="ir.ui.menu"/>
 
-   		<!--  Carto -->
 
-   	  <menuitem id="menu_carto"
-			name="Cartographie"
-			groups="base.group_erp_manager"
-			parent="base.menu_main_pm"
-			sequence="4"/>
-
-
-   	 <menuitem action="action_openstc_view_carto_inter"
-   			id="menu_action_openstc_view_carto_request"
-   			parent="menu_carto"
-   			name="nouvelle intervention"
-   			groups="base.group_erp_manager"
-   			sequence="1"/>
-   	 <menuitem action="action_openstc_view_carto_inter"
-   			id="menu_action_openstc_view_carto_intervention"
-   			parent="menu_carto"
-   			groups="base.group_erp_manager"
-   			sequence="2"/>
-   	 <menuitem action="action_openstc_view_carto_inter"
-   			id="menu_action_openstc_view_carto_stat"
-   			parent="menu_carto"
-   			name="statistique"
-   			groups="base.group_erp_manager"
-   			sequence="3"/>
-   	 <menuitem action="action_openstc_view_carto_inter"
-   			id="menu_action_openstc_view_carto_geoportail"
-   			parent="menu_carto"
-   			name="geoportail"
-   			groups="base.group_erp_manager"
-   			sequence="4"/>
 
 		 <delete model="ir.ui.menu" id="project.menu_definitions" />
 		 <delete model="ir.ui.menu" id="project.menu_project_config_project" />

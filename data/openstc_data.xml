@@ -32,12 +32,14 @@
 					<h2>Madame, Monsieur,</h2>
 
 					<p>Nous vous confirmons que la demande d'intervention suivante a été enregistrée </p>
-					<%
-					from datetime import datetime
-					import pytz
-					%>
-					<p>${ object.name } : </p>
-					<p>${ object.description } </p>
+
+					<p>${ object.name } : <br />
+					${ object.description } </p><br />
+
+					<p>Vous recevrez prochainement un autre à email pour vous informer de la validation ou du refus de votre demande.</p> <br/>
+
+					<p>Bien cordialement</p>
+
 				    <p>${object.write_uid.signature or ''}<br />
 				    ${object.partner_id.company_id.name or ''} </p>
 
@@ -47,12 +49,14 @@
 					Madame, Monsieur,
 
 					Nous vous confirmons que la demande d'intervention suivante a été enregistrée
-					<%
-					from datetime import datetime
-					import pytz
-					%>
+
 					${ object.name } :
 					${ object.description }
+
+					Vous recevrez prochainement un autre à email pour vous informer de la validation ou du refus de votre demande.
+
+					Bien cordialement
+
 				    ${object.write_uid.signature or ''}
 				    ${object.partner_id.company_id.name or ''}
 		    ]]></field>
@@ -69,18 +73,28 @@
 					<h2>Madame, Monsieur,</h2>
 
 					<p>Nous vous confirmons que la demande d'intervention suivante a été validée </p>
+
 					<%
 					from datetime import datetime
 					import pytz
 					%>
+
 					<p>${ object.name } : </p>
 					<p>${ object.description } </p>
+
 					<%
+					date_deadline_str = ""
 					date_deadline = datetime.strptime(str(object.date_deadline),"%Y-%m-%d").replace(tzinfo=pytz.utc)
 					date_deadline_str = date_deadline.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x").encode('utf-8'))
-					date_deadline_str = date_deadline_str.decode('utf-8')
+
 					%>
+
 					<p>Date butoir :  ${date_deadline_str}</p>
+
+					<p>Vous recevrez prochainement un autre email pour vous informer de la planification de votre demande.</p>
+
+					<p>Bien cordialement</p>
+
 				    <p>${object.write_uid.signature or ''}<br />
 				    ${object.partner_id.company_id.name or ''} </p>
 
@@ -90,21 +104,69 @@
 					Madame, Monsieur,
 
 					Nous vous confirmons que la demande d'intervention suivante a été validée
+
 					<%
 					from datetime import datetime
 					import pytz
 					%>
-					<p>${ object.name } : </p>
-					<p>${ object.description } </p>
+
+					${ object.name } :
+					${ object.description }
+
 					<%
+					date_deadline_str= ""
 					date_deadline = datetime.strptime(str(object.date_deadline),"%Y-%m-%d").replace(tzinfo=pytz.utc)
 					date_deadline_str = date_deadline.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x").encode('utf-8'))
-					date_deadline_str = date_deadline_str.decode('utf-8')
+
 					%>
+
 					Date butoir :  ${date_deadline_str}
+
+					Vous recevrez prochainement un autre email pour vous informer de la planification de votre demande.
+
+					Bien cordialement
+
 				    ${object.write_uid.signature or ''}
 				    ${object.partner_id.company_id.name or ''}
 
+		    ]]></field>
+	    </record>
+	   	<!-- mail template about has been cancelled -->
+		<record id="openstc_email_template_ask_cancelled" model="email.template">
+		        <field name="name">Demande d'intervention Refusée</field>
+		        <field name="model_id" ref="model_openstc_ask"/>
+		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
+				<field name="email_to">pierreyves.fadet@siclic.fr</field>
+				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est refusée</field>
+				<!-- BODY HTML -->
+				<field name="body_html"><![CDATA[
+					<h2>Madame, Monsieur,</h2>
+
+					<p>Nous ne pouvons donner une suite favorable à votre demande d'intervention <b>${object.name or 'inconnu'}</b> :</p>
+
+					<p>La raison de ce refus : </br>
+					${object.refusal_reason or u'Contactez la Mairie pour plus détail'}
+					</p>
+
+					<p>Bien cordialement</p>
+
+				    <p>${object.write_uid.signature or ''}<br />
+				    ${object.partner_id.company_id.name or ''} </p>
+
+				]]></field>
+				<!-- BODY TEXT -->
+				<field name="body_text"><![CDATA[
+					Madame, Monsieur,
+
+					Nous ne pouvons donner une suite favorable à votre demande d'intervention ${object.name or 'inconnu'}
+
+					La raison de ce refus :
+					${object.refusal_reason or u'Contactez la Mairie pour plus détail'}
+
+					Bien cordialement
+
+				    ${object.write_uid.signature or ''}
+				    ${object.partner_id.company_id.name or ''}
 		    ]]></field>
 	    </record>
 		<!-- mail template about has been finished -->
@@ -122,8 +184,9 @@
 					from datetime import datetime
 					import pytz
 
+					my_first_checkin = None
 					my_last_checkout = None
-					my_checkin_str = ""
+					my_first_checkin_str = ""
 					my_last_checkout_str = ""
 					%>
 
@@ -132,6 +195,12 @@
 						<%
 							my_checkin = datetime.strptime(str(task.date_start),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
 							my_checkout = datetime.strptime(str(task.date_end),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+							if my_first_checkin == None:
+								my_first_checkin = my_checkin
+							if my_checkin < my_first_checkin:
+								my_first_checkin = my_checkin
+
+
 							if my_last_checkout == None:
 								my_last_checkout = my_checkout
 							if my_checkout > my_last_checkout:
@@ -139,18 +208,22 @@
 
 
 							my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+							my_first_checkin_str = my_first_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
 							my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
 							my_last_checkout_str = my_last_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
 
 							my_checkin_str = my_checkin_str.decode('utf-8')
+							my_first_checkin_str = my_first_checkin_str.decode('utf-8')
 							my_checkout_str = my_checkout_str.decode('utf-8')
 							my_last_checkout_str = my_last_checkout_str.decode('utf-8')
 						%>
 						% endfor
 					% endfor
 
-					<p>L'intervention <b>${object.name}</b> s'est déroulée du ${my_checkin_str} au ${my_last_checkout_str}.<br>
+					<p>L'intervention <b>${object.name}</b> s'est déroulée à partir du ${my_first_checkin_str} et s'est terminée le ${my_last_checkout_str}.<br>
 					Cette intervention est terminée.</p>
+
+					<p>Bien cordialement</p>
 
 				   <br />
 				   <p>${object.write_uid.signature or ''} <br />
@@ -166,9 +239,11 @@
 					from datetime import datetime
 					import pytz
 
+					my_first_checkin = None
 					my_last_checkout = None
-					my_checkin_str = ""
+					my_first_checkin_str = ""
 					my_last_checkout_str = ""
+
 					%>
 
 					% for inter in object.intervention_ids:
@@ -176,6 +251,12 @@
 						<%
 							my_checkin = datetime.strptime(str(task.date_start),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
 							my_checkout = datetime.strptime(str(task.date_end),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+							if my_first_checkin == None:
+								my_first_checkin = my_checkin
+							if my_checkin < my_first_checkin:
+								my_first_checkin = my_checkin
+
+
 							if my_last_checkout == None:
 								my_last_checkout = my_checkout
 							if my_checkout > my_last_checkout:
@@ -183,27 +264,28 @@
 
 
 							my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+							my_first_checkin_str = my_first_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
 							my_checkout_str = my_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
 							my_last_checkout_str = my_last_checkout.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
 
 							my_checkin_str = my_checkin_str.decode('utf-8')
+							my_first_checkin_str = my_first_checkin_str.decode('utf-8')
 							my_checkout_str = my_checkout_str.decode('utf-8')
 							my_last_checkout_str = my_last_checkout_str.decode('utf-8')
 						%>
 						% endfor
 					% endfor
 
-					Suite à la demande d'intervention ${object.name} s'est déroulée du ${my_checkin_str} au ${my_last_checkout_str}.
-					Cette réservation est terminée.
+					Suite à la demande d'intervention ${object.name} s'est déroulée à partir du ${my_first_checkin_str} et s'est terminée le ${my_last_checkout_str}.
+					Cette intervention est terminée.
+
+					Bien cordialement
 
 				   ${object.write_uid.signature or ''}
 
 
 			    ]]></field>
 	    </record>
-
-
-
 
 
 		<!-- mail template about has been created -->
@@ -217,29 +299,46 @@
 				<field name="body_html"><![CDATA[
 					<h2>Madame, Monsieur,</h2>
 
-					<p>Nous vous confirmons que la demande d'intervention suivante a été planifiée </p>
 					<%
 					from datetime import datetime
 					import pytz
+
+					create_date_str = ""
+					create_date= datetime.strptime(str(object.create_date),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+					create_date_str = create_date.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x à %Hh%M").encode('utf-8'))
+
 					%>
-					<p>${ object.name } : </p>
-					<p>${ object.description } </p>
-				    ${ object.partner_id.company_id.name or '' } </p>
+
+					<p>Nous vous confirmons que la demande d'intervention ${ object.name } a été planifiée le ${create_date_str} . </p>
+
+					<p>Vous recevrez prochainement un autre email pour vous informer de l'évolution de cette demande. </p>
+
+					<p>Bien cordialement</p>
+
+				    <p>${ object.ask_id.partner_id.company_id.name or '' } </p>
 
 				]]></field>
 				<!-- BODY TEXT -->
 				<field name="body_text"><![CDATA[
 					Madame, Monsieur,
 
-					Nous vous confirmons que la demande d'intervention suivante a été planifiée
 					<%
 					from datetime import datetime
 					import pytz
-					%>
-					${ object.name } :
-					${ object.description }
 
-				    ${ object.partner_id.company_id.name or '' }
+					create_date_str = ""
+					create_date = datetime.strptime(str(object.create_date),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+					create_date_str = create_date.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x à %Hh%M").encode('utf-8'))
+
+					%>
+
+					Nous vous confirmons que la demande d'intervention ${ object.name } a été planifiée le ${create_date_str}.
+
+					Vous recevrez prochainement un autre email pour vous informer de l'évolution de cette demande.
+
+					Bien cordialement
+
+				    ${ object.ask_id.partner_id.company_id.name or '' }
 		    ]]></field>
 	    </record>
 	</data>
