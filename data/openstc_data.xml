@@ -26,7 +26,7 @@
 		        <field name="model_id" ref="model_openstc_ask"/>
 		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
 				<field name="email_to">pierreyves.fadet@siclic.fr</field>
-				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est enregistrée</field>
+				<field name="subject">Votre demande d'intervention est enregistrée : ${object.name or 'inconnu'} </field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
 					<h2>Madame, Monsieur,</h2>
@@ -40,8 +40,8 @@
 
 					<p>Bien cordialement</p>
 
-				    <p>${object.write_uid.signature or ''}<br />
-				    ${object.partner_id.company_id.name or ''} </p>
+				    <p>${object.create_uid.signature or ''}<br />
+				    ${object.partner_id.company_id.name or object.create_uid.company_id.name or ''} </p>
 
 				]]></field>
 				<!-- BODY TEXT -->
@@ -57,8 +57,8 @@
 
 					Bien cordialement
 
-				    ${object.write_uid.signature or ''}
-				    ${object.partner_id.company_id.name or ''}
+				    ${object.create_uid.signature or ''}
+				    ${object.create_uid.company_id.name or ''}
 		    ]]></field>
 	    </record>
 		<!-- mail template about has been validated -->
@@ -67,7 +67,7 @@
 		        <field name="model_id" ref="model_openstc_ask"/>
 		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
 				<field name="email_to">pierreyves.fadet@siclic.fr</field>
-				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est validée</field>
+				<field name="subject">Votre demande d'intervention est validée: ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
 					<h2>Madame, Monsieur,</h2>
@@ -91,7 +91,7 @@
 
 					<p>Date butoir :  ${date_deadline_str}</p>
 
-					<p>Vous recevrez prochainement un autre email pour vous informer de la planification de votre demande.</p>
+					<p>Vous recevrez prochainement un autre email pour vous informer de la planification ou de la clôture de votre demande</p>
 
 					<p>Bien cordialement</p>
 
@@ -122,7 +122,7 @@
 
 					Date butoir :  ${date_deadline_str}
 
-					Vous recevrez prochainement un autre email pour vous informer de la planification de votre demande.
+					Vous recevrez prochainement un autre email pour vous informer de la planification ou de la clôture de votre demande
 
 					Bien cordialement
 
@@ -137,12 +137,12 @@
 		        <field name="model_id" ref="model_openstc_ask"/>
 		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
 				<field name="email_to">pierreyves.fadet@siclic.fr</field>
-				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est refusée</field>
+				<field name="subject">Votre demande d'intervention est refusée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
 					<h2>Madame, Monsieur,</h2>
 
-					<p>Nous ne pouvons donner une suite favorable à votre demande d'intervention <b>${object.name or 'inconnu'}</b> :</p>
+					<p>Nous ne pouvons donner une suite favorable à votre demande d'intervention <b>${object.name or 'inconnu'}</b> </p>
 
 					<p>La raison de ce refus : </br>
 					${object.refusal_reason or u'Contactez la Mairie pour plus détail'}
@@ -175,7 +175,7 @@
 		        <field name="model_id" ref="model_openstc_ask"/>
 		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
 				<field name="email_to">pierreyves.fadet@siclic.fr</field>
-				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est terminée</field>
+				<field name="subject">Votre demande d'intervention  est terminée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
 				<h2>Madame, Monsieur,</h2>
@@ -294,7 +294,7 @@
 		        <field name="model_id" ref="model_project_project"/>
 		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
 				<field name="email_to">pierreyves.fadet@siclic.fr</field>
-				<field name="subject">Votre Demande d'intervention: ${object.name or 'inconnu'} est planifiée</field>
+				<field name="subject">Votre demande d'intervention  est planifiée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
 					<h2>Madame, Monsieur,</h2>
@@ -303,13 +303,30 @@
 					from datetime import datetime
 					import pytz
 
-					create_date_str = ""
-					create_date= datetime.strptime(str(object.create_date),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-					create_date_str = create_date.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x à %Hh%M").encode('utf-8'))
-
+					my_first_checkin = None
+					my_first_checkin_str = ""
 					%>
 
-					<p>Nous vous confirmons que la demande d'intervention ${ object.name } a été planifiée le ${create_date_str} . </p>
+
+					%for task in object.tasks:
+					<%
+						my_checkin = datetime.strptime(str(task.date_start),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+						if my_first_checkin == None:
+							my_first_checkin = my_checkin
+						if my_checkin < my_first_checkin:
+							my_first_checkin = my_checkin
+
+						my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+						my_first_checkin_str = my_first_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+
+						my_checkin_str = my_checkin_str.decode('utf-8')
+						my_first_checkin_str = my_first_checkin_str.decode('utf-8')
+
+					%>
+					% endfor
+
+
+					<p>Nous vous confirmons que la demande d'intervention ${ object.name } a été planifiée à partir du  ${my_first_checkin_str} . </p>
 
 					<p>Vous recevrez prochainement un autre email pour vous informer de l'évolution de cette demande. </p>
 
@@ -326,13 +343,29 @@
 					from datetime import datetime
 					import pytz
 
-					create_date_str = ""
-					create_date = datetime.strptime(str(object.create_date),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-					create_date_str = create_date.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x à %Hh%M").encode('utf-8'))
-
+					my_first_checkin = None
+					my_first_checkin_str = ""
 					%>
 
-					Nous vous confirmons que la demande d'intervention ${ object.name } a été planifiée le ${create_date_str}.
+
+					%for task in object.tasks:
+					<%
+						my_checkin = datetime.strptime(str(task.date_start),"%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+						if my_first_checkin == None:
+							my_first_checkin = my_checkin
+						if my_checkin < my_first_checkin:
+							my_first_checkin = my_checkin
+
+						my_checkin_str = my_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+						my_first_checkin_str = my_first_checkin.astimezone(pytz.timezone("Europe/Paris")).strftime(("%x %Hh%M").encode('utf-8'))
+
+						my_checkin_str = my_checkin_str.decode('utf-8')
+						my_first_checkin_str = my_first_checkin_str.decode('utf-8')
+
+					%>
+					% endfor
+
+					Nous vous confirmons que la demande d'intervention ${ object.name } a été planifiée le ${my_first_checkin_str}.
 
 					Vous recevrez prochainement un autre email pour vous informer de l'évolution de cette demande.
 
