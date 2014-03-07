@@ -24,8 +24,8 @@
 		    <record id="openstc_email_template_ask_wait" model="email.template">
 		        <field name="name">Demande d'intervention Enregistrée</field>
 		        <field name="model_id" ref="model_openstc_ask"/>
-		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
-				<field name="email_to">pierreyves.fadet@siclic.fr</field>
+		    	<field name="email_from">${object.create_uid.company_id.partner_id.address[0].email or ''}</field>
+				<field name="email_to">${object.people_name or object.partner_id.email or ''}</field>
 				<field name="subject">Votre demande d'intervention est enregistrée : ${object.name or 'inconnu'} </field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
@@ -65,8 +65,8 @@
 		<record id="openstc_email_template_ask_valid" model="email.template">
 		        <field name="name">Demande d'intervention Validée</field>
 		        <field name="model_id" ref="model_openstc_ask"/>
-		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
-				<field name="email_to">pierreyves.fadet@siclic.fr</field>
+		    	<field name="email_from">${object.create_uid.company_id.partner_id.address[0].email or ''}</field>
+				<field name="email_to">${object.people_name or object.partner_id.email or ''}</field>
 				<field name="subject">Votre demande d'intervention est validée: ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
@@ -135,8 +135,8 @@
 		<record id="openstc_email_template_ask_cancelled" model="email.template">
 		        <field name="name">Demande d'intervention Refusée</field>
 		        <field name="model_id" ref="model_openstc_ask"/>
-		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
-				<field name="email_to">pierreyves.fadet@siclic.fr</field>
+		    	<field name="email_from">${object.create_uid.company_id.partner_id.address[0].email or ''}</field>
+				<field name="email_to">${object.people_name or object.partner_id.email or ''}</field>
 				<field name="subject">Votre demande d'intervention est refusée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
@@ -173,8 +173,8 @@
 		<record id="openstc_email_template_ask_finished" model="email.template">
 		        <field name="name">Demande d'intervention terminée</field>
 		        <field name="model_id" ref="model_openstc_ask"/>
-		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
-				<field name="email_to">pierreyves.fadet@siclic.fr</field>
+		    	<field name="email_from">${object.create_uid.company_id.partner_id.address[0].email or ''}</field>
+				<field name="email_to">${object.people_name or object.partner_id.email or ''}</field>
 				<field name="subject">Votre demande d'intervention  est terminée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
@@ -292,8 +292,8 @@
 		<record id="openstc_email_template_project_scheduled" model="email.template">
 		        <field name="name">Intervention planifiée</field>
 		        <field name="model_id" ref="model_project_project"/>
-		    	<field name="email_from">pierreyves.fadet@siclic.fr</field>
-				<field name="email_to">pierreyves.fadet@siclic.fr</field>
+		    	<field name="email_from">${object.create_uid.company_id.partner_id.address[0].email or ''}</field>
+				<field name="email_to">${object.people_name or object.partner_id.email or ''}</field>
 				<field name="subject">Votre demande d'intervention  est planifiée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
