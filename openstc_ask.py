@@ -77,58 +77,16 @@ class ask(OpenbaseCore):
         return user_obj.read(cr, uid, uid, ['service_ids'],context)['service_ids']
 
 
-    """
-        Returrn all possible actions for current ask
-    """
-    def _is_possible_action(self, cr, uid, ids, fields, arg, context):
-        res = {}
-        user_obj = self.pool.get('res.users')
-        group_obj = self.pool.get('res.groups')
-
-        for id in ids:
-            res[id] = []
-            isDST = False
-            isManager = False
-
-            asks = self.read(cr, uid, [id], ['intervention_ids','service_id','state'], context=context)
-            user = user_obj.read(cr, uid, uid,
-                                        ['groups_id','service_ids'],
-                                        context)
-            #user is DST (DIRECTOR group, code group=DIRE)?
-            group_ids = group_obj.search(cr, uid, [('code','=','DIRE'),('id','in',user['groups_id'])])
-            if len( group_ids ) != 0:
-                isDST = True
-
-            #user is Manager (code group = MANA)?
-            group_ids = group_obj.search(cr, uid, [('code','in',('DIRE','MANA'))])
-            if set(user['groups_id']).intersection(set(group_ids)) :
-                isManager = True
-
-            ask = asks[0] or False
-            if isManager and ask and ask.has_key('intervention_ids')!=False and ask.has_key('service_id') and user.has_key('service_ids')!=False :
-                if len(ask['intervention_ids'])==0 and ask['service_id'][0] in user['service_ids']:
-                        if ask['state'] == 'wait' :
-                            res[id] = ['valid', 'refused']
-                            if isDST == False:
-                                res[id] = ['valid', 'refused', 'to_confirm']
-
-                        if ask['state'] == 'to_confirm' :
-                            res[id] = ['valid', 'refused']
-
-                        if ask['state'] == 'refused' :
-                            res[id] = ['valid']
-                            if isDST == False:
-                                res[id] = ['valid', 'to_confirm']
-
-        return res
-
     def managerOnly(self, cr, uid, record, groups_code):
         return 'DIRE' in groups_code or 'MANA' in groups_code
 
     _actions = {
-        'valid':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','to_confirm','refused'),
-        'refused':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','to_confirm'),
-        'to_confirm':lambda self,cr,uid,record,groups_code: 'MANA' in groups_code and record.state in ('wait','refused'),
+        'valid':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','to_confirm','refused') and
+                    self.pool.get("res.users").search(cr, uid,['&',('id', '=', uid ),('service_ids','in',record.service_id.id)]),
+        'refused':lambda self,cr,uid,record,groups_code: self.managerOnly(cr,uid,record,groups_code) and record.state in ('wait','to_confirm') and
+                    self.pool.get("res.users").search(cr, uid,['&',('id', '=', uid ),('service_ids','in',record.service_id.id)]),
+        'to_confirm':lambda self,cr,uid,record,groups_code: 'MANA' in groups_code and record.state in ('wait','refused') and
+                    self.pool.get("res.users").search(cr, uid,['&',('id', '=', uid ),('service_ids','in',record.service_id.id)]),
         }
 
 
