@@ -293,7 +293,8 @@ class ask(OpenbaseCore):
             vals.update({'intervention_ids':[(0,0,inter_values)]})
 
         res = super(ask, self).write(cr, uid, ids, vals, context=context)
-        netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
+        if vals.has_key('state') :
+            netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
         return res
 
 

@@ -293,7 +293,8 @@ class project(OpenbaseCore):
             ask_ids = [item['ask_id'][0] for item in self.read(cr, uid, ids, ['ask_id'],context=context) if item['ask_id']]
             if ask_ids:
                 ask_obj.write(cr, uid, ask_ids, {'state':'finished'})
-        netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
+        if vals.has_key('state') :
+            netsvc.LocalService('workflow').trg_validate(uid, self._name, ids[0], vals['state'], cr)
         return res
 
 
