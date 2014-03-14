@@ -68,7 +68,7 @@
 
     <!-- Overrides openresa rule for stc user : he can create an intervenention for any partner
     But an hotel_user (internal agent) can only create booking for his -->
-   	<record model="ir.rule" id="res_partner_stc_rule_access">
+   	<!--  <record model="ir.rule" id="res_partner_stc_rule_access">
         <field name="name">Employee User Rule Access </field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="groups" eval="[(6,0,[ref('openbase.openstc_employee')])]" />
@@ -77,7 +77,7 @@
         <field eval="1" name="perm_write"/>
         <field eval="1" name="perm_read"/>
         <field eval="1" name="perm_create"/>
-	</record>
+	</record> -->
 
     <!--
     <record model="ir.rule" id="task_rule">
