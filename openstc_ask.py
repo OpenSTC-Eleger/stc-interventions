@@ -324,11 +324,18 @@ class ask(OpenbaseCore):
     """
     def valid_and_send_mail(self, cr, uid, ids, vals, context=None):
         ask = self.browse(cr, uid, ids[0], context=context)
+        send_mail = False
+        if ask.people_email != '':
+            send_mail=True
+        elif ask.partner_id and ask.partner_id.type_id :
+            if ask.partner_id.type_id.sending_mail :
+                send_mail=True
+        if not send_mail: return False
+
         try:
             #sending mail if partner's type has option 'sending mail'
-            if ask.partner_id.type_id.sending_mail:
-                 self.send_mail(cr, uid, ask.id, vals, 'openstc', self._name,
-                                    self._mail_templates(cr, uid, context))
+             self.send_mail(cr, uid, ask.id, vals, 'openstc', self._name,
+                                self._mail_templates(cr, uid, context))
         #Except if type is not defined on partner (normaly not possible)
         except Exception,e:
             return False
