@@ -2,7 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_account_analytic_account,account.analytic.account,analytic.model_account_analytic_account,base.group_user,1,0,0,0
 access_account_analytic_account_qualifier,account.analytic.account qualifier,analytic.model_account_analytic_account,openbase.openstc_qualifier,1,1,1,0
 
-access_openstc_planning,openstc_planning,model_openstc_planning,openbase.openstc_dst,1,1,1,1
 access_account_analytic_line_project_employee,account.analytic.line employee,analytic.model_account_analytic_line,openbase.openstc_employee,1,0,0,0
 access_account_analytic_line_project_dst,account.analytic.line dst,analytic.model_account_analytic_line,openbase.openstc_dst,1,1,1,1
 access_account_analytic_line_project_manager,account.analytic.line manager,analytic.model_account_analytic_line,openbase.openstc_manager,1,1,1,1
@@ -33,12 +32,6 @@ access_openstc_ask_employee,openstc_ask employee,model_openstc_ask,openbase.open
 access_openstc_ask_accueil,openstc_ask accueil,model_openstc_ask,openbase.openstc_accueil,1,1,1,0
 access_openstc_ask_agent_non_technique,openstc_ask agent_non_technique,model_openstc_ask,openbase.openstc_agent_non_technique,1,1,1,0
 
-access_openstc_planning_qualifier,openstc_planning qualifier,model_openstc_planning,openbase.openstc_manager,1,1,1,1
-access_openstc_planning_employee,openstc_planning employee,model_openstc_planning,openbase.openstc_employee,1,0,0,0
-access_openstc_planning_accueil,openstc_planning accueil,model_openstc_planning,openbase.openstc_accueil,1,0,0,0
-access_openstc_planning_agent_non_technique,openstc_planning agent_non_technique,model_openstc_planning,openbase.openstc_agent_non_technique,1,0,0,0
-access_openstc_planning_agent,openstc_planning agent,model_openstc_planning,openbase.openstc_agent,1,0,1,0
-
 access_project_project_base_user,project_project base user,model_project_project,base.group_user,1,0,0,0
 access_project_project_qualifier,project_project qualifier,model_project_project,openbase.openstc_qualifier,1,1,1,1
 access_project_project_agent,project_project agent,model_project_project,openbase.openstc_agent,1,0,0,0
@@ -47,7 +40,7 @@ access_project_project_accueil,project_project accueil,model_project_project,ope
 access_project_project_agent_non_technique,project_project agent_non_technique,model_project_project,openbase.openstc_agent_non_technique,1,0,0,0
 access_project_project_manager,project_project manager,model_project_project,openbase.openstc_manager,1,1,1,1
 access_project_project_dst,project_project dst,model_project_project,openbase.openstc_dst,1,1,1,1
-access_project_vs_hours,project.vs.hours,model_project_vs_hours,,1,0,0,0
+
 
 access_project_task_dst,project_task dst,model_project_task,openbase.openstc_dst,1,1,1,1
 access_project_task_qualifier,project_task qualifier,model_project_task,openbase.openstc_qualifier,1,0,0,0
@@ -76,5 +69,5 @@ access_res_partner_address_user,res_partner address,base.model_res_partner_addre
 access_res_partner_dst,res_partner dst,base.model_res_partner,openbase.openstc_dst,1,1,1,1
 access_res_partner_address_dst,res_partner address dst,base.model_res_partner_address,openbase.openstc_dst,1,1,1,0
 
-access_openstc_todo_dst,openstc_todo dst,model_openstc_todo,openbase.openstc_dst,1,1,1,1
+
 
