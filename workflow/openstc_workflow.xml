@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    OpenSTC Interventions - Openerp Module to manage Cityhall technical department
+    Copyright (C) 2013 Siclic www.siclic.fr
+
+    This file is part of OpenSTC Interventions.
+
+    OpenSTC Interventions is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    OpenSTC Interventions is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with OpenSTC Interventions.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<openerp>
+    <data noupdate="0">
+
+        <!-- ************************************************************** -->
+        <!-- ** Workflow demandes d'intervention ************************** -->
+        <!-- ************************************************************** -->
+
+        <record id="wkf_openstc_ask" model="workflow">
+            <field name="name">OpenSTC Ask</field>
+            <field name="osv">openstc.ask</field>
+            <field name="on_create" eval="True"/>
+        </record>
+
+        <!-- ** Création des activités sur les demandes d'interventions correspondant aux étapes ********** -->
+
+        <record id="wkf_ask_activity_wait" model="workflow.activity">
+            <field name="name">wait</field>
+            <field name="wkf_id" ref="wkf_openstc_ask"/>
+            <field name="kind">function</field>
+            <field name="action">action_wait()</field>
+            <field name="flow_start" eval="True"/>
+        </record>
+
+        <record id="wkf_ask_activity_valid" model="workflow.activity">
+            <field name="name">valid</field>
+            <field name="wkf_id" ref="wkf_openstc_ask"/>
+            <field name="kind">function</field>
+            <field name="action">action_valid()</field>
+        </record>
+
+        <record id="wkf_ask_activity_confirm" model="workflow.activity">
+            <field name="name">confirm</field>
+            <field name="wkf_id" ref="wkf_openstc_ask"/>
+            <field name="kind">function</field>
+            <field name="action">action_confirm()</field>
+        </record>
+
+        <record id="wkf_ask_activity_refused" model="workflow.activity">
+            <field name="name">refused</field>
+            <field name="wkf_id" ref="wkf_openstc_ask"/>
+            <field name="kind">function</field>
+            <field name="action">action_refused()</field>
+        </record>
+
+        <record id="wkf_ask_activity_finished" model="workflow.activity">
+            <field name="name">finished</field>
+            <field name="wkf_id" ref="wkf_openstc_ask"/>
+            <field name="kind">function</field>
+            <field name="action">action_finished()</field>
+        </record>
+
+        <!-- ** Créations des transitions  sur les demandes d'interventions ********************************* -->
+
+        <record id="wkf_ask_trans_wait_refused" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_wait"/>
+            <field name="act_to" ref="wkf_ask_activity_refused"/>
+            <field name="signal">refused</field>
+        </record>
+
+        <record id="wkf_ask_trans_wait_confirm" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_wait"/>
+            <field name="act_to" ref="wkf_ask_activity_confirm"/>
+            <field name="signal">confirm</field>
+        </record>
+
+        <record id="wkf_ask_trans_wait_valid" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_wait"/>
+            <field name="act_to" ref="wkf_ask_activity_valid"/>
+            <field name="signal">valid</field>
+        </record>
+
+        <record id="wkf_ask_trans_confirm_wait" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_confirm"/>
+            <field name="act_to" ref="wkf_ask_activity_wait"/>
+            <field name="signal">wait</field>
+        </record>
+
+        <record id="wkf_ask_trans_confirm_valid" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_confirm"/>
+            <field name="act_to" ref="wkf_ask_activity_valid"/>
+            <field name="signal">valid</field>
+        </record>
+
+        <record id="wkf_ask_trans_valid_finished" model="workflow.transition">
+            <field name="act_from" ref="wkf_ask_activity_valid"/>
+            <field name="act_to" ref="wkf_ask_activity_finished"/>
+            <field name="signal">finished</field>
+        </record>
+
+
+        <!-- ************************************************************** -->
+        <!-- ** Workflow interventions ************************** -->
+        <!-- ************************************************************** -->
+
+        <record id="wkf_openstc_project" model="workflow">
+            <field name="name">OpenSTC Project</field>
+            <field name="osv">project.project</field>
+            <field name="on_create" eval="True"/>
+        </record>
+
+        <!-- ** Création des activités sur les interventions correspondant aux étapes ********** -->
+
+        <record id="wkf_project_activity_open" model="workflow.activity">
+            <field name="name">open</field>
+            <field name="wkf_id" ref="wkf_openstc_project"/>
+            <field name="kind">function</field>
+            <field name="action">action_open()</field>
+            <field name="flow_start" eval="True"/>
+        </record>
+
+        <record id="wkf_project_activity_template" model="workflow.activity">
+            <field name="name">template</field>
+            <field name="wkf_id" ref="wkf_openstc_project"/>
+            <field name="kind">function</field>
+            <field name="action">action_template()</field>
+        </record>
+
+        <record id="wkf_project_activity_scheduled" model="workflow.activity">
+            <field name="name">scheduled</field>
+            <field name="wkf_id" ref="wkf_openstc_project"/>
+            <field name="kind">function</field>
+            <field name="action">action_scheduled()</field>
+        </record>
+
+        <record id="wkf_project_activity_pending" model="workflow.activity">
+            <field name="name">pending</field>
+            <field name="wkf_id" ref="wkf_openstc_project"/>
+            <field name="kind">function</field>
+            <field name="action">action_pending()</field>
+        </record>
+
+        <record id="wkf_project_activity_cancelled" model="workflow.activity">
+            <field name="name">cancelled</field>
+            <field name="wkf_id" ref="wkf_openstc_project"/>
+            <field name="kind">function</field>
+            <field name="action">action_cancelled()</field>
+        </record>
+
+        <record id="wkf_project_activity_finished" model="workflow.activity">
+            <field name="name">finished</field>
+            <field name="wkf_id" ref="wkf_openstc_project"/>
+            <field name="kind">function</field>
+            <field name="action">action_finished()</field>
+        </record>
+
+        <!-- ** Créations des transitions  sur les interventions ********************************* -->
+
+        <record id="wkf_project_trans_open_scheduled" model="workflow.transition">
+            <field name="act_from" ref="wkf_project_activity_open"/>
+            <field name="act_to" ref="wkf_project_activity_scheduled"/>
+            <field name="signal">scheduled</field>
+        </record>
+
+        <record id="wkf_project_trans_open_template" model="workflow.transition">
+            <field name="act_from" ref="wkf_project_activity_open"/>
+            <field name="act_to" ref="wkf_project_activity_template"/>
+            <field name="signal">template</field>
+        </record>
+
+        <record id="wkf_project_trans_open_cancelled" model="workflow.transition">
+            <field name="act_from" ref="wkf_project_activity_open"/>
+            <field name="act_to" ref="wkf_project_activity_cancelled"/>
+            <field name="signal">cancelled</field>
+        </record>
+
+        <record id="wkf_project_trans_scheduled_open" model="workflow.transition">
+            <field name="act_from" ref="wkf_project_activity_scheduled"/>
+            <field name="act_to" ref="wkf_project_activity_open"/>
+            <field name="signal">scheduled</field>
+        </record>
+
+        <record id="wkf_project_trans_scheduled_cancelled" model="workflow.transition">
+            <field name="act_from" ref="wkf_project_activity_scheduled"/>
+            <field name="act_to" ref="wkf_project_activity_cancelled"/>
+            <field name="signal">cancelled</field>
+        </record>
+
+        <record id="wkf_project_trans_scheduled_pending" model="workflow.transition">
+            <field name="act_from" ref="wkf_project_activity_scheduled"/>
+            <field name="act_to" ref="wkf_project_activity_pending"/>
+            <field name="signal">pending</field>
+        </record>
+
+
+        <record id="wkf_project_trans_pending_finished" model="workflow.transition">
+            <field name="act_from" ref="wkf_project_activity_pending"/>
+            <field name="act_to" ref="wkf_project_activity_finished"/>
+            <field name="signal">pending</field>
+        </record>
+
+    </data>
+</openerp>

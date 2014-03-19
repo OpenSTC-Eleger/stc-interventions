@@ -44,14 +44,14 @@
     </record>
 
     <record model="ir.rule" id="ask_non_technique_rule">
-        <field name="name">Project Rule non technique</field>
+        <field name="name">Ask Rule non technique</field>
         <field name="model_id" ref="model_openstc_ask"/>
-        <field name="domain_force">[('create_uid',"=",user.id)]</field>
+        <field name="domain_force">['|', ('service_id','in',[s.partner_id.technical_service_id.id for s in user.contact_id if s.partner_id and s.partner_id.technical_service_id.id] ),('create_uid',"=",user.id)]</field>
         <field eval="[(6,0,[ref('openbase.openstc_agent_non_technique')])]" name="groups"/>
         <field eval="0" name="perm_unlink"/>
         <field eval="0" name="perm_write"/>
         <field eval="1" name="perm_read"/>
-        <field eval="0" name="perm_create"/>
+        <field eval="1" name="perm_create"/>
     </record>
 
 
