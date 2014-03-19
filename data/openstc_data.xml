@@ -29,7 +29,7 @@
 				<field name="subject">Votre demande d'intervention est enregistrée : ${object.name or 'inconnu'} </field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
-					<h2>Madame, Monsieur,</h2>
+					<p>Madame, Monsieur,</p>
 
 					<p>Nous vous confirmons que la demande d'intervention suivante a été enregistrée </p>
 
@@ -70,7 +70,7 @@
 				<field name="subject">Votre demande d'intervention est validée: ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
-					<h2>Madame, Monsieur,</h2>
+					<p>Madame, Monsieur,</p>
 
 					<p>Nous vous confirmons que la demande d'intervention suivante a été validée </p>
 
@@ -140,7 +140,7 @@
 				<field name="subject">Votre demande d'intervention est refusée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
-					<h2>Madame, Monsieur,</h2>
+					<p>Madame, Monsieur,</p>
 
 					<p>Nous ne pouvons donner une suite favorable à votre demande d'intervention <b>${object.name or 'inconnu'}</b> </p>
 
@@ -178,7 +178,7 @@
 				<field name="subject">Votre demande d'intervention  est terminée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
-				<h2>Madame, Monsieur,</h2>
+				<p>Madame, Monsieur,</p>
 
 					<%
 					from datetime import datetime
@@ -298,7 +298,7 @@
 				<field name="subject">Votre demande d'intervention  est planifiée : ${object.name or 'inconnu'}</field>
 				<!-- BODY HTML -->
 				<field name="body_html"><![CDATA[
-					<h2>Madame, Monsieur,</h2>
+					<p>Madame, Monsieur,</p>
 
 					<%
 					from datetime import datetime
