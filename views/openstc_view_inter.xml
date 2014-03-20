@@ -43,16 +43,7 @@
 
     	<!--  planning -->
 
-        <record id="openstc_task_category_form_view" model="ir.ui.view">
-            <field name="name">openstc.planning.form</field>
-            <field name="model">project.project</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="planning">
-					<field name="name" />
-                </form>
-            </field>
-        </record>
+
         <record id="openstc_action_view_planning" model="ir.actions.act_window">
             <field name="name">Planning</field>
             <field name="type">ir.actions.act_window</field>
@@ -61,16 +52,6 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <record id="openstc_task_category_form_view" model="ir.ui.view">
-            <field name="name">openstc.planning.form</field>
-            <field name="model">openstc.planning</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="planning">
-					<field name="name" />
-                </form>
-            </field>
-        </record>
 
 		<!--  Category -->
         <record id="openstc_task_category_search_view" model="ir.ui.view">
