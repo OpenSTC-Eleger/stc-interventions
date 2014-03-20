@@ -39,6 +39,7 @@ import openstc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
+
 class project(OpenbaseCore):
     _name = "project.project"
     _description = "Interventon stc"
@@ -342,7 +343,7 @@ class project(OpenbaseCore):
             return False
         return True
 
-
+    #Cancel
     #Cancel intervention from swif
     def cancel(self, cr, uid, ids, params, context=None):
         #print("test"+params)
