@@ -40,7 +40,7 @@ access_project_project_accueil,project_project accueil,model_project_project,ope
 access_project_project_agent_non_technique,project_project agent_non_technique,model_project_project,openbase.openstc_agent_non_technique,1,0,0,0
 access_project_project_manager,project_project manager,model_project_project,openbase.openstc_manager,1,1,1,1
 access_project_project_dst,project_project dst,model_project_project,openbase.openstc_dst,1,1,1,1
-access_project_vs_hours,project.vs.hours,model_project_vs_hours,,1,0,0,0
+
 
 access_project_task_dst,project_task dst,model_project_task,openbase.openstc_dst,1,1,1,1
 access_project_task_qualifier,project_task qualifier,model_project_task,openbase.openstc_qualifier,1,0,0,0
