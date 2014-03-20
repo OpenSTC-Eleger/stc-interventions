@@ -39,6 +39,7 @@ import openstc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
+
 class project(OpenbaseCore):
     _name = "project.project"
     _description = "Interventon stc"
