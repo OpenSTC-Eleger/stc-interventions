@@ -154,7 +154,15 @@ class task(OpenbaseCore):
         else:
             ret = 'OFFI' not in groups_code
         return ret
-
+    
+    def _get_agent_or_team_name(self, cr, uid, ids, name, args,context=None):
+        ret = {}.fromkeys(ids, '')
+        for task in self.browse(cr, uid, ids, context=context):
+            if task.user_id:
+                ret[task.id] = task.user_id.name_get()[0][1]
+            elif task.team_id:
+                ret[task.id] = task.team_id.name_get()[0][1]
+        return ret
 
     _fields_names = {'equipment_names':'equipment_ids'}
 
@@ -196,6 +204,7 @@ class task(OpenbaseCore):
         'inter_desc': fields.related('project_id', 'description', type='char'),
         'inter_equipment': fields.related('project_id', 'equipment_id', type='many2one',relation='openstc.equipment'),
         'cancel_reason': fields.text('Cancel reason'),
+        'agent_or_team_name':fields.function(_get_agent_or_team_name, type='char', method=True, store=False),
 
     }
 
