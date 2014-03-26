@@ -51,6 +51,9 @@ class project(OpenbaseCore):
     def _mail_templates(self, cr, uid, context=None):
         return  {'scheduled':'openstc_email_template_project_scheduled'}
 
+    def _complete_name(self, cr, uid, ids, name, args, context=None):
+        return super(project, self)._complete_name(cr, uid, ids, name, args, context=context)
+
     def _get_projects_from_tasks(self, cr, uid, task_ids, context=None):
         tasks = self.pool.get('project.task').browse(cr, uid, task_ids, context=context)
         project_ids = [task.project_id.id for task in tasks if task.project_id]
@@ -218,7 +221,7 @@ class project(OpenbaseCore):
         return [('id','>',0)]
 
     _columns = {
-
+        'complete_name': fields.function(_complete_name, string="Project Name", type='char', size=250, store=True),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
         'create_uid': fields.many2one('res.users', 'Created by', readonly=True),
         'create_date' : fields.datetime('Create Date', readonly=True, select=True),

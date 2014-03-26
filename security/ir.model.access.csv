@@ -69,5 +69,3 @@ access_res_partner_address_user,res_partner address,base.model_res_partner_addre
 access_res_partner_dst,res_partner dst,base.model_res_partner,openbase.openstc_dst,1,1,1,1
 access_res_partner_address_dst,res_partner address dst,base.model_res_partner_address,openbase.openstc_dst,1,1,1,0
 
-
-
