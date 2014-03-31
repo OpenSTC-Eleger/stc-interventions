@@ -136,7 +136,8 @@ class openstc_task_recurrence(OpenbaseCore):
             #'project_id':record.contract_id.intervention_id.id,
             'user_id':record.agent_id.id if not record.is_team else False,
             'team_id':record.team_id.id if record.is_team else False,
-            'planned_hours': record.planned_hours
+            'planned_hours': record.planned_hours,
+            'project_id':record.intervention_id.id if record.intervention_id else False
             
             }
     
