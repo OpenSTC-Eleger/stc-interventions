@@ -76,9 +76,14 @@ class openstc_task_recurrence(OpenbaseCore):
         ret = {}.fromkeys(ids, False)
         task_obj = self.pool.get('project.task')
         for recurrence in self.browse(cr, uid, ids, context=context):
-            task_ids = task_obj.search(cr, uid, [('state','not in',('done','cancelled','absent')),('recurrence_id.id','=',recurrence.id)], order='date_start,date_deadline', context=context)
+            task_ids = task_obj.search(cr, uid, [('state','not in',('done','cancelled','absent')),('recurrence_id.id','=',recurrence.id)], order='date_deadline,date_start', context=context)
             if task_ids:
                 ret[recurrence.id] = task_ids[0]
+            #if not any task is remaining on intervention, retrieve the last one at state 'done'
+            else:
+                last_task_ids = task_obj.search(cr, uid, [('state','not in',('cancelled','absent')),('recurrence_id.id','=',recurrence.id)], order='date_deadline desc,date_start desc', context=context)
+                if last_task_ids:
+                    ret[recurrence.id] = last_task_ids[0]
         return ret
     
     _columns = {
@@ -153,7 +158,7 @@ class intervention(OpenbaseCore):
     def _get_tasks_todo(self, cr, uid, ids, name, args, context=None):
         ret = {}.fromkeys(ids, [])
         for inter in self.browse(cr, uid, ids, context=context):
-            val = [task.id for task in inter.tasks]
+            val = [task.id for task in inter.tasks if not task.recurrence_id]
             for recurrence in inter.recurrence_ids:
                 recur_task = recurrence.next_task
                 if recur_task:
