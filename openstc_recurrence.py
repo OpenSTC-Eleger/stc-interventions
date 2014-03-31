@@ -71,6 +71,16 @@ class openstc_task_recurrence(OpenbaseCore):
     def _related_fields_function(self, cr, uid, ids, name, args, context=None):
         return self.related_fields_function(cr, uid, ids, name, args, context=context)
     
+        """ @return: id of the next project.task to Do"""
+    def _get_next_task(self, cr, uid, ids, name, args, context=None):
+        ret = {}.fromkeys(ids, False)
+        task_obj = self.pool.get('project.task')
+        for recurrence in self.browse(cr, uid, ids, context=context):
+            task_ids = task_obj.search(cr, uid, [('state','not in',('done','cancelled','absent')),('recurrence_id.id','=',recurrence.id)], order='date_start,date_deadline', context=context)
+            if task_ids:
+                ret[recurrence.id] = task_ids[0]
+        return ret
+    
     _columns = {
         'recurrence':fields.boolean('has recurrence'),
         'from_inter':fields.boolean('From intervention'),
@@ -81,6 +91,9 @@ class openstc_task_recurrence(OpenbaseCore):
         'task_categ_id':fields.many2one('openstc.task.category', 'Task category'),
         'planned_hours':fields.float('Planned hours'),
         'supplier_cost':fields.float('Supplier Cost'),
+        
+        'next_task':fields.function(_get_next_task, method=True, type='many2one', relation="project.task", string='next task of the recurrence', help="Date of the next task to do in this contract",
+                                     store=False),
         
         'internal_inter':fields.function(_related_fields_function, multi="related_recur",type='boolean', string='Internal Intervention', store=store_related),
         'technical_service_id':fields.function(_related_fields_function, multi="related_recur",type='many2one',relation='openstc.service', string='Internal Service', store=store_related),
@@ -132,8 +145,24 @@ openstc_task_recurrence()
 class intervention(OpenbaseCore):
     
     _inherit = "project.project"
+    
+    """ @return: list of ids of project.task considered as 'TODO'
+    TODO tasks are all the task not coming from recurrence,
+    and all the next tasks of each recurrence"""
+    def _get_tasks_todo(self, cr, uid, ids, name, args, context=None):
+        ret = {}.fromkeys(ids, [])
+        for inter in self.browse(cr, uid, ids, context=context):
+            val = [task.id for task in inter.tasks]
+            for recurrence in inter.recurrence_ids:
+                recur_task = recurrence.next_task
+                if recur_task:
+                    val.append(recur_task.id)
+            ret[inter.id] = val
+        return ret
+    
     _columns = {
         'recurrence_ids':fields.one2many('openstc.task.recurrence', 'intervention_id', 'Recurrence(s)'),
+        'todo_tasks':fields.function(_get_tasks_todo, method=True, type='char', string="Tasks todo", store=False),
         }
 
 intervention()
