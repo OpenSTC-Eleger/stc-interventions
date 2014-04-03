@@ -414,8 +414,8 @@ class task(OpenbaseCore):
             start_lunch_time : date/heure début pause déjeuner
             end_lunch_time : date/heure fin pause déjeuner
             start_dt: date/heure du début de la plage souhaitée
-            team_mode : boolean, calendrier d'une équipe ou d'un agent
-            calendar_id : celui de l'agent / ou celui de l'équipe, selon le team_mode
+            type : string key : 'officer', 'team', 'partner'
+            calendar_id : celui de l'agent / ou celui de l'équipe, selon le type
 
         This method is used when plan tasks from client
 
@@ -447,7 +447,7 @@ class task(OpenbaseCore):
         elif params['timeToPlan']==0 or not params['start_dt']:
             return  params["returnIds"]; #params['results']
 
-        team_mode = params['team_mode']
+        type = params['type']
         calendar_id = params['calendar_id']
 
         #Get all events on 'start_dt' for officer or team 'calendar_id'
@@ -527,8 +527,9 @@ class task(OpenbaseCore):
                 'name': title,
                 'planned_hours': diff,
                 'remaining_hours': diff,
-                'team_id': calendar_id if team_mode else None,
-                'user_id': calendar_id if not team_mode else None,
+                'team_id': calendar_id if type == 'team' else None,
+                'user_id': calendar_id if type == 'user' else None,
+                'partner_id': calendar_id if type == 'partner' else None,
                 'date_start': datetime.strftime(start_dt,timeDtFrmt),
                 'date_end': datetime.strftime(endDt,timeDtFrmt),
                 'state': 'open',
@@ -566,8 +567,8 @@ class task(OpenbaseCore):
             start_lunch_time : date/heure début pause déjeuner
             end_lunch_time : date/heure fin pause déjeuner
             start_dt: date/heure du début de la plage souhaitée
-            team_mode : boolean, calendrier d'une équipe ou d'un agent
-            calendar_id : celui de l'agent / ou celui de l'équipe, selon le team_mode
+            type : string key : 'officer', 'team', 'partner'
+            calendar_id : celui de l'agent / ou celui de l'équipe, selon le type
 
         This method is used to get events on start_dt (lunch including) for officer or team (calendar_id)
 
@@ -602,7 +603,7 @@ class task(OpenbaseCore):
                        'date_end': end_working_time})
 
         task_ids = []
-        if params['team_mode'] == True:
+        if params['type'] == 'team':
             #Get all tasks on 'start_dt' for team
             task_ids = self.search(cr,uid,
                 ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
@@ -610,13 +611,20 @@ class task(OpenbaseCore):
                 '|',('team_id','=',params['calendar_id']),
                     ('user_id','in', self.pool.get('openstc.team').read(cr, uid, params['calendar_id'], ['user_ids'])['user_ids'] )
                 ])
-        else:
+        elif params['type'] == 'user':
             #Get all tasks on 'start_dt' for officer
             task_ids = self.search(cr,uid,
                 ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
                     ('date_start','<=', datetime.strftime(end_working_time,timeDtFrmt)),
                  '|',('user_id','=', params['calendar_id']),
                     ('team_id','in', self.pool.get('res.users').read(cr, uid, params['calendar_id'], ['team_ids'])['team_ids'] )
+                ])
+        else:
+            #Get all tasks on 'start_dt' for officer
+            task_ids = self.search(cr,uid,
+                ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
+                    ('date_start','<=', datetime.strftime(end_working_time,timeDtFrmt)),
+                    ('partner_id','=', params['calendar_id'])
                 ])
 
         tasks = self.read(cr,uid,task_ids, ['name','date_start','date_end'])
