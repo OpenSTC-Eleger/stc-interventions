@@ -38,6 +38,7 @@
 
         'views/openstc_view_inter.xml',
 
+        'data/openstc_mail.xml',
         'data/openstc_data.xml',
 
         'workflow/openstc_workflow.xml',
