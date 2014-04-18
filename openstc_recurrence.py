@@ -123,7 +123,7 @@ class openstc_task_recurrence(OpenbaseCore):
         'from_inter': lambda *a: True,
         }
     
-    _order = "next_inter,technical_service_id"
+    _order = "technical_service_id"
     
     """
     @param record: browse_record object of contract.line to generate tasks
