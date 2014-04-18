@@ -537,7 +537,7 @@ class task(OpenbaseCore):
                 'planned_hours': diff,
                 'remaining_hours': diff,
                 'team_id': calendar_id if type == 'team' else None,
-                'user_id': calendar_id if type == 'user' else None,
+                'user_id': calendar_id if type == 'officer' else None,
                 'partner_id': calendar_id if type == 'partner' else None,
                 'date_start': datetime.strftime(start_dt,timeDtFrmt),
                 'date_end': datetime.strftime(endDt,timeDtFrmt),
