@@ -188,6 +188,7 @@ class project_work(OpenbaseCore):
         'manager_id': fields.related('ask_id', 'manager_id', type='many2one', string='Services'),
         'user_id': fields.many2one('res.users', 'Done by', required=False, select="1"),
         'team_id': fields.many2one('openstc.team', 'Done by', required=False, select="1"),
+        'partner_id': fields.many2one('res.partner', 'Done by', required=False, select="1"),
     }
 
 project_work()

@@ -154,7 +154,7 @@ class task(OpenbaseCore):
         else:
             ret = 'OFFI' not in groups_code
         return ret
-    
+
     def _get_agent_or_team_name(self, cr, uid, ids, name, args,context=None):
         ret = {}.fromkeys(ids, '')
         for task in self.browse(cr, uid, ids, context=context):
@@ -277,6 +277,7 @@ class task(OpenbaseCore):
                 'date_end': task.date_end or openstc._get_param(params, 'date_end'),
                 'team_id': task.team_id and task.team_id.id or openstc._get_param(params, 'team_id'),
                 'user_id': task.user_id and task.user_id.id or openstc._get_param(params, 'user_id'),
+                'partner_id': task.partner_id and task.partner_id.id or openstc._get_param(params, 'partner_id'),
                 'equipment_ids': equipments_ids,
                 'remaining_hours': 0,
                 'km': 0 if params.has_key('km')== False else params['km'],
@@ -303,6 +304,7 @@ class task(OpenbaseCore):
                  'remaining_hours'   : 0 if params.has_key('remaining_hours')== False else params['remaining_hours'],
                  'user_id'           : None,
                  'team_id'           : None,
+                 'partner_id'        : None,
                  'date_end'          : None,
                  'date_start'        : None,
              }, context)
@@ -360,6 +362,7 @@ class task(OpenbaseCore):
              'hours':  openstc._get_param(params, 'report_hours'),
              'user_id': task.user_id.id or False,
              'team_id': task.team_id.id or False,
+             'partner_id': task.partner_id.id or False,
              'company_id': task.company_id.id or False,
             }, context=context)
 
@@ -499,6 +502,7 @@ class task(OpenbaseCore):
                   'remaining_hours': params['timeToPlan'],
                   'user_id': None,
                   'team_id': None,
+                  'partner_id': None,
                   'date_end': None,
                   'date_start': None,
             })
@@ -620,7 +624,7 @@ class task(OpenbaseCore):
                 '|',('team_id','=',params['calendar_id']),
                     ('user_id','in', self.pool.get('openstc.team').read(cr, uid, params['calendar_id'], ['user_ids'])['user_ids'] )
                 ])
-        elif params['type'] == 'user':
+        elif params['type'] == 'officer':
             #Get all tasks on 'start_dt' for officer
             task_ids = self.search(cr,uid,
                 ['&',('date_start','>=', datetime.strftime(start_working_time,timeDtFrmt)),
