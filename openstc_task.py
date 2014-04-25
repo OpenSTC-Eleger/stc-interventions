@@ -162,6 +162,8 @@ class task(OpenbaseCore):
                 ret[task.id] = task.user_id.name_get()[0][1]
             elif task.team_id:
                 ret[task.id] = task.team_id.name_get()[0][1]
+            elif task.partner_id:
+                ret[task.id] = task.partner_id.name_get()[0][1]
         return ret
 
     _fields_names = {'equipment_names':'equipment_ids'}
