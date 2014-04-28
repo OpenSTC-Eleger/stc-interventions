@@ -164,6 +164,45 @@ class task(OpenbaseCore):
                 ret[task.id] = task.team_id.name_get()[0][1]
         return ret
 
+    def _get_task_from_inter(self, cr, uid, ids, context=None):
+        return self.pool.get('project.task').search(cr, uid, [('project_id','in',ids)],context=context)
+
+    #Get task's cost
+    def _get_cost(self, cr, uid, ids, name, args, context):
+        ret = {}.fromkeys(ids, '')
+        user_obj = self.pool.get('res.users')
+        for task in self.browse(cr, uid, ids, context=context):
+            cost = 0.0
+            for task_work in task.work_ids:
+                cost +=  self._get_labour_cost(cr, uid, task, task_work.hours, context) + self._get_operating_cost(cr, uid, task, task_work.hours, context)
+            ret[task.id] = cost
+        return ret
+
+    def _get_labour_cost(self, cr, uid, task, hours, context):
+        user_ids = []
+        user_obj = self.pool.get('res.users')
+        labour_cost = 0.0
+        if task.user_id:
+            labour_cost = task.user_id.cost * hours
+        elif task.team_id:
+            for user_id in user_obj.browse(cr, uid, task.team_id.user_ids, context=context):
+                labour_cost += user_id.cost * hours
+        else:
+            #external partner cost
+            labour_cost = task.cost
+        return labour_cost
+
+    def _get_operating_cost(self, cr, uid, task, hours, context):
+        user_ids = []
+        equipment_obj = self.pool.get('openstc.equipment')
+        consumable_obj = self.pool.get('openbase.consumable')
+        operating_cost = 0.0
+        for equipment_id in task.equipment_ids:
+            operating_cost += equipment_id.hour_price * hours
+        for consumable_id in task.consumable_ids:
+            operating_cost += consumable_id.hour_price
+        return operating_cost
+
     _fields_names = {'equipment_names':'equipment_ids'}
 
     _actions = {
@@ -179,14 +218,14 @@ class task(OpenbaseCore):
 
         }
 
-    def _get_task_from_inter(self, cr, uid, ids, context=None):
-        return self.pool.get('project.task').search(cr, uid, [('project_id','in',ids)],context=context)
+
 
     _columns = {
         'active':fields.function(_get_active, method=True,type='boolean', store=False),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1"),
         'project_id': fields.many2one('project.project', 'Intervention', ondelete='set null'),
         'equipment_ids':fields.many2many('openstc.equipment', 'openstc_equipment_task_rel', 'task_id', 'equipment_id', 'Equipments'),
+        'consumable_ids':fields.many2many('openbase.consumable', 'openbase_consumable_task_rel', 'task_id', 'consumable_id', 'Fournitures'),
         'parent_id': fields.many2one('project.task', 'Parent Task'),
         'intervention_assignement_id':fields.many2one('openstc.intervention.assignement', 'Assignement'),
         'absent_type_id':fields.many2one('openstc.absent.type', 'Type d''abscence'),
@@ -205,6 +244,7 @@ class task(OpenbaseCore):
         'inter_equipment': fields.related('project_id', 'equipment_id', type='many2one',relation='openstc.equipment'),
         'cancel_reason': fields.text('Cancel reason'),
         'agent_or_team_name':fields.function(_get_agent_or_team_name, type='char', method=True, store=False),
+        'cost' : fields.function(_get_cost,  string='cost',type='float', store=True),
 
     }
 

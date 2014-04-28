@@ -220,6 +220,17 @@ class project(OpenbaseCore):
             return [('id','in',[item[0] for item in ret])]
         return [('id','>',0)]
 
+    #Get intervention's cost
+    def _get_cost(self, cr, uid, ids, name, args, context):
+        ret = {}.fromkeys(ids, '')
+        task_obj = self.pool.get('project.task')
+        cost = 0.0
+        for project in self.browse(cr, uid, ids, context=context):
+            for task in project.tasks:
+                cost +=  task.cost #task._get_cost(self, cr, uid, ids, name, args, context):
+        ret[project.id] = cost
+        return ret
+
     _columns = {
         'complete_name': fields.function(_complete_name, string="Project Name", type='char', size=250, store=True),
         'ask_id': fields.many2one('openstc.ask', 'Demande', ondelete='set null', select="1", readonly=True),
@@ -247,6 +258,7 @@ class project(OpenbaseCore):
         'overPourcent' : fields.function(_overPourcent, fnct_search=_searchOverPourcent, method=True, string='OverPourcent',type='float', store=False),
         'equipment_id': fields.many2one('openstc.equipment','Equipment', select=True),
         'has_equipment': fields.boolean('Request is about equipment'),
+        'cost' : fields.function(_get_cost,  string='cost',type='float', store=False),
     }
 
     #Overrides  set_template method of project module
