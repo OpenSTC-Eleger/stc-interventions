@@ -186,9 +186,9 @@ class task(OpenbaseCore):
             labour_cost = task.user_id.cost * hours
         elif task.team_id:
             for user_id in user_obj.browse(cr, uid, task.team_id.user_ids, context=context):
-                labour_cost += user_id.cost * hours
+                labour_cost += user_id.id.cost * hours
         else:
-            #external partner cost
+            #TODO 1 : external partner cost : verfier si le coût prestaire rattaché directement à la tâche est bien pris en compte
             labour_cost = task.cost
         return labour_cost
 
@@ -200,7 +200,7 @@ class task(OpenbaseCore):
         for equipment_id in task.equipment_ids:
             operating_cost += equipment_id.hour_price * hours
         for consumable_id in task.consumable_ids:
-            operating_cost += consumable_id.hour_price
+            operating_cost += consumable_id.price #TODO 2 : lire task_work += qtité * price de task_work
         return operating_cost
 
     _fields_names = {'equipment_names':'equipment_ids'}
@@ -244,7 +244,7 @@ class task(OpenbaseCore):
         'inter_equipment': fields.related('project_id', 'equipment_id', type='many2one',relation='openstc.equipment'),
         'cancel_reason': fields.text('Cancel reason'),
         'agent_or_team_name':fields.function(_get_agent_or_team_name, type='char', method=True, store=False),
-        'cost' : fields.function(_get_cost,  string='cost',type='float', store=True),
+        'cost' : fields.function(_get_cost,  string='cost',type='float', method=True, store=True),
 
     }
 
@@ -393,7 +393,7 @@ class task(OpenbaseCore):
     def createWork(self, cr, uid, task, params, context):
         task_work_obj = self.pool.get('project.task.work')
         #update task work
-
+        #TODO add DQE, qtité, price
         task_work_obj.create(cr, uid, {
              'name': task.name,
              #TODO : manque l'heure
@@ -694,6 +694,19 @@ class task(OpenbaseCore):
         return events
 
 task()
+
+class project_work(osv.osv):
+    _name = "project.task.work"
+    _description = "Project Task Work"
+    _inherit = "project.task.work"
+
+    _columns = {
+        'dqe': fields.char('Detailed Quantitative Quantities', size=128),
+        'quantity': fields.datetime('Date', select="1"),
+        'price':fields.float('Price', digits=(4,2))
+    }
+
+project_work()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """ Task categories """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
