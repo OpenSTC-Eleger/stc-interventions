@@ -221,9 +221,16 @@ class project(OpenbaseCore):
         cost = 0.0
         for project in self.browse(cr, uid, ids, context=context):
             for task in project.tasks:
-                cost +=  task.cost #task._get_cost(self, cr, uid, ids, name, args, context):
+                #TODO
+                cost +=  task.cost #task._get_cost(self, cr, uid, ids, name, args, context):ret[project.id] =  task_obj._get_cost(cr, uid, project.tasks, 'cost', [], context)
         ret[project.id] = cost
         return ret
+
+    def _get_task(self, cr, uid, ids, context=None):
+        result = {}
+        for task in self.pool.get('project.task').browse(cr, uid, ids, context=context):
+            if task.project_id: result[task.project_id.id] = True
+        return result.keys()
 
     _columns = {
         'complete_name': fields.function(_complete_name, string="Project Name", type='char', size=250, store=True),
@@ -252,7 +259,11 @@ class project(OpenbaseCore):
         'overPourcent' : fields.function(_overPourcent, fnct_search=_searchOverPourcent, method=True, string='OverPourcent',type='float', store=False),
         'equipment_id': fields.many2one('openstc.equipment','Equipment', select=True),
         'has_equipment': fields.boolean('Request is about equipment'),
-        'cost' : fields.function(_get_cost,  string='cost',type='float', store=False),
+        'cost' : fields.function(_get_cost,  string='cost',type='float', #multi="progress",
+            store = {
+                'project.project': (_get_project_and_parents, ['tasks'], 10),
+                'project.task': (_get_task, ['cost','equipment_ids','consumable_ids','user_id','team_id','partner_id'], 11),
+            }),
     }
 
     #Overrides  set_template method of project module
