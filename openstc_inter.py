@@ -286,6 +286,7 @@ class project(OpenbaseCore):
             if task_ids:
                 task_obj.write(cr, uid, task_ids, {'state':'cancelled',
                                                                'user_id':False,
+                                                               'partner_id':False,
                                                                'team_id':False,
                                                                'date_end':False,
                                                                'date_start':False,
@@ -359,6 +360,7 @@ class project(OpenbaseCore):
                     'state' : params['state'],
                     'user_id': None,
                     'team_id': None,
+                    'partner_id': None,
                     'date_end': None,
                     'date_start': None,
                 }, context=context)
