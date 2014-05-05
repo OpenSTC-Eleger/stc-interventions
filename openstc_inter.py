@@ -220,19 +220,34 @@ class project(OpenbaseCore):
             return [('id','in',[item[0] for item in ret])]
         return [('id','>',0)]
 
-    #Get intervention's cost
     def _get_cost(self, cr, uid, ids, name, args, context):
+        """
+        Set project cost when one task associated is udpated
+
+        :param cr: database cursor
+        :param uid: current user id
+        :param name: name field (cost)
+        :param args: other agrs
+
+        """
         ret = {}.fromkeys(ids, '')
         task_obj = self.pool.get('project.task')
         cost = 0.0
         for project in self.browse(cr, uid, ids, context=context):
             for task in project.tasks:
-                #TODO
-                cost +=  task.cost #task._get_cost(self, cr, uid, ids, name, args, context):ret[project.id] =  task_obj._get_cost(cr, uid, project.tasks, 'cost', [], context)
+                cost +=  task.cost
         ret[project.id] = cost
         return ret
 
     def _get_task(self, cr, uid, ids, context=None):
+        """
+        Get tasks
+
+        :param cr: database cursor
+        :param uid: current user id
+        :param ids: project ids
+
+        """
         result = {}
         for task in self.pool.get('project.task').browse(cr, uid, ids, context=context):
             if task.project_id: result[task.project_id.id] = True

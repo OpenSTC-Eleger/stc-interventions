@@ -167,41 +167,69 @@ class task(OpenbaseCore):
     def _get_task_from_inter(self, cr, uid, ids, context=None):
         return self.pool.get('project.task').search(cr, uid, [('project_id','in',ids)],context=context)
 
-    #Get task's cost
-    def _get_cost(self, cr, uid, ids, name, args, context):
-        ret = {}.fromkeys(ids, '')
-        user_obj = self.pool.get('res.users')
-        for task in self.browse(cr, uid, ids, context=context):
-            cost = 0.0
-            for task_work in task.work_ids:
-                cost +=  self._get_labour_cost(cr, uid, task, task_work.hours, context) + self._get_operating_cost(cr, uid, task, task_work.hours, context)
-            ret[task.id] = cost
-        return ret
+    def _get_labour_cost(self, cr, uid, task, task_work, presta_cost, context):
+        """
+        Get Human resource cost
 
-    def _get_labour_cost(self, cr, uid, task, hours, context):
+        :param cr: database cursor
+        :param uid: current user id
+        :param task: current task
+        :param task_work: current task work
+        :param presta_cost: if external recipient cost indicated directly in the input
+
+        """
         user_ids = []
         user_obj = self.pool.get('res.users')
         labour_cost = 0.0
         if task.user_id:
-            labour_cost = task.user_id.cost * hours
+            # officer timesheet cost equal hourly rate multiplied by time spent
+            labour_cost = task.user_id.cost * task_work.hours
         elif task.team_id:
+             # team timesheet cost equal addition of hourly rate by officer multiplied by time spent
             for user_id in user_obj.browse(cr, uid, task.team_id.user_ids, context=context):
-                labour_cost += user_id.id.cost * hours
+                labour_cost += user_id.id.cost * task_work.hours
         else:
-            #TODO 1 : external partner cost : verfier si le coût prestaire rattaché directement à la tâche est bien pris en compte
-            labour_cost = task.cost
+             # external timesheet cost equal cost indicated directly in the input
+            labour_cost = presta_cost
         return labour_cost
 
-    def _get_operating_cost(self, cr, uid, task, hours, context):
+    def _get_operating_cost(self, cr, uid, task, task_work, context):
+        """
+        Get operating cost takes into account equipments and consumables
+
+        :param cr: database cursor
+        :param uid: current user id
+        :param task: current task
+        :param task_work: current task work
+        :param presta_cost: if external recipient cost indicated directly in the input
+
+        """
         user_ids = []
         equipment_obj = self.pool.get('openstc.equipment')
         consumable_obj = self.pool.get('openbase.consumable')
         operating_cost = 0.0
         for equipment_id in task.equipment_ids:
-            operating_cost += equipment_id.hour_price * hours
-        for consumable_id in task.consumable_ids:
-            operating_cost += consumable_id.price #TODO 2 : lire task_work += qtité * price de task_work
+            #equipments cost
+            operating_cost += equipment_id.hour_price * task_work.hours
+        for consumable in task_work.consumables:
+            #consumables cost
+            operating_cost += consumable.unit_price * consumable.quantity
         return operating_cost
+
+    def _get_task(self, cr, uid, ids, context=None):
+        """
+        Get task works
+
+        :param cr: database cursor
+        :param uid: current user id
+        :param ids: task ids
+
+        """
+        result = {}
+        for work in self.pool.get('project.task.work').browse(cr, uid, ids, context=context):
+            if work.task_id: result[work.task_id.id] = True
+        return result.keys()
+
 
     _fields_names = {'equipment_names':'equipment_ids'}
 
@@ -244,8 +272,7 @@ class task(OpenbaseCore):
         'inter_equipment': fields.related('project_id', 'equipment_id', type='many2one',relation='openstc.equipment'),
         'cancel_reason': fields.text('Cancel reason'),
         'agent_or_team_name':fields.function(_get_agent_or_team_name, type='char', method=True, store=False),
-        'cost' : fields.function(_get_cost,  string='cost',type='float', method=True, store=True),
-
+        'cost':fields.float('Cost', type='float', digits=(5,2)),
     }
 
     _defaults = {'active': lambda *a: True, 'user_id':None}
@@ -304,10 +331,18 @@ class task(OpenbaseCore):
         else :
             equipments_ids = []
         #update mobile equipment kilometers
-        self.updateEquipment(cr, uid, params, context)
+        self.updateEquipment(cr, uid, params, ids[0], context)
+
 
         #Records report time
         self.createWork(cr, uid, task, params, context)
+
+        #TODO cost calculation
+        task = self.browse(cr, uid, ids[0], context=context)
+        cost = 0.0
+        for task_work in task.work_ids:
+            presta_cost = 0.0 if params.has_key('cost')== False or params['cost']== '' else float(params['cost'])
+            cost +=  self._get_labour_cost(cr, uid, task, task_work, presta_cost , context) + self._get_operating_cost(cr, uid, task, task_work, context)
 
         self.__logger.warning('----------------- Write task %s ------------------------------', ids[0])
         #Update Task
@@ -318,6 +353,7 @@ class task(OpenbaseCore):
                 'team_id': task.team_id and task.team_id.id or openstc._get_param(params, 'team_id'),
                 'user_id': task.user_id and task.user_id.id or openstc._get_param(params, 'user_id'),
                 'partner_id': task.partner_id and task.partner_id.id or openstc._get_param(params, 'partner_id'),
+                'cost': cost ,
                 'equipment_ids': equipments_ids,
                 'remaining_hours': 0,
                 'km': 0 if params.has_key('km')== False else params['km'],
@@ -378,23 +414,34 @@ class task(OpenbaseCore):
     """
         Update equipment information when task has done
     """
-    def updateEquipment(self, cr, uid, params, context):
+    def updateEquipment(self, cr, uid, params, task_id, context):
         equipment_obj = self.pool.get('openstc.equipment')
+        equipment_lines_obj = self.pool.get('openstc.equipment.lines')
         #Update kilometers on vehucule
         if openstc._test_params(params,['vehicule','km'])!= False :
             equipment_obj.write(cr, uid, params['vehicule'], {
-                     'km': 0 if params.has_key('km')== False else params['km']
+                    'km': 0 if params.has_key('km')== False else params['km'],
                  }, context=context)
+
+            equipment_lines_obj.create(cr, uid, {
+                    'km': 0 if params.has_key('km')== False else params['km'],
+                    'oil_qtity': 0 if params.has_key('oil_qtity')== False else params['oil_qtity'],
+                    'oil_price': 0 if params.has_key('oil_price')== False else params['oil_price'],
+                    'equipment_id': params['vehicule'],
+                    'task_id': task_id
+                }, context=context)
+
+
 
 
     """
         Report working time for task
     """
     def createWork(self, cr, uid, task, params, context):
+        task_obj = self.pool.get('project.task')
         task_work_obj = self.pool.get('project.task.work')
         #update task work
-        #TODO add DQE, qtité, price
-        task_work_obj.create(cr, uid, {
+        work_id = task_work_obj.create(cr, uid, {
              'name': task.name,
              #TODO : manque l'heure
              'date':  datetime.now().strftime('%Y-%m-%d') if params.has_key('date')== False  else params['date'],
@@ -405,6 +452,22 @@ class task(OpenbaseCore):
              'partner_id': task.partner_id.id or False,
              'company_id': task.company_id.id or False,
             }, context=context)
+
+        work_consumables_obj = self.pool.get('openstc.task.work.consumables')
+        if params.has_key('consumables'):
+            consumables = params['consumables']
+            for consumable in consumables:
+                  work_consumable_id = work_consumables_obj.create(cr, uid, {
+                     'dqe': '' if consumable['dqe']== False else consumable['dqe'],
+                     'quantity':  0 if consumable['quantity']== False else consumable['quantity'],
+                     'unit_price': 0 if consumable['unit_price']== False else consumable['unit_price'],
+                     'work_id': work_id,
+                     'consumable_id': consumable['id']
+                    }, context=context)
+
+
+
+
 
     def create(self, cr, uid, vals, context=None):
         res = super(task, self).create(cr, uid, vals, context=context)
@@ -700,10 +763,25 @@ class project_work(osv.osv):
     _description = "Project Task Work"
     _inherit = "project.task.work"
 
+
+    _columns = {
+        'consumables': fields.one2many('openstc.task.work.consumables', 'work_id', 'Consumable lines'),
+    }
+
+project_work()
+
+""" work line for consumable record list
+"""
+class project_work_consumables(osv.osv):
+    _name = "openstc.task.work.consumables"
+    _description = "Project Task Work consumables"
+
     _columns = {
         'dqe': fields.char('Detailed Quantitative Quantities', size=128),
-        'quantity': fields.datetime('Date', select="1"),
-        'price':fields.float('Price', digits=(4,2))
+        'quantity': fields.float('Quantity', digits=(4,2)),
+        'unit_price':fields.float('Unit Price', digits=(4,2)),
+        'work_id':fields.many2one('project.task.work', 'Task work'),
+        'consumable_id':fields.many2one('openbase.consumable', 'Consumable'),
     }
 
 project_work()
