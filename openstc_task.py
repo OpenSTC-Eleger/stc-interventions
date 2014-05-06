@@ -169,7 +169,7 @@ class task(OpenbaseCore):
     def _get_task_from_inter(self, cr, uid, ids, context=None):
         return self.pool.get('project.task').search(cr, uid, [('project_id','in',ids)],context=context)
 
-    def _get_labour_cost(self, cr, uid, task, task_work, presta_cost, context):
+    def _get_hr_cost(self, cr, uid, task, task_work, presta_cost, context):
         """
         Get Human resource cost
 
@@ -195,28 +195,38 @@ class task(OpenbaseCore):
             labour_cost = presta_cost
         return labour_cost
 
-    def _get_operating_cost(self, cr, uid, task, task_work, context):
+    def _get_equipment_cost(self, cr, uid, task, task_work, context):
         """
-        Get operating cost takes into account equipments and consumables
+        Get operating cost takes into account equipments
 
         :param cr: database cursor
         :param uid: current user id
         :param task: current task
         :param task_work: current task work
-        :param presta_cost: if external recipient cost indicated directly in the input
 
         """
-        user_ids = []
         equipment_obj = self.pool.get('openstc.equipment')
-        consumable_obj = self.pool.get('openbase.consumable')
-        operating_cost = 0.0
+        equipment_cost = 0.0
         for equipment_id in task.equipment_ids:
             #equipments cost
-            operating_cost += equipment_id.hour_price * task_work.hours
+            equipment_cost += equipment_id.hour_price * task_work.hours
+        return equipment_cost
+
+    def _get_consumable_cost(self, cr, uid, task, task_work, context):
+        """
+        Get operating cost takes into account consumables
+
+        :param cr: database cursor
+        :param uid: current user id
+        :param task: current task
+        :param task_work: current task work
+        """
+        consumable_obj = self.pool.get('openbase.consumable')
+        consumable_cost = 0.0
         for consumable in task_work.consumables:
             #consumables cost
-            operating_cost += consumable.unit_price * consumable.quantity
-        return operating_cost
+            consumable_cost += consumable.unit_price * consumable.quantity
+        return consumable_cost
 
     def _get_task(self, cr, uid, ids, context=None):
         """
@@ -275,6 +285,9 @@ class task(OpenbaseCore):
         'cancel_reason': fields.text('Cancel reason'),
         'agent_or_team_name':fields.function(_get_agent_or_team_name, type='char', method=True, store=False),
         'cost':fields.float('Cost', type='float', digits=(5,2)),
+        'hr_cost':fields.float('Cost', type='float', digits=(5,2)),
+        'equipment_cost':fields.float('Cost', type='float', digits=(5,2)),
+        'consumable_cost':fields.float('Cost', type='float', digits=(5,2)),
     }
 
     _defaults = {'active': lambda *a: True, 'user_id':None}
@@ -341,10 +354,13 @@ class task(OpenbaseCore):
 
         #TODO cost calculation
         task = self.browse(cr, uid, ids[0], context=context)
-        cost = 0.0
+        cost=hr_cost=equipment_cost=consumable_cost = 0.0
         for task_work in task.work_ids:
             presta_cost = 0.0 if params.has_key('cost')== False or params['cost']== '' else float(params['cost'])
-            cost +=  self._get_labour_cost(cr, uid, task, task_work, presta_cost , context) + self._get_operating_cost(cr, uid, task, task_work, context)
+            hr_cost += self._get_hr_cost(cr, uid, task, task_work, presta_cost , context)
+            equipment_cost +=   self._get_equipment_cost(cr, uid, task, task_work, context)
+            consumable_cost +=  self._get_consumable_cost(cr, uid, task, task_work, context)
+        cost = hr_cost + equipment_cost + consumable_cost
 
         self.__logger.warning('----------------- Write task %s ------------------------------', ids[0])
         #Update Task
@@ -356,6 +372,9 @@ class task(OpenbaseCore):
                 'user_id': task.user_id and task.user_id.id or openstc._get_param(params, 'user_id'),
                 'partner_id': task.partner_id and task.partner_id.id or openstc._get_param(params, 'partner_id'),
                 'cost': cost ,
+                'hr_cost': hr_cost ,
+                'equipment_cost': equipment_cost ,
+                'consumable_cost': consumable_cost ,
                 'equipment_ids': equipments_ids,
                 'remaining_hours': 0,
                 'km': 0 if params.has_key('km')== False else params['km'],
