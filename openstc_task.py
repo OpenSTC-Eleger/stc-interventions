@@ -243,7 +243,7 @@ class task(OpenbaseCore):
         return result.keys()
 
 
-    _fields_names = {'equipment_names':'equipment_ids'}
+    _fields_names = {'equipment_names':'equipment_ids', 'consumable_names':'consumable_ids'}
 
     _actions = {
         'print':lambda self,cr,uid,record, groups_code: record.state in ('draft','open'),
@@ -340,11 +340,18 @@ class task(OpenbaseCore):
 
         #Prepare equipment list
         if params.has_key('equipment_ids') and len(params['equipment_ids'])>0 :
-            equipments_ids = params['equipment_ids']
-            if not isinstance(equipments_ids[0], list) and not isinstance(equipments_ids[0], tuple):
-                equipments_ids = [(6,0,equipments_ids)]
+            equipment_ids = params['equipment_ids']
+            if not isinstance(equipment_ids[0], list) and not isinstance(equipment_ids[0], tuple):
+                equipment_ids = [(6,0,equipment_ids)]
         else :
-            equipments_ids = []
+            equipment_ids = []
+
+        #Prepare consumable list
+        consumable_ids = []
+        if params.has_key('consumables') and len(params['consumables'])>0 :
+            for consumable in params['consumables']:
+                consumable_ids.append(consumable['id'])
+
         #update mobile equipment kilometers
         self.updateEquipment(cr, uid, params, ids[0], context)
 
@@ -375,7 +382,8 @@ class task(OpenbaseCore):
                 'hr_cost': hr_cost ,
                 'equipment_cost': equipment_cost ,
                 'consumable_cost': consumable_cost ,
-                'equipment_ids': equipments_ids,
+                'equipment_ids': equipment_ids,
+                'consumable_ids': [(6,0,consumable_ids)],
                 'remaining_hours': 0,
                 'km': 0 if params.has_key('km')== False else params['km'],
                 'oil_qtity': 0 if params.has_key('oil_qtity')== False else params['oil_qtity'],
