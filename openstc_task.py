@@ -348,7 +348,8 @@ class task(OpenbaseCore):
         consumable_ids = []
         if params.has_key('consumables') and len(params['consumables'])>0 :
             for consumable in params['consumables']:
-                consumable_ids.append(consumable['id'])
+                if consumable['id'] not in consumable_ids :
+                    consumable_ids.append(consumable['id'])
 
         #update mobile equipment kilometers
         self.updateEquipment(cr, uid, params, ids[0], context)
