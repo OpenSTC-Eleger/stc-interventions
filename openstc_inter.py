@@ -224,13 +224,18 @@ class project(OpenbaseCore):
         :param args: other agrs
 
         """
-        ret = {}.fromkeys(ids, '')
+
+        ret = dict([(id, {'cost':0.0,'hr_cost':0.0,'equipment_cost':0.0,'consumable_cost':0.0}) for id in ids])
         task_obj = self.pool.get('project.task')
-        cost = 0.0
+
         for project in self.browse(cr, uid, ids, context=context):
             for task in project.tasks:
-                cost +=  task.cost
-        ret[project.id] = cost
+                ret[project.id]['cost'] += task.cost
+                ret[project.id]['hr_cost'] += task.hr_cost
+                ret[project.id]['equipment_cost'] += task.equipment_cost
+                ret[project.id]['consumable_cost'] += task.consumable_cost
+
+
         return ret
 
     def _get_task(self, cr, uid, ids, context=None):
@@ -274,10 +279,25 @@ class project(OpenbaseCore):
         'overPourcent' : fields.function(_overPourcent, fnct_search=_searchOverPourcent, method=True, string='OverPourcent',type='float', store=False),
         'equipment_id': fields.many2one('openstc.equipment','Equipment', select=True),
         'has_equipment': fields.boolean('Request is about equipment'),
-        'cost' : fields.function(_get_cost,  string='cost',type='float', #multi="progress",
+        'cost' : fields.function(_get_cost,  string='cost',type='float', multi="cost",
             store = {
                 'project.project': (_get_project_and_parents, ['tasks'], 10),
-                'project.task': (_get_task, ['cost','equipment_ids','consumable_ids','user_id','team_id','partner_id'], 11),
+                'project.task': (_get_task, ['cost'], 20),
+            }),
+        'hr_cost' : fields.function(_get_cost,  string='cost',type='float', multi="cost",
+            store = {
+                'project.project': (_get_project_and_parents, ['tasks'], 10),
+                'project.task': (_get_task, ['cost'], 20),
+            }),
+        'equipment_cost' : fields.function(_get_cost,  string='cost',type='float', multi="cost",
+            store = {
+                'project.project': (_get_project_and_parents, ['tasks'], 10),
+                'project.task': (_get_task, ['cost'], 20),
+            }),
+        'consumable_cost' : fields.function(_get_cost,  string='cost',type='float', multi="cost",
+            store = {
+                'project.project': (_get_project_and_parents, ['tasks'], 10),
+                'project.task': (_get_task, ['cost'], 20),
             }),
     }
 
