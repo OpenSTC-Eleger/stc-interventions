@@ -111,25 +111,18 @@ class project(OpenbaseCore):
 
         project_obj = self.pool.get('project.project')
         task_obj = self.pool.get('project.task')
-
-        for id in ids:
+        
+        for inter in self.browse(cr, uid, ids, context=context):
+            id = inter.id
             res[id] = ''
-            inter = self.browse(cr, uid, id, context)
             if inter :
                 first_date = None
                 last_date = None
                 allPlanned = True
-                for task_id in inter.tasks :
-                    task = task_obj.browse(cr, uid, task_id.id, context)
-                    if  first_date == None :
-                        first_date = task.date_start;
-                    elif task.date_start and first_date>task.date_start :
-                        first_date=task.date_start;
-
-                    if last_date == None :
-                        last_date = task.date_end;
-                    elif task.date_end and last_date<task.date_end :
-                        last_date=task.date_end
+                for task in inter.tasks :
+                    first_date = max(first_date,task.date_start)
+                    
+                    last_date = max(last_date, task.date_end)
 
                     if task.state == 'draft' :
                         allPlanned = False

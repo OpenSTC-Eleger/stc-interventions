@@ -205,11 +205,12 @@ class intervention(OpenbaseCore):
             val = [task.id for task in inter.tasks if not task.recurrence_id]
             for recurrence in inter.recurrence_ids:
                 next_task = recurrence.next_task
-                previous_task = recurrence.previous_task
                 if next_task:
                     val.append(next_task.id)
-                elif previous_task:
-                    val.append(previous_task.id)
+                else:
+                   previous_task = recurrence.previous_task
+                   if previous_task:
+                       val.append(previous_task.id)
             ret[inter.id] = val
         return ret
     
