@@ -350,6 +350,7 @@ class project(OpenbaseCore):
         return res
 
 
+
     """ Workflow actions"""""""""""""""""""""""""""""""""""""""""""""""""""""""
     """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     def action_open(self, cr, uid, ids):
@@ -369,6 +370,10 @@ class project(OpenbaseCore):
         return True
 
     def action_finished(self, cr, uid, ids):
+        self.write(cr, uid, ids, {'state':'finished'})
+        ask_ids = [item['ask_id'][0] for item in self.read(cr, uid, ids, ['ask_id'],None) if item['ask_id']]
+        if ask_ids:
+            self.pool.get("openstc.ask").write(cr, uid, ask_ids, {'state':'finished'})
         return True
 
 
