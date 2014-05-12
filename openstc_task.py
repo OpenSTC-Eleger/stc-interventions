@@ -515,6 +515,7 @@ class task(OpenbaseCore):
                     if not mTask.date_end:
                         vals.update({ 'date_end':time.strftime('%Y-%m-%d %H:%M:%S')})
                     super(task,self).write(cr, uid, [mTask.id],vals, context=context)
+                    self.pool.get("project.project").action_finished(cr, uid, [mTask.project_id.id])
         else:
             res = super(task, self).write(cr, uid, ids, vals, context=context)
             #if task(s) have hours to report, we update task works and those tasks
