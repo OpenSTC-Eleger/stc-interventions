@@ -111,7 +111,7 @@ class project(OpenbaseCore):
 
         project_obj = self.pool.get('project.project')
         task_obj = self.pool.get('project.task')
-        
+
         for inter in self.browse(cr, uid, ids, context=context):
             id = inter.id
             res[id] = ''
@@ -121,7 +121,7 @@ class project(OpenbaseCore):
                 allPlanned = True
                 for task in inter.tasks :
                     first_date = max(first_date,task.date_start)
-                    
+
                     last_date = max(last_date, task.date_end)
 
                     if task.state == 'draft' :
@@ -370,12 +370,19 @@ class project(OpenbaseCore):
         return True
 
     def action_finished(self, cr, uid, ids):
-        self.write(cr, uid, ids, {'state':'finished'})
-        ask_ids = [item['ask_id'][0] for item in self.read(cr, uid, ids, ['ask_id'],None) if item['ask_id']]
-        if ask_ids:
-            self.pool.get("openstc.ask").write(cr, uid, ask_ids, {'state':'finished'})
+        if self.is_to_closed( cr, uid, ids):
+            self.write(cr, uid, ids, {'state':'finished'})
+            ask_ids = [item['ask_id'][0] for item in self.read(cr, uid, ids, ['ask_id'],None) if item['ask_id']]
+            if ask_ids:
+                self.pool.get("openstc.ask").write(cr, uid, ask_ids, {'state':'finished'})
         return True
 
+    def is_to_closed(self,cr, uid, ids):
+        inter = self.browse(cr, uid, ids[0], None)
+        for task in inter.tasks:
+            if task.state not in ('absent','done','cancelled'):
+                return False
+        return True
 
     """
     Test if send mail after action on ask
