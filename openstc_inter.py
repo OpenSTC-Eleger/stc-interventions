@@ -369,6 +369,10 @@ class project(OpenbaseCore):
     def action_cancelled(self, cr, uid, ids):
         return True
 
+    """
+    Close project if necessary
+    @param vals: project id
+    """
     def action_finished(self, cr, uid, ids):
         if self.is_to_closed( cr, uid, ids):
             self.write(cr, uid, ids, {'state':'finished'})
@@ -378,6 +382,11 @@ class project(OpenbaseCore):
 
         return True
 
+    """
+    Test if all tasks are closed
+    @param vals: project id
+    @return: return True all tasks are closed
+    """
     def is_to_closed(self,cr, uid, ids):
         inter = self.browse(cr, uid, ids[0], None)
         for task in inter.tasks:
